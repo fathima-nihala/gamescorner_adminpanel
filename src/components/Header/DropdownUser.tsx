@@ -1,10 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState,  } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
+import { useDispatch } from 'react-redux';
+import { fetchProfile } from '../../slices/userSlice';
+
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
+
+
+  useEffect(()=>{
+    dispatch(fetchProfile());
+  },[dispatch])
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
