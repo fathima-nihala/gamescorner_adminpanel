@@ -130,10 +130,8 @@
 
 // export default App;
 
-
-
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -149,7 +147,7 @@ import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
-import PrivateRoute from './pages/PrivateRoute';  
+import PrivateRoute from './pages/PrivateRoute';
 import Login from './Login/Login';
 
 function App() {
@@ -167,115 +165,124 @@ function App() {
   return loading ? (
     <Loader />
   ) : (
-    <DefaultLayout>
-      <Routes>
-        {/* Protected Route */}
-        <Route
-          index
-          element={
-            <PrivateRoute>
-              <>
-                <PageTitle title="Games Corner" />
-                <ECommerce />
-              </>
-            </PrivateRoute>
-          }
-        />
-        
-        {/* Public Routes */}
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin | Games Corner" />
-              <Login />
-            </>
-          }
-        />
-        
-        <Route
-          path="/calendar"
-          element={
-            <>
-              <PageTitle title="Calendar | Games Corner" />
-              <Calendar />
-            </>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <>
-              <PageTitle title="Profile | Games Corner" />
-              <Profile />
-            </>
-          }
-        />
-        <Route
-          path="/forms/form-elements"
-          element={
-            <>
-              <PageTitle title="Form Elements | Games Corner" />
-              <FormElements />
-            </>
-          }
-        />
-        <Route
-          path="/forms/form-layout"
-          element={
-            <>
-              <PageTitle title="Form Layout | Games Corner" />
-              <FormLayout />
-            </>
-          }
-        />
-        <Route
-          path="/tables"
-          element={
-            <>
-              <PageTitle title="Tables | Games Corner" />
-              <Tables />
-            </>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <>
-              <PageTitle title="Settings | Games Corner" />
-              <Settings />
-            </>
-          }
-        />
-        <Route
-          path="/chart"
-          element={
-            <>
-              <PageTitle title="Basic Chart | Games Corner" />
-              <Chart />
-            </>
-          }
-        />
-        <Route
-          path="/ui/alerts"
-          element={
-            <>
-              <PageTitle title="Alerts | Games Corner" />
-              <Alerts />
-            </>
-          }
-        />
-        <Route
-          path="/ui/buttons"
-          element={
-            <>
-              <PageTitle title="Buttons | Games Corner" />
-              <Buttons />
-            </>
-          }
-        />
-      </Routes>
-    </DefaultLayout>
+    <Routes>
+      {/* Public Route */}
+      <Route
+        path="/"
+        element={
+          <>
+            <PageTitle title="Signin | Games Corner" />
+            <Login />
+          </>
+        }
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/dashboard/*"
+        element={
+          <PrivateRoute>
+            <DefaultLayout>
+              <Routes>
+                <Route
+                  index
+                  element={
+                    <>
+                      <PageTitle title="Games Corner" />
+                      <ECommerce />
+                    </>
+                  }
+                />
+                <Route
+                  path="/calendar"
+                  element={
+                    <>
+                      <PageTitle title="Calendar | Games Corner" />
+                      <Calendar />
+                    </>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <>
+                      <PageTitle title="Profile | Games Corner" />
+                      <Profile />
+                    </>
+                  }
+                />
+                <Route
+                  path="/forms/form-elements"
+                  element={
+                    <>
+                      <PageTitle title="Form Elements | Games Corner" />
+                      <FormElements />
+                    </>
+                  }
+                />
+                <Route
+                  path="/forms/form-layout"
+                  element={
+                    <>
+                      <PageTitle title="Form Layout | Games Corner" />
+                      <FormLayout />
+                    </>
+                  }
+                />
+                <Route
+                  path="/tables"
+                  element={
+                    <>
+                      <PageTitle title="Tables | Games Corner" />
+                      <Tables />
+                    </>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <>
+                      <PageTitle title="Settings | Games Corner" />
+                      <Settings />
+                    </>
+                  }
+                />
+                <Route
+                  path="/chart"
+                  element={
+                    <>
+                      <PageTitle title="Basic Chart | Games Corner" />
+                      <Chart />
+                    </>
+                  }
+                />
+                <Route
+                  path="/ui/alerts"
+                  element={
+                    <>
+                      <PageTitle title="Alerts | Games Corner" />
+                      <Alerts />
+                    </>
+                  }
+                />
+                <Route
+                  path="/ui/buttons"
+                  element={
+                    <>
+                      <PageTitle title="Buttons | Games Corner" />
+                      <Buttons />
+                    </>
+                  }
+                />
+              </Routes>
+            </DefaultLayout>
+          </PrivateRoute>
+        }
+      />
+
+      {/* Redirect any unknown routes to Login */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 

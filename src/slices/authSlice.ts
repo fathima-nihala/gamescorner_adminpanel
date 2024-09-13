@@ -6,6 +6,16 @@ const api = axios.create({
   baseURL: 'http://localhost:5000/api/', // Adjust based on your backend setup
 });
 
+const setToken = (token: string | null) => {
+  if (token) {
+    localStorage.setItem('token', token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    localStorage.removeItem('token');
+    delete api.defaults.headers.common['Authorization'];
+  }
+};
+
 // Initial auth state
 interface AuthState {
   token: string | null;
@@ -15,7 +25,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: null,
+  token: localStorage.getItem('token'),
   loading: false,
   error: null,
   user: null,
@@ -26,8 +36,11 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/login', credentials); // Login API
-      return response.data; // Expected to contain { token, user }
+      const response = await api.post('/login', credentials); 
+      if (response.data && response.data.token) {
+        setToken(response.data.token);
+      }
+      return response.data; 
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Login failed');
     }

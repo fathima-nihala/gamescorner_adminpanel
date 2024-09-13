@@ -1,13 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../slices/authSlice';
 import { AppDispatch, RootState } from '../store';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  // const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error, token } = useSelector((state: RootState) => state.auth);
+
+
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (token) {
+      navigate('/dashboard'); // Redirect to dashboard or home page after successful login
+    }
+  }, [token, navigate]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,8 +28,8 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container flex items-center justify-center h-screen">
-      <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4">
+    <div className="flex items-center justify-center w-full h-full px-2 mt-16 mb-16 md:px-10 lg:mb-10 lg:items-center lg:justify-center">
+      <form onSubmit={handleSubmit} className=" bg-white shadow-lg rounded px-8 pt-6 pb-8 mt-[10vh] w-full max-w-full flex-col items-center lg:max-w-[520px] 2xl:max-w-[650px]">
         <h2 className="text-center text-2xl font-bold mb-6">Login</h2>
 
         {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
@@ -51,11 +64,11 @@ const Login: React.FC = () => {
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <button
             type="submit"
             disabled={loading}
-            className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50' : ''}`}
+            className={`bg-orange-600 hover:bg-orange-700 text-white  font-bold py-2 px-8 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50' : ''}`}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
