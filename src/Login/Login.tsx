@@ -8,7 +8,6 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  // const { loading, error } = useSelector((state: RootState) => state.auth);
   const { loading, error, token } = useSelector((state: RootState) => state.auth);
 
 

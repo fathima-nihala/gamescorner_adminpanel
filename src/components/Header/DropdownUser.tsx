@@ -13,9 +13,14 @@ const DropdownUser = () => {
   const navigate = useNavigate();
 
 
-  useEffect(()=>{
-    dispatch(fetchProfile());
-  },[dispatch])
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await dispatch(fetchProfile()).unwrap();
+      console.log("Profile fetch result:", result);
+    };
+    fetchData();
+  }, [dispatch]);
+  
 
   const handleLogout = async () => {
     try {
