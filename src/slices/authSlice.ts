@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // API instance
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api/', // Adjust based on your backend setup
+  baseURL: 'http://localhost:5000/api/', 
 });
 
 const setToken = (token: string | null) => {
@@ -15,6 +15,19 @@ const setToken = (token: string | null) => {
     delete api.defaults.headers.common['Authorization'];
   }
 };
+
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      await api.get('/logout');
+      setToken(null);
+      return null;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Logout failed');
+    }
+  }
+);
 
 // Initial auth state
 interface AuthState {
@@ -65,12 +78,20 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token; // Store JWT token
-        state.user = action.payload.user; // Store user details
+        state.token = action.payload.token; 
+        state.user = action.payload.user; 
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.token = null;
+        state.user = null;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

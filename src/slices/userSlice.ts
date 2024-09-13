@@ -4,19 +4,21 @@ import axios from 'axios';
 // axios.defaults.baseURL = 'http://localhost:6000/api/';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api/', 
-  });
-  
+  baseURL: 'http://localhost:5000/api/',
+});
 
 // Async thunk for fetching profile
-export const fetchProfile = createAsyncThunk('user/fetchProfile', async (_, { rejectWithValue }) => {
-  try {
-    const response = await api.get('/profile');
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response?.data || 'Failed to fetch profile');
-  }
-});
+export const fetchProfile = createAsyncThunk(
+  'user/fetchProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/profile');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch profile');
+    }
+  },
+);
 
 // Async thunk for updating profile
 export const updateProfile = createAsyncThunk(
@@ -30,9 +32,11 @@ export const updateProfile = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to update profile');
+      return rejectWithValue(
+        error.response?.data || 'Failed to update profile',
+      );
     }
-  }
+  },
 );
 
 interface ProfileState {
@@ -44,11 +48,11 @@ interface ProfileState {
   } | null;
   loading: boolean;
   error: string | null;
-  updateSuccess: boolean;  // For indicating if update was successful
+  updateSuccess: boolean; // For indicating if update was successful
 }
 
 const initialState: ProfileState = {
-    admin: null,
+  admin: null,
   loading: false,
   error: null,
   updateSuccess: false,
