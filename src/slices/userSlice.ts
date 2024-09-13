@@ -219,7 +219,10 @@ const userSlice = createSlice({
       })
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload; 
+        // state.admin = action.payload; 
+        const { admin } = action.payload;
+        state.admin = admin;
+
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;
