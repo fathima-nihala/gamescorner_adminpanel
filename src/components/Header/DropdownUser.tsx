@@ -2,25 +2,27 @@ import { useEffect, useState,  } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
 import UserOne from '../../images/user/user-01.png';
-import { useDispatch } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { fetchProfile } from '../../slices/userSlice';
 import {  logoutUser } from '../../slices/authSlice';
+import { AppDispatch, RootState } from '../store';
 
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await dispatch(fetchProfile()).unwrap();
-      console.log("Profile fetch result:", result);
     };
     fetchData();
   }, [dispatch]);
   
+  const { admin } = useSelector((state: RootState) => state.userState);  
+
 
   const handleLogout = async () => {
     try {
@@ -40,9 +42,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {admin?.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{admin?.profession}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">

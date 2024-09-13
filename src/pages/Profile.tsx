@@ -2,8 +2,25 @@ import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import CoverOne from '../images/cover/cover-01.png';
 import userSix from '../images/user/user-06.png';
 import { Link } from 'react-router-dom';
+import { AppDispatch, RootState } from '../store';
+import {  useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchProfile } from '../slices/userSlice';
+
 
 const Profile = () => {
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await dispatch(fetchProfile()).unwrap();
+    };
+    fetchData();
+  }, [dispatch]);
+  
+  const { admin } = useSelector((state: RootState) => state.userState);  
+
   return (
     <>
       <Breadcrumb pageName="Profile" />
