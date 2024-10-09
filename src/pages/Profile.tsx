@@ -3,13 +3,15 @@ import CoverOne from '../images/cover/cover-01.png';
 import userSix from '../images/user/user-06.png';
 import { AppDispatch, RootState } from '../../src/redux/store';
 import {  useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchProfile } from '../slices/userSlice';
 
 
-const Profile = () => {
+const Profile: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
+  const [bgImage, setBgImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,6 +22,17 @@ const Profile = () => {
   
   const { admin } = useSelector((state: RootState) => state.userState);  
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string | null>>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <>
       <Breadcrumb pageName="Profile" />
@@ -27,16 +40,16 @@ const Profile = () => {
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="relative z-20 h-35 md:h-65">
           <img
-            src={admin?.bg_image || CoverOne}
+            src={ bgImage ||admin?.bg_image || CoverOne }
             alt="profile cover"
             className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
           />
           <div className="absolute bottom-1 right-1 z-10 xsm:bottom-4 xsm:right-4">
             <label
-              htmlFor="cover"
+              htmlFor="bg_image"
               className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90 xsm:px-4"
             >
-              <input type="file" name="cover" id="cover" className="sr-only" />
+              <input type="file" name="bg_image" id="bg_image" className="sr-only" onChange={(e) => handleImageUpload(e, setBgImage)}/>
               <span>
                 <svg
                   className="fill-current"
@@ -66,9 +79,10 @@ const Profile = () => {
         </div>
         <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
-            <div className="relative drop-shadow-2">
-              <img src={admin?.profile ?  admin?.profile :userSix} alt="profile" />
-              <label
+            <div className="relative h-full w-full rounded-full overflow-hidden">
+              <img src={ profileImage || admin?.profile || userSix } alt="profile" className="h-full w-full object-cover rounded-full"/>
+            </div>
+            <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
               >
@@ -98,9 +112,10 @@ const Profile = () => {
                   name="profile"
                   id="profile"
                   className="sr-only"
+                  onChange={(e) => handleImageUpload(e, setProfileImage)}
                 />
               </label>
-            </div>
+           
           </div>
           <div className="mt-4">
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
