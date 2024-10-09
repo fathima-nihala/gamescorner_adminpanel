@@ -1,22 +1,57 @@
+import { useEffect, useState } from 'react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import userThree from '../images/user/user-03.png';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../redux/store';
+import { fetchProfile } from '../slices/userSlice';
 
-const Settings = () => {
+
+
+const Settings: React.FC = () => {
+
+  const dispatch = useDispatch<AppDispatch>();
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await dispatch(fetchProfile()).unwrap();
+    };
+    fetchData();
+  }, [dispatch])
+
+  const { admin } = useSelector((state: RootState) => state.userState)
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+
   return (
     <>
       <div className="mx-auto max-w-270">
         <Breadcrumb pageName="Settings" />
 
-        <div className="grid grid-cols-5 gap-8">
-          <div className="col-span-5 xl:col-span-3">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Personal Information
-                </h3>
-              </div>
-              <div className="p-7">
-                <form action="#">
+        <form action="">
+
+          {/* user info */}
+          <div className="grid grid-cols-5 gap-8">
+            <div className="col-span-5 xl:col-span-3">
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Personal Information
+                  </h3>
+                </div>
+                <div className="p-7">
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                     <div className="w-full sm:w-1/2">
                       <label
@@ -56,8 +91,8 @@ const Settings = () => {
                           type="text"
                           name="fullName"
                           id="fullName"
-                          placeholder="Devid Jhon"
-                          defaultValue="Devid Jhon"
+                          placeholder={admin?.name || 'username'}
+                          defaultValue={admin?.name}
                         />
                       </div>
                     </div>
@@ -74,8 +109,8 @@ const Settings = () => {
                         type="text"
                         name="phoneNumber"
                         id="phoneNumber"
-                        placeholder="+990 3343 7865"
-                        defaultValue="+990 3343 7865"
+                        placeholder={admin?.phone || 'phone'}
+                        defaultValue={admin?.phone}
                       />
                     </div>
                   </div>
@@ -118,28 +153,14 @@ const Settings = () => {
                         type="email"
                         name="emailAddress"
                         id="emailAddress"
-                        placeholder="devidjond45@gmail.com"
-                        defaultValue="devidjond45@gmail.com"
+                        placeholder={admin?.email || 'email'}
+                        defaultValue={admin?.email}
+
                       />
                     </div>
                   </div>
 
-                  <div className="mb-5.5">
-                    <label
-                      className="mb-3 block text-sm font-medium text-black dark:text-white"
-                      htmlFor="Username"
-                    >
-                      Username
-                    </label>
-                    <input
-                      className="w-full rounded border border-stroke bg-gray py-3 px-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                      type="text"
-                      name="Username"
-                      id="Username"
-                      placeholder="devidjhon24"
-                      defaultValue="devidjhon24"
-                    />
-                  </div>
+
 
                   <div className="mb-5.5">
                     <label
@@ -182,45 +203,31 @@ const Settings = () => {
 
                       <textarea
                         className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                        name="bio"
+                        name="text"
                         id="bio"
                         rows={6}
                         placeholder="Write your bio here"
-                        defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque posuere fermentum urna, eu condimentum mauris tempus ut. Donec fermentum blandit aliquet."
+                        defaultValue={admin?.about_me || ''}
                       ></textarea>
                     </div>
                   </div>
-
-                  <div className="flex justify-end gap-4.5">
-                    <button
-                      className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
-                      type="submit"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
-                      type="submit"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="col-span-5 xl:col-span-2">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Your Photo
-                </h3>
-              </div>
-              <div className="p-7">
-                <form action="#">
+
+
+            {/* photo uploading */}
+            <div className="col-span-5 xl:col-span-2">
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Your Photo
+                  </h3>
+                </div>
+                <div className="p-7">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="h-14 w-14 rounded-full">
-                      <img src={userThree} alt="User" />
+                      <img src={admin?.profile || userThree} alt="User" />
                     </div>
                     <div>
                       <span className="mb-1.5 text-black dark:text-white">
@@ -245,6 +252,8 @@ const Settings = () => {
                       type="file"
                       accept="image/*"
                       className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
+                      onChange={handleFileChange}
+
                     />
                     <div className="flex flex-col items-center justify-center space-y-3">
                       <span className="flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
@@ -284,25 +293,33 @@ const Settings = () => {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-4.5">
-                    <button
-                      className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
-                      type="submit"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
-                      type="submit"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
+                  {/* Image preview */}
+                  {previewUrl && (
+                    <div className="mt-4">
+                      <h4 className="mb-2 font-medium text-black dark:text-white">
+                        Image Preview
+                      </h4>
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="max-w-full h-auto rounded-lg"
+                      />
+                    </div>
+                  )}
+
+
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          <div className='flex justify-end mt-12'>
+            <button className='bg-blue-500 text-white font-semibold py-2 px-16 rounded shadow hover:bg-blue-600 transition duration-200'>
+              Edit
+            </button>
+          </div>
+
+        </form>
       </div>
     </>
   );

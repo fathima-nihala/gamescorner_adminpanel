@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// API instance
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api/', 
+  baseURL: import.meta.env.VITE_PUBLIC_CLIENT_URL, 
 });
+
+
 
 const setToken = (token: string | null) => {
   if (token) {
@@ -23,7 +24,7 @@ export const logoutUser = createAsyncThunk(
       await api.get('/logout');
       setToken(null);
       return null;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Logout failed');
     }
   }
@@ -34,7 +35,7 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
-  user: any | null; // You can create a more specific type if needed
+  user: any | null; 
 }
 
 const initialState: AuthState = {
@@ -54,7 +55,7 @@ export const loginUser = createAsyncThunk(
         setToken(response.data.token);
       }
       return response.data; 
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Login failed');
     }
   }
@@ -99,3 +100,4 @@ const authSlice = createSlice({
 
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;
+

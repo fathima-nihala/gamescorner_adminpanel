@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../slices/authSlice';
-import { AppDispatch, RootState } from '../store';
+import { AppDispatch, RootState } from '../../src/redux/store';
 import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
@@ -9,6 +9,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, token } = useSelector((state: RootState) => state.auth);
+
 
 
 

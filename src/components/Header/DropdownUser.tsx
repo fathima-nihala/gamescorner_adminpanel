@@ -5,7 +5,7 @@ import UserOne from '../../images/user/user-01.png';
 import {  useDispatch, useSelector } from 'react-redux';
 import { fetchProfile } from '../../slices/userSlice';
 import {  logoutUser } from '../../slices/authSlice';
-import { AppDispatch, RootState } from '../store';
+import { AppDispatch, RootState } from '../../redux/store';
 
 
 const DropdownUser = () => {
@@ -16,7 +16,7 @@ const DropdownUser = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await dispatch(fetchProfile()).unwrap();
+      await dispatch(fetchProfile()).unwrap();
     };
     fetchData();
   }, [dispatch]);
@@ -42,13 +42,15 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            {admin?.name}
+            {admin ? admin?.name : 'username' } 
           </span>
-          <span className="block text-xs">{admin?.profession}</span>
+          <span className="block text-xs">
+            {admin ? admin?.profession : 'profession'}
+          </span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+          <img src={admin?.profile ?  admin?.profile : UserOne} alt="User" />
         </span>
 
         <svg
