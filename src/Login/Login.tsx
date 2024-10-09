@@ -16,7 +16,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (token) {
-      navigate('/dashboard'); // Redirect to dashboard or home page after successful login
+      navigate('/dashboard'); 
     }
   }, [token, navigate]);
 
