@@ -4,14 +4,14 @@ import userSix from '../images/user/user-06.png';
 import { AppDispatch, RootState } from '../../src/redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { fetchProfile, resetUpdateSuccess, updateProfile } from '../slices/userSlice';
+import { fetchProfile, updateProfile } from '../slices/userSlice';
 
 
 const Profile: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
-  const [bgImage, setBgImage] = useState<string | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [files, setFiles] = useState<{ profile?: File; bg_image?: File }>({});
+  const [previewUrls, setPreviewUrls] = useState<{ profile?: string; bg_image?: string }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,40 +20,33 @@ const Profile: React.FC = () => {
     fetchData();
   }, [dispatch]);
 
-  const { admin, loading, updateSuccess } = useSelector((state: RootState) => state.userState);
+  const { admin, loading } = useSelector((state: RootState) => state.userState);
 
-  useEffect(() => {
-    if (updateSuccess) {
-      console.log('Profile updated successfully');
-      setProfileImage(null);
-      setBgImage(null);
-      dispatch(resetUpdateSuccess());
-    }
-  }, [updateSuccess, dispatch]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string | null>>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'bg_image') => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFiles((prev) => ({ ...prev, [type]: selectedFile }));
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        setPreviewUrls((prev) => ({ ...prev, [type]: reader.result as string }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(selectedFile);
     }
   };
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
-    if (profileImage) {
-      formData.append('profile', profileImage);
+    if (files.profile) {
+      formData.append('profile', files.profile);
     }
-    if (bgImage) {
-      formData.append('bg_image', bgImage);
+    if (files.bg_image) {
+      formData.append('bg_image', files.bg_image);
     }
-    if (formData.has('profile') || formData.has('bg_image')) {
-      await dispatch(updateProfile(formData));
-    }
+    await dispatch(updateProfile(formData));
   };
   
 
@@ -67,7 +60,7 @@ const Profile: React.FC = () => {
       <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="relative z-20 h-35 md:h-65">
           <img
-            src={bgImage || admin?.bg_image || CoverOne}
+            src={previewUrls.bg_image || admin?.bg_image || CoverOne}
             alt="profile cover"
             className="h-full w-full rounded-tl-sm rounded-tr-sm object-cover object-center"
           />
@@ -76,7 +69,7 @@ const Profile: React.FC = () => {
               htmlFor="bg_image"
               className="flex cursor-pointer items-center justify-center gap-2 rounded bg-primary py-1 px-2 text-sm font-medium text-white hover:bg-opacity-90 xsm:px-4"
             >
-              <input type="file" name="bg_image" id="bg_image" className="sr-only" onChange={(e) => handleImageUpload(e, setBgImage)} />
+              <input type="file" name="bg_image" id="bg_image" className="sr-only" onChange={(e) => handleFileChange(e, 'bg_image')} />
               <span>
                 <svg
                   className="fill-current"
@@ -108,7 +101,7 @@ const Profile: React.FC = () => {
         <form onSubmit={handleSubmit} className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 backdrop-blur sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative h-full w-full rounded-full overflow-hidden">
-              <img src={profileImage || admin?.profile || userSix} alt="profile" className="h-full w-full object-cover rounded-full" />
+              <img src={previewUrls.profile || admin?.profile || userSix} alt="profile" className="h-full w-full object-cover rounded-full" />
             </div>
             <label
               htmlFor="profile"
@@ -140,8 +133,8 @@ const Profile: React.FC = () => {
                 name="profile"
                 id="profile"
                 className="sr-only"
-                onChange={(e) => handleImageUpload(e, setProfileImage)}
-              />
+                onChange={(e) => handleFileChange(e, 'profile')}
+                />
             </label>
 
           </div>
@@ -160,7 +153,7 @@ const Profile: React.FC = () => {
               </p>
             </div>
 
-            {(profileImage || bgImage) && (
+            {(files.profile || files.bg_image) && (
               <button
                 type="submit"
                 className="mt-4.5 bg-primary text-white py-2 px-4 rounded-md hover:bg-opacity-90"
@@ -169,7 +162,6 @@ const Profile: React.FC = () => {
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
             )}
-
 
           </div>
         </form>
