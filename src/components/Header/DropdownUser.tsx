@@ -50,7 +50,7 @@ const DropdownUser = () => {
         </span>
 
         <span className="h-12 w-12 rounded-full">
-          <img src={admin?.profile ?  admin?.profile : UserOne} alt="User" />
+          <img src={admin?.profile ?  admin?.profile : UserOne} alt="User"  className='w-full h-full rounded-full'/>
         </span>
 
         <svg

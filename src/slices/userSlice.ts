@@ -2,11 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_PUBLIC_CLIENT_URL
-
+  baseURL: import.meta.env.VITE_PUBLIC_CLIENT_URL,
 });
-
-
 
 export const fetchProfile = createAsyncThunk(
   'user/fetchProfile',
@@ -36,9 +33,14 @@ export const updateProfile = createAsyncThunk(
   'user/updateProfile',
   async (formData: FormData, { rejectWithValue }) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
       const response = await api.put('/profile/update', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
         },
       });
       return response.data;
@@ -50,24 +52,25 @@ export const updateProfile = createAsyncThunk(
   },
 );
 
+
 interface ProfileState {
   admin: {
     id: string;
     name: string;
     email: string;
-    profilePicture?: string;
-    profession:string;
-    profile:String,
-    bg_image:String,
-    about_me:String,
-    phone?: string;
-    passwordChangedAt?: Date;
-    resetPasswordOTP?: string;
-    resetPasswordOTPExpires?: Date;
+    profilePicture: string;
+    profession: string;
+    profile: string;
+    bg_image: string;
+    about_me: string;
+    phone: string;
+    passwordChangedAt: Date;
+    resetPasswordOTP: string;
+    resetPasswordOTPExpires: Date;
   } | null;
   loading: boolean;
   error: string | null;
-  updateSuccess: boolean; // For indicating if update was successful
+  updateSuccess: boolean;
 }
 
 const initialState: ProfileState = {
@@ -102,11 +105,43 @@ const userSlice = createSlice({
         state.loading = false;
         const { admin } = action.payload;
         state.admin = admin;
-
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      // Update Profile
+      // .addCase(updateProfile.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      //   state.updateSuccess = false;
+      // })
+      // .addCase(updateProfile.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.admin = action.payload.user;
+      //   state.updateSuccess = true;
+      // })
+      // .addCase(updateProfile.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload as string;
+      //   state.updateSuccess = false;
+      // });
+
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.updateSuccess = false;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.admin = action.payload.user;
+        state.updateSuccess = true;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.updateSuccess = false;
       });
   },
 });

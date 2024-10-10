@@ -3,15 +3,22 @@ import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
 import userThree from '../images/user/user-03.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../redux/store';
-import { fetchProfile } from '../slices/userSlice';
-
+import { fetchProfile, updateProfile } from '../slices/userSlice';
 
 
 const Settings: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { admin } = useSelector((state: RootState) => state.userState)
+
+  const [fullName, setFullName] = useState<string>(admin?.name || '');
+  const [phoneNumber, setPhoneNumber] = useState<string>(admin?.phone || '');
+  const [emailAddress, setEmailAddress] = useState<string>(admin?.email || '');
+  const [profession, setProfession] = useState<string>(admin?.profession || '');
+  const [aboutMe, setAboutMe] = useState<string>(admin?.about_me || '');
+  const [files, setFiles] = useState<{ profile?: File; bg_image?: File }>({});
+  const [previewUrls, setPreviewUrls] = useState<{ profile?: string; bg_image?: string }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,18 +27,48 @@ const Settings: React.FC = () => {
     fetchData();
   }, [dispatch])
 
-  const { admin } = useSelector((state: RootState) => state.userState)
+  useEffect(() => {
+    if (admin) {
+      setFullName(admin.name);
+      setPhoneNumber(admin.phone);
+      setEmailAddress(admin.email);
+      setProfession(admin.profession);
+      setAboutMe(admin.about_me);
+    }
+  }, [admin]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'bg_image') => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
+      setFiles((prev) => ({ ...prev, [type]: selectedFile }));
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
+        setPreviewUrls((prev) => ({ ...prev, [type]: reader.result as string }));
       };
       reader.readAsDataURL(selectedFile);
     }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append('name', fullName);
+    formData.append('email', emailAddress);
+    formData.append('phone', phoneNumber);
+    formData.append('profession', profession);
+    formData.append('about_me', aboutMe);
+
+    if (files.profile) {
+      formData.append('profile', files.profile);
+    }
+    if (files.bg_image) {
+      formData.append('bg_image', files.bg_image);
+    }
+
+    await dispatch(updateProfile(formData));
   };
 
 
@@ -40,7 +77,7 @@ const Settings: React.FC = () => {
       <div className="mx-auto max-w-270">
         <Breadcrumb pageName="Settings" />
 
-        <form action="">
+        <form onSubmit={handleSubmit}>
 
           {/* user info */}
           <div className="grid grid-cols-5 gap-8">
@@ -90,9 +127,10 @@ const Settings: React.FC = () => {
                           className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="fullName"
-                          id="fullName"
-                          placeholder={admin?.name || 'username'}
-                          defaultValue={admin?.name}
+                          id="fullName"  
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Enter your full name"
                         />
                       </div>
                     </div>
@@ -109,8 +147,9 @@ const Settings: React.FC = () => {
                         type="text"
                         name="phoneNumber"
                         id="phoneNumber"
-                        placeholder={admin?.phone || 'phone'}
-                        defaultValue={admin?.phone}
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Enter your phone number"
                       />
                     </div>
                   </div>
@@ -153,14 +192,12 @@ const Settings: React.FC = () => {
                         type="email"
                         name="emailAddress"
                         id="emailAddress"
-                        placeholder={admin?.email || 'email'}
-                        defaultValue={admin?.email}
-
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
+                        placeholder="Enter your email address"
                       />
                     </div>
                   </div>
-
-
 
                   <div className="mb-5.5">
                     <label
@@ -206,8 +243,9 @@ const Settings: React.FC = () => {
                         name="text"
                         id="bio"
                         rows={6}
-                        placeholder="Write your bio here"
-                        defaultValue={admin?.about_me || ''}
+                        value={aboutMe}
+                        onChange={(e) => setAboutMe(e.target.value)}
+                        placeholder="Tell us about yourself"
                       ></textarea>
                     </div>
                   </div>
@@ -227,7 +265,7 @@ const Settings: React.FC = () => {
                 <div className="p-7">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="h-14 w-14 rounded-full">
-                      <img src={admin?.profile || userThree} alt="User" />
+                      <img src={admin?.profile || userThree} alt="User" className="h-14 w-14 rounded-full" />
                     </div>
                     <div>
                       <span className="mb-1.5 text-black dark:text-white">
@@ -252,7 +290,7 @@ const Settings: React.FC = () => {
                       type="file"
                       accept="image/*"
                       className="absolute inset-0 z-50 m-0 h-full w-full cursor-pointer p-0 opacity-0 outline-none"
-                      onChange={handleFileChange}
+                      onChange={(e) => handleFileChange(e, 'profile')}
 
                     />
                     <div className="flex flex-col items-center justify-center space-y-3">
@@ -294,27 +332,25 @@ const Settings: React.FC = () => {
                   </div>
 
                   {/* Image preview */}
-                  {previewUrl && (
+                  {previewUrls && (
                     <div className="mt-4">
                       <h4 className="mb-2 font-medium text-black dark:text-white">
                         Image Preview
                       </h4>
                       <img
-                        src={previewUrl}
+                        src={previewUrls.profile || admin?.profile}
                         alt="Preview"
                         className="max-w-full h-auto rounded-lg"
                       />
                     </div>
                   )}
-
-
                 </div>
               </div>
             </div>
           </div>
 
           <div className='flex justify-end mt-12'>
-            <button className='bg-blue-500 text-white font-semibold py-2 px-16 rounded shadow hover:bg-blue-600 transition duration-200'>
+            <button className='bg-blue-500 text-white font-semibold py-2 px-16 rounded shadow hover:bg-blue-600 transition duration-200 dark:bg-primary'>
               Edit
             </button>
           </div>
@@ -326,3 +362,6 @@ const Settings: React.FC = () => {
 };
 
 export default Settings;
+
+
+
