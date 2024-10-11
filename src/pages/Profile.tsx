@@ -5,6 +5,8 @@ import { AppDispatch, RootState } from '../../src/redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { fetchProfile, updateProfile } from '../slices/userSlice';
+import { useSnackbar } from 'notistack';
+
 
 
 const Profile: React.FC = () => {
@@ -12,6 +14,8 @@ const Profile: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [files, setFiles] = useState<{ profile?: File; bg_image?: File }>({});
   const [previewUrls, setPreviewUrls] = useState<{ profile?: string; bg_image?: string }>({});
+  const { enqueueSnackbar } = useSnackbar();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,9 +50,20 @@ const Profile: React.FC = () => {
     if (files.bg_image) {
       formData.append('bg_image', files.bg_image);
     }
-    await dispatch(updateProfile(formData));
+    try {
+      await dispatch(updateProfile(formData)).unwrap();
+      enqueueSnackbar('Profile updated successfully!', {
+        variant: 'success', anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        }
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to update profile. Please try again.';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
   };
-  
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -134,7 +149,7 @@ const Profile: React.FC = () => {
                 id="profile"
                 className="sr-only"
                 onChange={(e) => handleFileChange(e, 'profile')}
-                />
+              />
             </label>
 
           </div>

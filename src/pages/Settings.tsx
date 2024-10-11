@@ -4,11 +4,14 @@ import userThree from '../images/user/user-03.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../redux/store';
 import { fetchProfile, updateProfile } from '../slices/userSlice';
+import { useSnackbar } from 'notistack';
 
 
 const Settings: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
+  const { enqueueSnackbar } = useSnackbar();
+
 
   const { admin } = useSelector((state: RootState) => state.userState)
 
@@ -68,7 +71,18 @@ const Settings: React.FC = () => {
       formData.append('bg_image', files.bg_image);
     }
 
-    await dispatch(updateProfile(formData));
+    try {
+      await dispatch(updateProfile(formData)).unwrap();
+      enqueueSnackbar('Profile updated successfully!', {
+        variant: 'success', anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        }
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to update profile. Please try again.';
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
   };
 
 
@@ -127,7 +141,7 @@ const Settings: React.FC = () => {
                           className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="fullName"
-                          id="fullName"  
+                          id="fullName"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Enter your full name"

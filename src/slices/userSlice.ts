@@ -111,23 +111,7 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Update Profile
-      // .addCase(updateProfile.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      //   state.updateSuccess = false;
-      // })
-      // .addCase(updateProfile.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.admin = action.payload.user;
-      //   state.updateSuccess = true;
-      // })
-      // .addCase(updateProfile.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload as string;
-      //   state.updateSuccess = false;
-      // });
-
+      //update profile
       .addCase(updateProfile.pending, (state) => {
         state.loading = true;
         state.error = null;

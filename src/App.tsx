@@ -7,8 +7,8 @@ import PageTitle from './components/PageTitle';
 import Calendar from './pages/Calendar';
 import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
-import FormElements from './pages/Form/FormElements';
-import FormLayout from './pages/Form/FormLayout';
+import Brands from './pages/Product/Brands';
+import FormLayout from './pages/Product/FormLayout';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Tables from './pages/Tables';
@@ -17,6 +17,7 @@ import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
 import PrivateRoute from './pages/PrivateRoute';
 import Login from './Login/Login';
+import { AddProduct } from './pages/Product/AddProduct';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -80,11 +81,11 @@ function App() {
                   }
                 />
                 <Route
-                  path="/forms/form-elements"
+                  path="/product/product-brand"
                   element={
                     <>
                       <PageTitle title="Form Elements | Games Corner" />
-                      <FormElements />
+                      <Brands />
                     </>
                   }
                 />
@@ -94,6 +95,15 @@ function App() {
                     <>
                       <PageTitle title="Form Layout | Games Corner" />
                       <FormLayout />
+                    </>
+                  }
+                />
+                <Route
+                  path="/product/product-addproduct"
+                  element={
+                    <>
+                      <PageTitle title="Add Product | Games Corner" />
+                      <AddProduct />
                     </>
                   }
                 />
