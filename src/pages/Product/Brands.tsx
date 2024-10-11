@@ -7,7 +7,7 @@ import { IconButton } from '@mui/material';
 import ConfirmationModal from '../../shared/ConfirmationModal';
 import { AppDispatch, RootState } from '../../redux/store';
 import { useSnackbar } from 'notistack';
-
+import AddBrands from './AddBrand';
 
 const Brands: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,8 +16,12 @@ const Brands: React.FC = () => {
 
   const [delOpen, setDelOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Brand | null>(null);
+  const [addBrandOpen, setAddBrandOpen] = useState<boolean>(false); 
   const { enqueueSnackbar } = useSnackbar();
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const brandsPerPage = 10;
 
   useEffect(() => {
     if (status === 'idle') {
@@ -39,10 +43,11 @@ const Brands: React.FC = () => {
       try {
         await dispatch(deleteBrand(selectedItem._id)).unwrap();
         enqueueSnackbar('Brand deleted successfully!', {
-          variant: 'success', anchorOrigin: {
+          variant: 'success',
+          anchorOrigin: {
             vertical: 'top',
             horizontal: 'right',
-          }
+          },
         });
       } catch (error: any) {
         enqueueSnackbar('Failed to delete the brand.', { variant: 'error' });
@@ -51,12 +56,29 @@ const Brands: React.FC = () => {
     delHandleClose();
   };
 
+  // Pagination logic
+  const indexOfLastBrand = currentPage * brandsPerPage;
+  const indexOfFirstBrand = indexOfLastBrand - brandsPerPage;
+  const currentBrands = brands.slice(indexOfFirstBrand, indexOfLastBrand);
+  const totalPages = Math.ceil(brands.length / brandsPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <>
       <Breadcrumb pageName="Brand" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="py-6 px-4 md:px-6 xl:px-7.5"></div>
+        <div className="py-6 px-4 md:px-6 xl:px-7.5 flex justify-end">
+          <button 
+            className="bg-blue-500 text-white py-2 px-4 rounded-md disabled:opacity-50" 
+            onClick={() => setAddBrandOpen(true)} // Open Add Brand modal
+          >
+            Add Brand
+          </button>
+        </div>
 
         {/* Table Header */}
         <div className="grid grid-cols-4 border-t border-stroke py-4.5 px-4 lg:px-8 dark:border-strokedark">
@@ -75,14 +97,14 @@ const Brands: React.FC = () => {
         </div>
 
         {/* Table Content */}
-        {brands.map((brand, index) => (
+        {currentBrands.map((brand, index) => (
           <div
             className="grid grid-cols-4 border-t border-stroke py-4.5 px-4 lg:px-8 dark:border-strokedark"
             key={brand._id}
           >
             <div className="col-span-1 flex items-center">
               <p className="text-sm text-black dark:text-white">
-                {index + 1}
+                {index + 1 + indexOfFirstBrand} {/* Adjust index */}
               </p>
             </div>
             <div className="col-span-1 flex items-center ">
@@ -112,7 +134,29 @@ const Brands: React.FC = () => {
           delHandleClose={delHandleClose}
           onDelete={onDelete}
         />
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center py-4 px-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <p>{`Page ${currentPage} of ${totalPages}`}</p>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
+
+      {/* Add Brand Modal */}
+      <AddBrands open={addBrandOpen} handleClose={() => setAddBrandOpen(false)} />
     </>
   );
 };
