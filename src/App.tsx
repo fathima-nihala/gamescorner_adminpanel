@@ -84,7 +84,7 @@ function App() {
                   path="/product/product-brand"
                   element={
                     <>
-                      <PageTitle title="Form Elements | Games Corner" />
+                      <PageTitle title="Brand | Games Corner" />
                       <Brands />
                     </>
                   }
