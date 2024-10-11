@@ -18,6 +18,7 @@ import DefaultLayout from './layout/DefaultLayout';
 import PrivateRoute from './pages/PrivateRoute';
 import Login from './Login/Login';
 import { AddProduct } from './pages/Product/AddProduct';
+import Category from './pages/Product/Category';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -86,6 +87,15 @@ function App() {
                     <>
                       <PageTitle title="Brand | Games Corner" />
                       <Brands />
+                    </>
+                  }
+                />
+                 <Route
+                  path="/product/product-category"
+                  element={
+                    <>
+                      <PageTitle title="Product Category | Games Corner" />
+                      <Category />
                     </>
                   }
                 />
