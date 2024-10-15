@@ -85,6 +85,11 @@ const Category: React.FC = () => {
 };
 
 
+const handleEdit = (id: string) => {
+  setSelectedId(id);
+  handleClose();
+};
+
   return (
     <>
       <Breadcrumb pageName="Category" />
@@ -207,7 +212,8 @@ const Category: React.FC = () => {
                           </MenuItem>
                           <MenuItem
                             className="text-black dark:text-white bg-white dark:bg-boxdark hover:bg-gray-200 dark:hover:bg-gray-700"
-                          >
+                            onClick={() => handleEdit(category._id)}
+                            >
                             <AddEditCategory mode="edit" id={category._id} />
                           </MenuItem>
                         </Menu>

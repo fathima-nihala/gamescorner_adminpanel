@@ -68,9 +68,8 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
     }
   }, [mode, id, categories]);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
+
+  const resetForm = () => {
     setData({
       parent_category: '',
       image: null,
@@ -81,6 +80,31 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
     setPreviewIcon(null);
     setPreviewCoverImage(null);
     setError({});
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setOpen(true);
+    if (mode === 'edit' && id && categories) {
+      const categoryToEdit = categories.find((cat) => cat._id === id);
+      if (categoryToEdit) {
+        setData({
+          _id: categoryToEdit._id,
+          parent_category: categoryToEdit.parent_category,
+          image: null,
+          icon: null,
+          cover_image: null,
+        });
+        setPreviewImage(categoryToEdit.image);
+        setPreviewIcon(categoryToEdit.icon);
+        setPreviewCoverImage(categoryToEdit.cover_image);
+      }
+    } else {
+      resetForm();
+    }
   };
 
   const handleFileChange = (
@@ -141,13 +165,13 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
     <div>
       {mode === 'add' ? (
         <Button onClick={handleOpen}
-        sx={{
-          backgroundColor: '#3B82F6', 
-          color: 'white',
-          paddingY: '8px',
-          paddingX: '32px',
-          borderRadius: '8px',
-        }}
+          sx={{
+            backgroundColor: '#3B82F6',
+            color: 'white',
+            paddingY: '8px',
+            paddingX: '32px',
+            borderRadius: '8px',
+          }}
         >Add</Button>
       ) : (
         <span onClick={handleOpen} className="flex cursor-pointer">
@@ -157,7 +181,7 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
       )}
 
       <Dialog open={open} maxWidth="sm" fullWidth>
-        <DialogTitle>
+        <DialogTitle className='text-black dark:text-white bg-white dark:bg-black'>
           {mode === 'add' ? 'Add Category' : 'Edit Category'}
           <IconButton
             aria-label="close"
@@ -169,11 +193,11 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
               color: (theme) => theme.palette.grey[500],
             }}
           >
-            <CloseIcon />
+            <CloseIcon className='text-black dark:text-white' />
           </IconButton>
         </DialogTitle>
         <Divider />
-        <DialogContent>
+        <DialogContent className='bg-white dark:bg-black text-black dark:text-white'>
           <Box component="form" autoComplete="off">
             <Typography variant="subtitle1">Parent Category</Typography>
             <TextField
@@ -186,9 +210,19 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
               onChange={(e) => onFieldChange('parent_category', e.target.value)}
               error={!!error.parent_category}
               helperText={error.parent_category}
-            />
+              sx={{
+                '& .MuiInputBase-root': {
+                  backgroundColor: 'white',
+                },
 
-           
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(0, 0, 0, 0.6)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'black',
+                },
+              }}
+            />
             <div className="flex gap-4 mt-4">
               <div className="block w-full">
                 <Typography variant="body2">Image (212×101)</Typography>
@@ -222,11 +256,11 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
             </div>
           </Box>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', py: 2 }}>
+        <DialogActions sx={{ justifyContent: 'center', py: 2 }} className='bg-white dark:bg-black text-black dark:text-white'>
           <Button
             onClick={handleFormSubmit}
             variant="contained"
-            sx={{ backgroundColor: '#525b39', '&:hover': { backgroundColor: '#525b39' } }}
+            sx={{ backgroundColor: '#fa6800', '&:hover': { backgroundColor: '#fa6800' }, borderRadius: '10px' }}
           >
             Save
           </Button>
@@ -237,3 +271,5 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
 };
 
 export default AddEditCategory;
+
+

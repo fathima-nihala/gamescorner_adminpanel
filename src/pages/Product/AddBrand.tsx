@@ -115,7 +115,7 @@ const AddBrands: React.FC<AddBrandsProps> = ({ open, handleClose, initialData })
                     <CloseIcon className='text-black dark:text-white' />
                 </IconButton>
             </DialogTitle>
-            <Divider className='' />
+            <Divider  />
             <DialogContent className='bg-white dark:bg-black text-black dark:text-white'>
                 <Box component="form" noValidate autoComplete="off">
                     <h3 className='text-[15px]'>Name</h3>

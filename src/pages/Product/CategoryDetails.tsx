@@ -133,21 +133,21 @@ const CategoryDetails: React.FC = () => {
                         <h2 className="text-xl font-semibold mb-2">
                             {filterParentCat[0]?.parent_category || 'No Category'}
                         </h2>
-                        <TableContainer component={Paper} sx={{ width: '100%' }}>
+                        <TableContainer component={Paper} sx={{ width: '100%' }} className="text-black dark:text-white bg-white dark:bg-black">
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>#</TableCell>
-                                        <TableCell>Value</TableCell>
-                                        <TableCell align='center'>Action</TableCell>
+                                        <TableCell className="text-black dark:text-white">#</TableCell>
+                                        <TableCell className="text-black dark:text-white">Value</TableCell>
+                                        <TableCell align='center' className="text-black dark:text-white">Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {paginatedValues.length > 0 ? (
                                         paginatedValues.map((item, index) => (
                                             <TableRow key={index}>
-                                                <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                                                <TableCell>{item}</TableCell>
+                                                <TableCell className="text-black dark:text-white">{page * rowsPerPage + index + 1}</TableCell>
+                                                <TableCell className="text-black dark:text-white">{item}</TableCell>
                                                 <TableCell align='center'>
                                                     <IconButton
                                                         size="small"
@@ -162,7 +162,7 @@ const CategoryDetails: React.FC = () => {
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan={3}>
-                                                <Typography align="center">No category names found</Typography>
+                                                <Typography align="center" className="text-black dark:text-white">No category names found</Typography>
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -176,6 +176,7 @@ const CategoryDetails: React.FC = () => {
                                 page={page}
                                 onPageChange={handleChangePage}
                                 onRowsPerPageChange={handleChangeRowsPerPage}
+                                className="text-black dark:text-white bg-white dark:bg-black"
                             />
                         </TableContainer>
                     </Grid>
@@ -191,6 +192,19 @@ const CategoryDetails: React.FC = () => {
                                 helperText={error.name}
                                 fullWidth
                                 margin="normal"
+
+                                sx={{
+                                    '& .MuiInputBase-root': {
+                                        backgroundColor:  '#f6f0f0',
+                                    },
+                                    
+                                    '& .MuiInputLabel-root': {
+                                        color: 'rgba(0, 0, 0, 0.6)',
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        color: 'black',
+                                    },
+                                }}
                             />
                             <Button
                                 variant="contained"
