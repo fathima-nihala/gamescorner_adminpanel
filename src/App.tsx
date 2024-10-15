@@ -19,6 +19,7 @@ import PrivateRoute from './pages/PrivateRoute';
 import Login from './Login/Login';
 import { AddProduct } from './pages/Product/AddProduct';
 import Category from './pages/Product/Category';
+import CategoryDetails from './pages/Product/CategoryDetails';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -90,12 +91,21 @@ function App() {
                     </>
                   }
                 />
-                 <Route
+                <Route
                   path="/product/product-category"
                   element={
                     <>
                       <PageTitle title="Product Category | Games Corner" />
                       <Category />
+                    </>
+                  }
+                />
+                <Route
+                  path="/category-details/:id"
+                  element={
+                    <>
+                      <PageTitle title="Category Details | Games Corner" />
+                      <CategoryDetails />
                     </>
                   }
                 />
@@ -117,6 +127,7 @@ function App() {
                     </>
                   }
                 />
+
                 <Route
                   path="/tables"
                   element={

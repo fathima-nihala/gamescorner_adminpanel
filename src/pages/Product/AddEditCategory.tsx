@@ -29,7 +29,6 @@ interface AddEditCategoryProps {
 interface CategoryData {
   _id?: string;
   parent_category: string;
-  name: string[];
   image: File | null;
   icon: File | null;
   cover_image: File | null;
@@ -39,7 +38,6 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [data, setData] = useState<CategoryData>({
     parent_category: '',
-    name: [''],
     image: null,
     icon: null,
     cover_image: null,
@@ -59,7 +57,6 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
         setData({
           _id: categoryToEdit._id,
           parent_category: categoryToEdit.parent_category,
-          name: categoryToEdit.name,
           image: null,
           icon: null,
           cover_image: null,
@@ -76,7 +73,6 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
     setOpen(false);
     setData({
       parent_category: '',
-      name: [''],
       image: null,
       icon: null,
       cover_image: null,
@@ -104,7 +100,6 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
   const validateInput = () => {
     const validationErrors: Record<string, string> = {};
     if (!data.parent_category) validationErrors.parent_category = 'Parent category is required';
-    if (!data.name[0]) validationErrors.name = 'Name is required';
     if (mode === 'add') {
       if (!data.image) validationErrors.image = 'Image is required';
       if (!data.icon) validationErrors.icon = 'Icon is required';
@@ -119,7 +114,6 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
       try {
         const formData = new FormData();
         formData.append('parent_category', data.parent_category);
-        formData.append('name', JSON.stringify(data.name));
         if (data.image) formData.append('image', data.image);
         if (data.icon) formData.append('icon', data.icon);
         if (data.cover_image) formData.append('cover_image', data.cover_image);

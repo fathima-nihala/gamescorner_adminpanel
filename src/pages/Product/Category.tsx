@@ -23,7 +23,7 @@ const Category: React.FC = () => {
     (state: RootState) => state.category
   );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(null); // Changed to string | null
+  const [selectedId, setSelectedId] = useState<string | null>(null); 
   const [query, setQuery] = useState<string>('');
   const { enqueueSnackbar } = useSnackbar();
 
@@ -80,10 +80,14 @@ const Category: React.FC = () => {
     category.parent_category.toLocaleLowerCase().includes(query.toLowerCase())
   );
 
+  const handleEditClick = (item:any) => {
+    setSelectedId(item); 
+};
+
+
   return (
     <>
       <Breadcrumb pageName="Category" />
-
       <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
         <div className="flex justify-between p-4">
           <div className="mt-2 relative w-full">
@@ -110,9 +114,6 @@ const Category: React.FC = () => {
             />
           </div>
           <div className="mt-2">
-            {/* <button className="bg-blue-500 text-white py-2 px-8 rounded-md disabled:opacity-50">
-              Add
-            </button> */}
             <AddEditCategory mode="add"/> 
           </div>
         </div>
@@ -174,7 +175,7 @@ const Category: React.FC = () => {
                     </td>
                     <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                       <div className="flex items-center space-x-3.5">
-                        <IconButton size="small">
+                        <IconButton size="small" onClick={handleEditClick}>
                           <Link to={`/dashboard/category-details/${category._id}`}>
                             <Settings fontSize="small" className="text-black dark:text-white" />
                           </Link>
@@ -207,7 +208,6 @@ const Category: React.FC = () => {
                           <MenuItem
                             className="text-black dark:text-white bg-white dark:bg-boxdark hover:bg-gray-200 dark:hover:bg-gray-700"
                           >
-                            {/* <EditIcon className="mr-2" /> Edit */}
                             <AddEditCategory mode="edit" id={category._id} />
                           </MenuItem>
                         </Menu>

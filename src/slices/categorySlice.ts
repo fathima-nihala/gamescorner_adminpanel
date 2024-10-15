@@ -97,6 +97,74 @@ export const updateCategory = createAsyncThunk(
   },
 );
 
+// Add category name
+export const addCategoryName = createAsyncThunk(
+  'category/addCategoryName',
+  async ({ id, name }: { id: string; name: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/category/${id}/name`, { name });
+      return response.data.cat;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to add category name',
+      );
+    }
+  },
+);
+
+// Edit category name
+export const editCategoryName = createAsyncThunk(
+  'category/editCategoryName',
+  async (
+    { id, index, newValue }: { id: string; index: number; newValue: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await api.patch(`/category/${id}/name`, {
+        index,
+        newValue,
+      });
+      return response.data.cat;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to edit category name',
+      );
+    }
+  },
+);
+
+// Delete category name
+export const deleteCategoryName = createAsyncThunk(
+  'category/deleteCategoryName',
+  async ({ id, index }: { id: string; index: number }, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/category/${id}/name`, {
+        data: { index },
+      });
+      return response.data.cat;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to delete category name',
+      );
+    }
+  },
+);
+
+// Fetch category by ID
+export const fetchCategoryById = createAsyncThunk(
+  'category/fetchCategoryById',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/category/${id}`);
+      return response.data.category;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to fetch category',
+      );
+    }
+  },
+);
+
 export const categorySlice = createSlice({
   name: 'category',
   initialState,
@@ -194,6 +262,112 @@ export const categorySlice = createSlice({
     );
     builder.addCase(
       updateCategory.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+    );
+
+    // Add category name
+    builder.addCase(addCategoryName.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(
+      addCategoryName.fulfilled,
+      (state, action: PayloadAction<Category>) => {
+        state.loading = false;
+        const index = state.categories.findIndex(
+          (category) => category._id === action.payload._id,
+        );
+        if (index !== -1) {
+          state.categories[index] = action.payload;
+        }
+        state.successMessage = 'Category name added successfully!';
+      },
+    );
+    builder.addCase(
+      addCategoryName.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+    );
+
+    // Edit category name
+    builder.addCase(editCategoryName.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(
+      editCategoryName.fulfilled,
+      (state, action: PayloadAction<Category>) => {
+        state.loading = false;
+        const index = state.categories.findIndex(
+          (category) => category._id === action.payload._id,
+        );
+        if (index !== -1) {
+          state.categories[index] = action.payload;
+        }
+        state.successMessage = 'Category name edited successfully!';
+      },
+    );
+    builder.addCase(
+      editCategoryName.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+    );
+
+    // Delete category name
+    builder.addCase(deleteCategoryName.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(
+      deleteCategoryName.fulfilled,
+      (state, action: PayloadAction<Category>) => {
+        state.loading = false;
+        const index = state.categories.findIndex(
+          (category) => category._id === action.payload._id,
+        );
+        if (index !== -1) {
+          state.categories[index] = action.payload;
+        }
+        state.successMessage = 'Category name deleted successfully!';
+      },
+    );
+    builder.addCase(
+      deleteCategoryName.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      },
+    );
+
+    // Fetch category by ID
+    builder.addCase(fetchCategoryById.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(
+      fetchCategoryById.fulfilled,
+      (state, action: PayloadAction<Category>) => {
+        state.loading = false;
+        const index = state.categories.findIndex(
+          (category) => category._id === action.payload._id,
+        );
+        if (index === -1) {
+          state.categories.push(action.payload);
+        } else {
+          state.categories[index] = action.payload;
+        }
+        state.successMessage = 'Category retrieved successfully!';
+      },
+    );
+    builder.addCase(
+      fetchCategoryById.rejected,
       (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
