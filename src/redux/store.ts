@@ -3,6 +3,7 @@ import userReducer from '../slices/userSlice.ts';
 import authReducer from '../slices/authSlice';
 import brandReducer from '../slices/brandSlice.ts';
 import categoryReducer from '../slices/categorySlice.ts';
+import attributeReducer from '../slices/attributeSlice.ts';
 
  const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ import categoryReducer from '../slices/categorySlice.ts';
     auth: authReducer,
     brands: brandReducer,
     category: categoryReducer,
+    attribute: attributeReducer,
   },
 });
 

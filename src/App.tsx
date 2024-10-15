@@ -20,6 +20,7 @@ import Login from './Login/Login';
 import { AddProduct } from './pages/Product/AddProduct';
 import Category from './pages/Product/Category';
 import CategoryDetails from './pages/Product/CategoryDetails';
+import Attributes from './pages/Product/Attributes';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -106,6 +107,15 @@ function App() {
                     <>
                       <PageTitle title="Category Details | Games Corner" />
                       <CategoryDetails />
+                    </>
+                  }
+                />
+                <Route
+                  path="/product/product-attributes"
+                  element={
+                    <>
+                      <PageTitle title="Attributes | Games Corner" />
+                      <Attributes />
                     </>
                   }
                 />
