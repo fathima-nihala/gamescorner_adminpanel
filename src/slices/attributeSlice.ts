@@ -1,6 +1,8 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { RootState } from '../redux/store';
+
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_PUBLIC_CLIENT_URL,
@@ -14,6 +16,13 @@ export interface Attribute {
   createdAt: string;
   updatedAt: string;
 }
+
+interface EditAttributeValuePayload {
+  id: string;
+  index: number;
+  newValue: string;
+}
+
 
 // Define the initial state type
 interface AttributeState {
@@ -90,17 +99,25 @@ export const addAttributeValue = createAsyncThunk(
 );
 
 // Edit an attribute value
-export const editAttributeValue = createAsyncThunk(
+export const editAttributeValue = createAsyncThunk<
+  Attribute,
+  EditAttributeValuePayload,
+  {
+    rejectValue: string;
+    state: RootState;
+  }
+>(
   'attributes/editValue',
-  async ({ id, index, newValue }: { id: string, index: number, newValue: string }, thunkAPI) => {
+  async ({ id, index, newValue }, thunkAPI) => {
     try {
       const response = await api.patch(`/attributes/${id}/value`, { index, newValue });
       return response.data.attribute;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data.message || 'Failed to update attribute value');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to update attribute value');
     }
   }
 );
+
 
 // Delete an attribute value
 export const deleteAttributeValue = createAsyncThunk(
@@ -183,6 +200,7 @@ const attributeSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      //edit attribute values
       .addCase(editAttributeValue.pending, (state) => {
         state.loading = true;
       })
@@ -193,8 +211,9 @@ const attributeSlice = createSlice({
       })
       .addCase(editAttributeValue.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload ?? 'An error occurred';
       })
+
       .addCase(deleteAttributeValue.pending, (state) => {
         state.loading = true;
       })

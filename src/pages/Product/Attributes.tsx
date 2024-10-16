@@ -118,7 +118,7 @@ const Attributes: React.FC = () => {
         <div>
             <Card sx={{ my: 5, px: 5, py: 4, mx: 5 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white">
                 <Box sx={{ p: 3 }}>
-                    <Typography variant="h5" gutterBottom>All Attributes</Typography>
+                    <Typography variant="h5" gutterBottom>Attributes</Typography>
                     <Box display="flex" >
                         <TableContainer component={Paper} sx={{ width: '65%', mr: 2 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark ">
                             <Table>
@@ -183,17 +183,9 @@ const Attributes: React.FC = () => {
                                 onChange={(e) => onFieldChange("name", e.target.value)}
                                 error={!!error.name}
                                 helperText={error.name}
-                                sx={{
-                                    mb: 2,
-                                    '& .MuiInputBase-root': {
-                                        backgroundColor: 'white',
-                                    },
-
-                                    '& .MuiInputLabel-root': {
-                                        color: 'rgba(0, 0, 0, 0.6)',
-                                    },
-                                    '& .MuiInputBase-input': {
-                                        color: 'black',
+                                slotProps={{
+                                    input: {
+                                        className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input mb-2", 
                                     },
                                 }}
                             />

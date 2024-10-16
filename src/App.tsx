@@ -21,6 +21,7 @@ import { AddProduct } from './pages/Product/AddProduct';
 import Category from './pages/Product/Category';
 import CategoryDetails from './pages/Product/CategoryDetails';
 import Attributes from './pages/Product/Attributes';
+import AttributeDetails from './pages/Product/AttributeDetails';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -119,6 +120,15 @@ function App() {
                     </>
                   }
                 />
+                 <Route
+                  path="/attribute-details/:id"
+                  element={
+                    <>
+                      <PageTitle title="Attribute Details | Games Corner" />
+                      <AttributeDetails />
+                    </>
+                  }
+                />
                 <Route
                   path="/forms/form-layout"
                   element={
@@ -137,7 +147,6 @@ function App() {
                     </>
                   }
                 />
-
                 <Route
                   path="/tables"
                   element={

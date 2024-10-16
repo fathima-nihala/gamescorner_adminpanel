@@ -86,16 +86,9 @@ const EditAttributeName: React.FC<EditAttributeNameProps> = ({ id }) => {
                             fullWidth
                             value={data.name}
                             onChange={(e) => setData({ name: e.target.value })}
-                            sx={{
-                                '& .MuiInputBase-root': {
-                                    backgroundColor: 'white',
-                                },
-                                
-                                '& .MuiInputLabel-root': {
-                                    color: 'rgba(0, 0, 0, 0.6)',
-                                },
-                                '& .MuiInputBase-input': {
-                                    color: 'black',
+                            slotProps={{
+                                input: {
+                                    className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input", 
                                 },
                             }}
                         />
