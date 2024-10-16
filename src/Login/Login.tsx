@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../slices/authSlice';
 import { AppDispatch, RootState } from '../../src/redux/store';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import img from '../images/logo/06.jpg'; 
 import logo from '../images/logo/games.png';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
@@ -113,12 +113,11 @@ const Login: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a
-                  href="#"
+                <Link to='/forgot-password'
                   className="font-medium text-purple-600 hover:text-purple-500"
                 >
                   Forgot your password?
-                </a>
+                </Link>
               </div>
             </div>
 

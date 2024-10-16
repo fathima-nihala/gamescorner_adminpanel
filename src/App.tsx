@@ -22,6 +22,9 @@ import Category from './pages/Product/Category';
 import CategoryDetails from './pages/Product/CategoryDetails';
 import Attributes from './pages/Product/Attributes';
 import AttributeDetails from './pages/Product/AttributeDetails';
+import ForgotPassword from './Login/ForgotPassword';
+import VerifyOtp from './Login/VerifyOtp';
+import Resetpassword from './Login/Resetpassword';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,6 +52,34 @@ function App() {
           </>
         }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          <>
+            <PageTitle title="Forgot Password | Games Corner" />
+            <ForgotPassword />
+          </>
+        }
+      />
+      <Route
+        path="/verify-otp"
+        element={
+          <>
+            <PageTitle title="Verify Otp | Games Corner" />
+            <VerifyOtp />
+          </>
+        }
+      />
+       <Route
+        path="/reset-password"
+        element={
+          <>
+            <PageTitle title="Verify Otp | Games Corner" />
+            <Resetpassword />
+          </>
+        }
+      />
+
 
       {/* Protected Routes */}
       <Route
@@ -120,7 +151,7 @@ function App() {
                     </>
                   }
                 />
-                 <Route
+                <Route
                   path="/attribute-details/:id"
                   element={
                     <>
