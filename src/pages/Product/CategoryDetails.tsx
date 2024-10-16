@@ -11,6 +11,7 @@ import {
 import { FaTrash } from 'react-icons/fa';
 import ConfirmationModal from "../../shared/ConfirmationModal";
 import { AppDispatch, RootState } from '../../redux/store';
+import EditCategoryName from "./EditCategoryName";
 
 interface SelectedItem {
     itemId: string;
@@ -149,6 +150,13 @@ const CategoryDetails: React.FC = () => {
                                                 <TableCell className="text-black dark:text-white">{page * rowsPerPage + index + 1}</TableCell>
                                                 <TableCell className="text-black dark:text-white">{item}</TableCell>
                                                 <TableCell align='center'>
+                                                <IconButton size="small" style={{ color: '#4d087e' }}>
+                                                    <EditCategoryName
+                                                        id={id}
+                                                        index={index}
+                                                        value={item}
+                                                    />
+                                                </IconButton>
                                                     <IconButton
                                                         size="small"
                                                         style={{ color: '#EF4444' }}

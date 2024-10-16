@@ -1,26 +1,25 @@
-
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { FaEdit } from "react-icons/fa";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, TextField } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { editAttributeValue } from '../../slices/attributeSlice';
 import { AppDispatch } from '../../redux/store';
+import CloseIcon from '@mui/icons-material/Close';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, TextField } from '@mui/material';
+import { FaEdit } from "react-icons/fa";
+import { editCategoryName } from "../../slices/categorySlice";
 import { useSnackbar } from "notistack";
 
 
-interface EditAttributeValueProps {
+
+interface EditCategoryNameProps {
     id: string | undefined;
     index: number;
     value: string;
 }
 
-const EditAttributeValue: React.FC<EditAttributeValueProps> = ({ id, index, value }) => {
+const EditCategoryName: React.FC<EditCategoryNameProps> = ({ id, index, value }) => {
     const [open, setOpen] = useState(false);
     const [editedValue, setEditedValue] = useState(value);
     const dispatch = useDispatch<AppDispatch>();
     const { enqueueSnackbar } = useSnackbar();
-
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -31,19 +30,19 @@ const EditAttributeValue: React.FC<EditAttributeValueProps> = ({ id, index, valu
 
     const handleSubmit = () => {
         if (id) {
-            dispatch(editAttributeValue({ id, index, newValue: editedValue }))
+            dispatch(editCategoryName({ id, index, newValue: editedValue }))
                 .unwrap()
                 .then(() => {
-                    enqueueSnackbar("Attribute value updated successfully!", {
+                    enqueueSnackbar("Category name updated successfully!", {
                         variant: "success",
-                        anchorOrigin: { vertical: 'top', horizontal: 'right' }, 
+                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
                     });
                     handleClose();
                 })
                 .catch((error: string) => {
-                    enqueueSnackbar(`Failed to update attribute value: ${error}`, {
+                    enqueueSnackbar(`Failed to update category name: ${error}`, {
                         variant: "error",
-                        anchorOrigin: { vertical: 'top', horizontal: 'right' }, 
+                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
                     });
                 });
         }
@@ -54,7 +53,7 @@ const EditAttributeValue: React.FC<EditAttributeValueProps> = ({ id, index, valu
             <FaEdit onClick={handleOpen} />
             <Dialog open={open} maxWidth="sm" fullWidth sx={{ borderRadius: '15px' }}>
                 <DialogTitle className='text-[24px] font-medium  text-black dark:text-white bg-white dark:bg-black'>
-                    Edit Value
+                    Edit Attribute Name
                     <IconButton
                         aria-label="close"
                         onClick={handleClose}
@@ -103,7 +102,7 @@ const EditAttributeValue: React.FC<EditAttributeValueProps> = ({ id, index, valu
                 </DialogActions>
             </Dialog>
         </div>
-    );
+    )
 }
 
-export default EditAttributeValue;
+export default EditCategoryName
