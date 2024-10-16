@@ -8,7 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const VerifyOtp: React.FC = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const dispatch = useDispatch<AppDispatch>(); 
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate(); 
     const { loading, error, success } = useSelector((state: RootState) => state.auth);
     
     // Use useLocation to access location object
@@ -47,7 +47,7 @@ const VerifyOtp: React.FC = () => {
 
     // Effect to navigate on success
     if (success) {
-        navigate('/reset-password'); // Redirect to reset-password page
+        navigate('/reset-password', { state: { email , otp}}); 
     }
 
     return (
