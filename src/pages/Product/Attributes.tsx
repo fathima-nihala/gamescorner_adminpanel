@@ -23,6 +23,9 @@ import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../shared/ConfirmationModal";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
+import EditAttributeName from "./EditAttributeName";
+
+
 
 const Attributes: React.FC = () => {
     const [data, setData] = useState<{ name: string; value?: string[] }>({ name: "" });
@@ -44,15 +47,19 @@ const Attributes: React.FC = () => {
         setDelOpen(true);
     };
 
+    const handleEdit = (item: any) => {
+        setSelectedItem(item); 
+    }
+
     const onDelete = () => {
         if (selectedItem) {
             dispatch(deleteAttribute(selectedItem))
                 .unwrap()
                 .then(() => {
-                    enqueueSnackbar("Attribute deleted successfully!", { variant: "success" , anchorOrigin: { vertical: 'top', horizontal: 'right' }});
+                    enqueueSnackbar("Attribute deleted successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
                 })
                 .catch((error: any) => {
-                    enqueueSnackbar(`Failed to delete attribute: ${error.message}`, { variant: "error" , anchorOrigin: { vertical: 'top', horizontal: 'right' } });
+                    enqueueSnackbar(`Failed to delete attribute: ${error.message}`, { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
                 });
             setDelOpen(false);
         }
@@ -86,10 +93,10 @@ const Attributes: React.FC = () => {
 
             try {
                 await dispatch(addAttribute(formData)).unwrap();
-                enqueueSnackbar("Attribute added successfully!", { variant: "success" , anchorOrigin: { vertical: 'top', horizontal: 'right' }});
+                enqueueSnackbar("Attribute added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
                 setData({ name: "" });
             } catch (error: any) {
-                enqueueSnackbar(error.message || "Failed to add attribute.", { variant: "error" , anchorOrigin: { vertical: 'top', horizontal: 'right' }});
+                enqueueSnackbar(error.message || "Failed to add attribute.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
             }
         }
     };
@@ -127,20 +134,25 @@ const Attributes: React.FC = () => {
                                     {attributes && attributes.length > 0 ? (
                                         attributes.map((attr, index) => (
                                             <TableRow key={attr._id}>
-                                                <TableCell  className="text-black dark:text-white">{index + 1}</TableCell>
-                                                <TableCell  className="text-black dark:text-white">{attr.name}</TableCell>
+                                                <TableCell className="text-black dark:text-white">{index + 1}</TableCell>
+                                                <TableCell className="text-black dark:text-white">{attr.name}</TableCell>
                                                 <TableCell>
                                                     {attr.value && attr.value.map((value: string, idx: number) => (
-                                                        <Chip key={`${attr._id}-${idx}`} label={value} size="small" sx={{ mr: 1, mb: 1 }}  className="text-black dark:text-white" />
+                                                        <Chip key={`${attr._id}-${idx}`} label={value} size="small" sx={{ mr: 1, mb: 1 }} className="text-black dark:text-white" />
                                                     ))}
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex">
                                                         <IconButton size="small" color="default">
                                                             <Link to={`/dashboard/attribute-details/${attr._id}`}>
-                                                                <Settings fontSize="small"  className="text-black dark:text-white"/>
+                                                                <Settings fontSize="small" className="text-black dark:text-white" />
                                                             </Link>
                                                         </IconButton>
+
+                                                        <IconButton size="small" color="success" onClick={() => handleEdit(attr._id)}>
+                                                            <EditAttributeName id={attr._id}/>
+                                                        </IconButton>
+                                                      
                                                         <IconButton size="small" color="error" onClick={() => handleDeleteClick(attr._id)}>
                                                             <Delete fontSize="small" />
                                                         </IconButton>
@@ -176,7 +188,7 @@ const Attributes: React.FC = () => {
                                     '& .MuiInputBase-root': {
                                         backgroundColor: 'white',
                                     },
-                                    
+
                                     '& .MuiInputLabel-root': {
                                         color: 'rgba(0, 0, 0, 0.6)',
                                     },
@@ -184,7 +196,6 @@ const Attributes: React.FC = () => {
                                         color: 'black',
                                     },
                                 }}
-                                // className="border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                             />
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button
