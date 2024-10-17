@@ -57,15 +57,16 @@ const ForgotPassword: React.FC = () => {
                             required
                         />
                     </div>
-                    {loading && <p className="mt-2 text-sm text-center text-blue-500">Sending OTP...</p>}
+                    {/* {loading && <p className="mt-2 text-sm text-center text-blue-500">Sending OTP...</p>}
                     {!loading && !error && <p className="mt-2 text-sm text-center text-green-500">OTP send to {email}</p>}
-                    {error && <p className="mt-2 text-sm text-center text-red-500">{error || 'Failed to send OTP'}</p>}
+                    {error && <p className="mt-2 text-sm text-center text-red-500">{error || 'Failed to send OTP'}</p>} */}
                     <button
                         type="submit"
                         className="w-full px-4 py-2 mt-4 text-white bg-blue-950 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-200"
                         disabled={loading}
                     >
-                        Send OTP
+                        {/* Send OTP */}
+                        {loading ? 'Sending OTP...' : `OTP send to ${email}`}
                     </button>
                 </form>
             </div>
