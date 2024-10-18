@@ -15,13 +15,18 @@ import EditCategoryName from "./EditCategoryName";
 
 interface SelectedItem {
     itemId: string;
-    index: number;
+    nameId: string;
+}
+
+interface CategoryName {
+    _id: string;
+    value: string;
 }
 
 interface Category {
     _id: string;
     parent_category: string;
-    name: string[];
+    name: CategoryName[];
 }
 
 const CategoryDetails: React.FC = () => {
@@ -38,80 +43,78 @@ const CategoryDetails: React.FC = () => {
 
     const delHandleClose = () => setDelOpen(false);
 
-    const handleDeleteClick = (itemId: string, index: number) => {
-        setSelectedItem({ itemId, index });
+    const handleDeleteClick = (nameId: string) => {
+        setSelectedItem({ itemId: id || '', nameId });
         setDelOpen(true);
     };
 
     const onDelete = () => {
         if (selectedItem && id) {
-            const { index } = selectedItem;
-            dispatch(deleteCategoryName({ id, index }))
-                .then(() => {
-                    enqueueSnackbar("Category name deleted successfully!", { variant: "success" , anchorOrigin: { vertical: 'top', horizontal: 'right' },});
+            const { nameId } = selectedItem;
+            dispatch(deleteCategoryName({ id, nameId }))
+                .unwrap()
+                .then((result) => {
+                    if (result && result.success) {
+                        enqueueSnackbar("Category name deleted successfully!", {
+                            variant: "success",
+                            anchorOrigin: { vertical: 'top', horizontal: 'right' }
+                        });
+                    } else {
+                        enqueueSnackbar("Operation completed successfully", {
+                            variant: "success",
+                            anchorOrigin: { vertical: 'top', horizontal: 'right' }
+                        });
+                    }
+                    setDelOpen(false);
                 })
-                .catch((error: Error) => {
-                    enqueueSnackbar(`Failed to delete category name: ${error.message}`, { variant: "error" , anchorOrigin: { vertical: 'top', horizontal: 'right' },});
+                .catch((error) => {
+                    enqueueSnackbar(`Failed to delete category name: ${error.message || 'Unknown error'}`, {
+                        variant: "error",
+                        anchorOrigin: { vertical: 'top', horizontal: 'right' }
+                    });
                 });
-            setDelOpen(false);
         }
     };
 
-    // Get categories from Redux store directly
     const { categories, loading, error: fetchError } = useSelector((state: RootState) => state.category);
-
 
     useEffect(() => {
         if (id) {
             dispatch(fetchCategoryById(id));
         }
     }, [dispatch, id]);
-    
-    console.log('Categories:', categories);
 
+    const category = Array.isArray(categories) ? categories.find((category: Category) => category._id === id) : null;
 
-    // Filter parent categories by ID
-    const filterParentCat: Category[] = Array.isArray(categories)
-        ? categories.filter((category: Category) => category._id === id)
-        : [];
+    const paginatedValues = category?.name?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) || [];
 
-    // Handle paginated category names
-    const paginatedValues = filterParentCat.length > 0 && filterParentCat[0]?.name?.length > 0
-        ? filterParentCat[0].name.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        : [];
-
-    // Input validation
     const validateInput = () => {
         const validationErrors: { name?: string } = { name: data.name ? "" : "Name is required" };
         setError(validationErrors);
         return Object.values(validationErrors).every(value => !value);
     };
 
-    // Handle form submission
     const handleFormSubmit = async () => {
         if (validateInput() && id) {
             try {
-                await dispatch(addCategoryName({ id, name: data.name }));
-                enqueueSnackbar("Category name added successfully!", { variant: "success" , anchorOrigin: { vertical: 'top', horizontal: 'right' },});
+                await dispatch(addCategoryName({ id, name: data.name })).unwrap();
+                enqueueSnackbar("Category name added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
                 setData({ name: "" });
             } catch (error: any) {
-                enqueueSnackbar(error.message || "Failed to add category name.", { variant: "error" , anchorOrigin: { vertical: 'top', horizontal: 'right' },});
+                enqueueSnackbar(error.message || "Failed to add category name.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
             }
         }
     };
 
-    // Handle field change
     const onFieldChange = (key: keyof typeof data, value: string) => {
         setData((prevData) => ({ ...prevData, [key]: value }));
         setError((prevError) => ({ ...prevError, [key]: "" }));
     };
 
-    // Handle page change
     const handleChangePage = (_event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
-    // Handle rows per page change
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
@@ -132,7 +135,7 @@ const CategoryDetails: React.FC = () => {
                 <Grid container spacing={4}>
                     <Grid item xs={12} md={8}>
                         <h2 className="text-xl font-semibold mb-2">
-                            {filterParentCat[0]?.parent_category || 'No Category'}
+                            {category?.parent_category || 'No Category'}
                         </h2>
                         <TableContainer component={Paper} sx={{ width: '100%' }} className="text-black dark:text-white bg-white dark:bg-black">
                             <Table>
@@ -146,21 +149,21 @@ const CategoryDetails: React.FC = () => {
                                 <TableBody>
                                     {paginatedValues.length > 0 ? (
                                         paginatedValues.map((item, index) => (
-                                            <TableRow key={index}>
+                                            <TableRow key={item._id}>
                                                 <TableCell className="text-black dark:text-white">{page * rowsPerPage + index + 1}</TableCell>
-                                                <TableCell className="text-black dark:text-white">{item}</TableCell>
+                                                <TableCell className="text-black dark:text-white">{item.value}</TableCell>
                                                 <TableCell align='center'>
-                                                <IconButton size="small" style={{ color: '#4d087e' }}>
-                                                    <EditCategoryName
-                                                        id={id}
-                                                        index={index}
-                                                        value={item}
-                                                    />
-                                                </IconButton>
+                                                    <IconButton size="small" style={{ color: '#4d087e' }}>
+                                                        <EditCategoryName
+                                                            id={id}
+                                                            nameId={item._id}
+                                                            value={item.value}
+                                                        />
+                                                    </IconButton>
                                                     <IconButton
                                                         size="small"
                                                         style={{ color: '#EF4444' }}
-                                                        onClick={() => handleDeleteClick(filterParentCat[0]._id, page * rowsPerPage + index)}
+                                                        onClick={() => handleDeleteClick(item._id)}
                                                     >
                                                         <FaTrash />
                                                     </IconButton>
@@ -179,7 +182,7 @@ const CategoryDetails: React.FC = () => {
                             <TablePagination
                                 rowsPerPageOptions={[5, 10, 15]}
                                 component="div"
-                                count={filterParentCat[0]?.name?.length || 0}
+                                count={category?.name?.length || 0}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
                                 onPageChange={handleChangePage}
@@ -200,12 +203,10 @@ const CategoryDetails: React.FC = () => {
                                 helperText={error.name}
                                 fullWidth
                                 margin="normal"
-
                                 sx={{
                                     '& .MuiInputBase-root': {
-                                        backgroundColor:  '#f6f0f0',
+                                        backgroundColor: '#f6f0f0',
                                     },
-                                    
                                     '& .MuiInputLabel-root': {
                                         color: 'rgba(0, 0, 0, 0.6)',
                                     },
@@ -236,5 +237,9 @@ const CategoryDetails: React.FC = () => {
 };
 
 export default CategoryDetails;
+
+
+
+
 
 

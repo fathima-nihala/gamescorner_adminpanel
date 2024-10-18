@@ -8,7 +8,8 @@ const api = axios.create({
 export interface Category {
   _id: string;
   parent_category: string;
-  name: string[];
+  // name: string[];
+  name: { _id: string; value: string }[];
   image: string;
   icon: string;
   cover_image: string;
@@ -97,6 +98,7 @@ export const updateCategory = createAsyncThunk(
   },
 );
 
+
 // Add category name
 export const addCategoryName = createAsyncThunk(
   'category/addCategoryName',
@@ -116,38 +118,42 @@ export const addCategoryName = createAsyncThunk(
 export const editCategoryName = createAsyncThunk(
   'category/editCategoryName',
   async (
-    { id, index, newValue }: { id: string; index: number; newValue: string },
-    { rejectWithValue },
+    { id, nameId, newValue }: { id: string; nameId: string; newValue: string },
+    { rejectWithValue }
   ) => {
     try {
       const response = await api.patch(`/category/${id}/name`, {
-        index,
+        nameId,
         newValue,
       });
-      return response.data.cat;
+      if (response.data && response.data.category) {
+        return response.data.category;
+      } else {
+        return rejectWithValue('Invalid response structure from server');
+      }
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to edit category name',
+        error.response?.data?.message || 'Failed to edit category name'
       );
     }
-  },
+  }
 );
 
 // Delete category name
 export const deleteCategoryName = createAsyncThunk(
   'category/deleteCategoryName',
-  async ({ id, index }: { id: string; index: number }, { rejectWithValue }) => {
+  async ({ id, nameId }: { id: string; nameId: string }, { rejectWithValue }) => {
     try {
       const response = await api.delete(`/category/${id}/name`, {
-        data: { index },
+        data: { nameId },
       });
-      return response.data.cat;
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to delete category name',
+        error.response?.data?.message || 'Failed to delete category name'
       );
     }
-  },
+  }
 );
 
 // Fetch category by ID
@@ -266,7 +272,7 @@ export const categorySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       },
-    );
+    ); 
 
     // Add category name
     builder.addCase(addCategoryName.pending, (state) => {
@@ -303,15 +309,20 @@ export const categorySlice = createSlice({
       editCategoryName.fulfilled,
       (state, action: PayloadAction<Category>) => {
         state.loading = false;
-        const index = state.categories.findIndex(
-          (category) => category._id === action.payload._id,
-        );
-        if (index !== -1) {
-          state.categories[index] = action.payload;
+        if (action.payload && action.payload._id) {
+          const index = state.categories.findIndex(
+            (category) => category._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.categories[index] = action.payload;
+          }
+          state.successMessage = 'Category name edited successfully!';
+        } else {
+          state.error = 'Received invalid data from server';
         }
-        state.successMessage = 'Category name edited successfully!';
-      },
+      }
     );
+
     builder.addCase(
       editCategoryName.rejected,
       (state, action: PayloadAction<any>) => {
@@ -324,16 +335,18 @@ export const categorySlice = createSlice({
     builder.addCase(deleteCategoryName.pending, (state) => {
       state.loading = true;
       state.error = null;
-    });
+    });  
     builder.addCase(
       deleteCategoryName.fulfilled,
-      (state, action: PayloadAction<Category>) => {
+      (state, action: PayloadAction<any>) => {
         state.loading = false;
-        const index = state.categories.findIndex(
-          (category) => category._id === action.payload._id,
-        );
-        if (index !== -1) {
-          state.categories[index] = action.payload;
+        if (action.payload && action.payload.category) {
+          const index = state.categories.findIndex(
+            (category) => category._id === action.payload.category._id,
+          );
+          if (index !== -1) {
+            state.categories[index] = action.payload.category;
+          }
         }
         state.successMessage = 'Category name deleted successfully!';
       },

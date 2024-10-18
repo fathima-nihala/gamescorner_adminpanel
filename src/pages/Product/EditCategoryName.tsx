@@ -7,15 +7,13 @@ import { FaEdit } from "react-icons/fa";
 import { editCategoryName } from "../../slices/categorySlice";
 import { useSnackbar } from "notistack";
 
-
-
 interface EditCategoryNameProps {
     id: string | undefined;
-    index: number;
+    nameId: string;
     value: string;
 }
 
-const EditCategoryName: React.FC<EditCategoryNameProps> = ({ id, index, value }) => {
+const EditCategoryName: React.FC<EditCategoryNameProps> = ({ id, nameId, value }) => {
     const [open, setOpen] = useState(false);
     const [editedValue, setEditedValue] = useState(value);
     const dispatch = useDispatch<AppDispatch>();
@@ -29,18 +27,22 @@ const EditCategoryName: React.FC<EditCategoryNameProps> = ({ id, index, value })
     }, [value]);
 
     const handleSubmit = () => {
-        if (id) {
-            dispatch(editCategoryName({ id, index, newValue: editedValue }))
+        if (id && nameId) {
+            dispatch(editCategoryName({ id, nameId, newValue: editedValue }))
                 .unwrap()
-                .then(() => {
-                    enqueueSnackbar("Category name updated successfully!", {
-                        variant: "success",
-                        anchorOrigin: { vertical: 'top', horizontal: 'right' },
-                    });
-                    handleClose();
+                .then((result) => {
+                    if (result && result._id) {
+                        enqueueSnackbar("Category name updated successfully!", {
+                            variant: "success",
+                            anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                        });
+                        handleClose();
+                    } else {
+                        throw new Error('Invalid response from server');
+                    }
                 })
-                .catch((error: string) => {
-                    enqueueSnackbar(`Failed to update category name: ${error}`, {
+                .catch((error) => {
+                    enqueueSnackbar(`Failed to update category name: ${error.message || error}`, {
                         variant: "error",
                         anchorOrigin: { vertical: 'top', horizontal: 'right' },
                     });
@@ -106,3 +108,4 @@ const EditCategoryName: React.FC<EditCategoryNameProps> = ({ id, index, value })
 }
 
 export default EditCategoryName
+
