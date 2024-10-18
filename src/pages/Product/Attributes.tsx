@@ -25,10 +25,8 @@ import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import EditAttributeName from "./EditAttributeName";
 
-
-
 const Attributes: React.FC = () => {
-    const [data, setData] = useState<{ name: string; value?: string[] }>({ name: "" });
+    const [newAttributeName, setNewAttributeName] = useState("");
     const [error, setError] = useState<{ name?: string }>({});
     const { enqueueSnackbar } = useSnackbar();
     const [delOpen, setDelOpen] = useState(false);
@@ -38,8 +36,35 @@ const Attributes: React.FC = () => {
 
     const { attributes, loading, error: stateError } = useSelector((state: RootState) => state.attribute);
 
-    const delHandleClose = () => {
-        setDelOpen(false);
+    useEffect(() => {
+        dispatch(fetchAttributes());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (stateError) {
+            enqueueSnackbar(stateError, { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
+        }
+    }, [stateError, enqueueSnackbar]);
+
+    const validateInput = () => {
+        if (!newAttributeName.trim()) {
+            setError({ name: "Name is required" });
+            return false;
+        }
+        setError({});
+        return true;
+    };
+
+    const handleFormSubmit = async () => {
+        if (validateInput()) {
+            try {
+                await dispatch(addAttribute({ name: newAttributeName, value: [] })).unwrap();
+                enqueueSnackbar("Attribute added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
+                setNewAttributeName("");
+            } catch (error: any) {
+                enqueueSnackbar(error.message || "Failed to add attribute.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
+            }
+        }
     };
 
     const handleDeleteClick = (itemId: string) => {
@@ -47,9 +72,9 @@ const Attributes: React.FC = () => {
         setDelOpen(true);
     };
 
-    const handleEdit = (item: any) => {
-        setSelectedItem(item); 
-    }
+    const handleEdit = (itemId: string) => {
+        setSelectedItem(itemId);
+    };
 
     const onDelete = () => {
         if (selectedItem) {
@@ -63,47 +88,6 @@ const Attributes: React.FC = () => {
                 });
             setDelOpen(false);
         }
-    };
-
-    const validateInput = () => {
-        const validationErrors = {
-            name: data.name ? "" : "Name is required",
-        };
-
-        setError(validationErrors);
-        return Object.values(validationErrors).every((value) => !value);
-    };
-
-    useEffect(() => {
-        dispatch(fetchAttributes());
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (stateError) {
-            enqueueSnackbar(stateError, { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
-        }
-    }, [stateError, enqueueSnackbar]);
-
-    const handleFormSubmit = async () => {
-        if (validateInput()) {
-            const formData = {
-                name: data.name,
-                value: data.value || [],
-            };
-
-            try {
-                await dispatch(addAttribute(formData)).unwrap();
-                enqueueSnackbar("Attribute added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
-                setData({ name: "" });
-            } catch (error: any) {
-                enqueueSnackbar(error.message || "Failed to add attribute.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
-            }
-        }
-    };
-
-    const onFieldChange = (key: keyof typeof data, value: string) => {
-        setData((prevData) => ({ ...prevData, [key]: value }));
-        setError((prevError) => ({ ...prevError, [key]: "" }));
     };
 
     if (loading) {
@@ -137,8 +121,8 @@ const Attributes: React.FC = () => {
                                                 <TableCell className="text-black dark:text-white">{index + 1}</TableCell>
                                                 <TableCell className="text-black dark:text-white">{attr.name}</TableCell>
                                                 <TableCell>
-                                                    {attr.value && attr.value.map((value: string, idx: number) => (
-                                                        <Chip key={`${attr._id}-${idx}`} label={value} size="small" sx={{ mr: 1, mb: 1 }} className="text-black dark:text-white" />
+                                                    {attr.value && attr.value.map((valueObj, idx) => (
+                                                        <Chip key={`${attr._id}-${idx}`} label={valueObj.value} size="small" sx={{ mr: 1, mb: 1 }} className="text-black dark:text-white" />
                                                     ))}
                                                 </TableCell>
                                                 <TableCell>
@@ -179,8 +163,8 @@ const Attributes: React.FC = () => {
                                 variant="outlined"
                                 id="name"
                                 type="text"
-                                value={data.name}
-                                onChange={(e) => onFieldChange("name", e.target.value)}
+                                value={newAttributeName}
+                                onChange={(e) => setNewAttributeName(e.target.value)}
                                 error={!!error.name}
                                 helperText={error.name}
                                 slotProps={{
@@ -204,7 +188,7 @@ const Attributes: React.FC = () => {
             </Card>
             <ConfirmationModal
                 delOpen={delOpen}
-                delHandleClose={delHandleClose}
+                delHandleClose={() => setDelOpen(false)}
                 onDelete={onDelete}
             />
         </div>

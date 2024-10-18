@@ -24,34 +24,31 @@ import ConfirmationModal from '../../shared/ConfirmationModal';
 import { AppDispatch, RootState } from '../../redux/store';
 import EditAttributeValue from './EditAttributeValue';
 
-
-
 const AttributeDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const [delOpen, setDelOpen] = useState<boolean>(false);
-    const [selectedItem, setSelectedItem] = useState<{ itemId: string; index: number } | null>(null);
+    const [selectedItem, setSelectedItem] = useState<{ valueId: string } | null>(null);
     const { enqueueSnackbar } = useSnackbar();
-    const [data, setData] = useState<{ value: string }>({ value: "" });
-    const [error, setError] = useState<{ value?: string }>({});
+    const [newValue, setNewValue] = useState<string>("");
+    const [error, setError] = useState<string>("");
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
     const delHandleClose = () => setDelOpen(false);
 
-    const handleDeleteClick = (itemId: string, index: number) => {
-        setSelectedItem({ itemId, index });
+    const handleDeleteClick = (valueId: string) => {
+        setSelectedItem({ valueId });
         setDelOpen(true);
     };
 
     const onDelete = async () => {
         if (selectedItem && id) {
-            const { index } = selectedItem;
             try {
-                await dispatch(deleteAttributeValue({ id, index })).unwrap();
-                enqueueSnackbar("Attribute value deleted successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' }, });
+                await dispatch(deleteAttributeValue({ id, valueId: selectedItem.valueId })).unwrap();
+                enqueueSnackbar("Attribute value deleted successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
             } catch (error: any) {
-                enqueueSnackbar(`Failed to delete attribute value: ${error.message}`, { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' }, });
+                enqueueSnackbar(`Failed to delete attribute value: ${error.message}`, { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
             }
             setDelOpen(false);
         }
@@ -70,26 +67,24 @@ const AttributeDetails: React.FC = () => {
         : [];
 
     const validateInput = (): boolean => {
-        const validationErrors = { value: data.value ? "" : "Value is required" };
-        setError(validationErrors);
-        return Object.values(validationErrors).every(value => !value);
+        if (!newValue.trim()) {
+            setError("Value is required");
+            return false;
+        }
+        setError("");
+        return true;
     };
 
     const handleFormSubmit = async () => {
         if (validateInput() && id) {
             try {
-                await dispatch(addAttributeValue({ id, value: data.value })).unwrap();
-                enqueueSnackbar("Attribute value added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' }, });
-                setData({ value: "" });
+                await dispatch(addAttributeValue({ id, value: newValue })).unwrap();
+                enqueueSnackbar("Attribute value added successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
+                setNewValue("");
             } catch (error: any) {
-                enqueueSnackbar(error.message || "Failed to add attribute value.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' }, });
+                enqueueSnackbar(error.message || "Failed to add attribute value.", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right' } });
             }
         }
-    };
-
-    const onFieldChange = (key: keyof typeof data, value: string) => {
-        setData((prevData) => ({ ...prevData, [key]: value }));
-        setError((prevError) => ({ ...prevError, [key]: "" }));
     };
 
     const handleChangePage = (_event: unknown, newPage: number) => {
@@ -131,18 +126,18 @@ const AttributeDetails: React.FC = () => {
                             <TableBody>
                                 {paginatedValues.length > 0 ? (
                                     paginatedValues.map((item, index) => (
-                                        <TableRow key={index}>
+                                        <TableRow key={item._id}>
                                             <TableCell className="text-black dark:text-white">{page * rowsPerPage + index + 1}</TableCell>
-                                            <TableCell className="text-black dark:text-white">{item}</TableCell>
+                                            <TableCell className="text-black dark:text-white">{item.value}</TableCell>
                                             <TableCell align='center'>
                                                 <IconButton size="small" style={{ color: '#4d087e' }}>
                                                     <EditAttributeValue
                                                         id={id}
-                                                        index={index}
-                                                        value={item}
+                                                        valueId={item._id}
+                                                        value={item.value}
                                                     />
                                                 </IconButton>
-                                                <IconButton size="small" style={{ color: '#EF4444' }} onClick={() => handleDeleteClick(filteredAttribute._id, page * rowsPerPage + index)}>
+                                                <IconButton size="small" style={{ color: '#EF4444' }} onClick={() => handleDeleteClick(item._id)}>
                                                     <FaTrash />
                                                 </IconButton>
                                             </TableCell>
@@ -182,18 +177,16 @@ const AttributeDetails: React.FC = () => {
                         variant="outlined"
                         id="value"
                         type="text"
-                        value={data.value}
-                        onChange={(e) => onFieldChange("value", e.target.value)}
-                        error={!!error.value}
-                        helperText={error.value}
+                        value={newValue}
+                        onChange={(e) => setNewValue(e.target.value)}
+                        error={!!error}
+                        helperText={error}
                         sx={{ mb: 2 }}
-
                         slotProps={{
                             input: {
                                 className: "text-black dark:text-white border border-stroke dark:border-strokedark",
                             },
                         }}
-
                     />
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
