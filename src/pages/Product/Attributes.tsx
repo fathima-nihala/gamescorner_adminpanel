@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-    Card,
     Box,
     Typography,
     TextField,
@@ -100,11 +99,31 @@ const Attributes: React.FC = () => {
 
     return (
         <div>
-            <Card sx={{ my: 5, px: 5, py: 4, mx: 5 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white">
+            {/* <Card sx={{ my: 5, px: 4, py: 4, mx: 5 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white"> */}
+            <div className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white">
                 <Box sx={{ p: 3 }}>
                     <Typography variant="h5" gutterBottom>Attributes</Typography>
-                    <Box display="flex" >
-                        <TableContainer component={Paper} sx={{ width: '65%', mr: 2 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark ">
+                    <Box
+                        sx={{
+                            display: {
+                                xs: 'block', 
+                                md: 'flex',  
+                            },
+                        }}
+                    >
+                        <TableContainer component={Paper}  className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark "
+                        sx={{ mr: 2 ,
+                            width: '65%',
+                            // width: {
+                            //     md:'65%',
+                            //     sm:'100%',
+                            //     lg:'100%'
+                            // },
+                            '@media (max-width: 834px)': {
+                                width: '100%',  
+                              },
+                        }}
+                        >
                             <Table>
                                 <TableHead>
                                     <TableRow>
@@ -134,9 +153,9 @@ const Attributes: React.FC = () => {
                                                         </IconButton>
 
                                                         <IconButton size="small" color="success" onClick={() => handleEdit(attr._id)}>
-                                                            <EditAttributeName id={attr._id}/>
+                                                            <EditAttributeName id={attr._id} />
                                                         </IconButton>
-                                                      
+
                                                         <IconButton size="small" color="error" onClick={() => handleDeleteClick(attr._id)}>
                                                             <Delete fontSize="small" />
                                                         </IconButton>
@@ -155,7 +174,12 @@ const Attributes: React.FC = () => {
                             </Table>
                         </TableContainer>
 
-                        <Box sx={{ width: '35%' }}>
+                        <Box sx={{ width: '35%',
+                            '@media (max-width: 834px)': {
+                                width: '100%',  
+                                marginTop:'8px'
+                              },
+                         }}>
                             <Typography variant="h6" gutterBottom>Add New Attribute</Typography>
                             <TextField
                                 fullWidth
@@ -169,7 +193,7 @@ const Attributes: React.FC = () => {
                                 helperText={error.name}
                                 slotProps={{
                                     input: {
-                                        className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input mb-2", 
+                                        className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input mb-2",
                                     },
                                 }}
                             />
@@ -185,7 +209,8 @@ const Attributes: React.FC = () => {
                         </Box>
                     </Box>
                 </Box>
-            </Card>
+            {/* </Card> */}
+            </div>
             <ConfirmationModal
                 delOpen={delOpen}
                 delHandleClose={() => setDelOpen(false)}
