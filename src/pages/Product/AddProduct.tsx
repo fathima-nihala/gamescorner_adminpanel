@@ -1,205 +1,250 @@
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import CheckboxFive from '../../components/Checkboxes/CheckboxFive';
-import CheckboxFour from '../../components/Checkboxes/CheckboxFour';
-import CheckboxOne from '../../components/Checkboxes/CheckboxOne';
-import CheckboxThree from '../../components/Checkboxes/CheckboxThree';
-import CheckboxTwo from '../../components/Checkboxes/CheckboxTwo';
-import SwitcherFour from '../../components/Switchers/SwitcherFour';
-import SwitcherOne from '../../components/Switchers/SwitcherOne';
+import React, { useState } from 'react';
 import SwitcherThree from '../../components/Switchers/SwitcherThree';
-import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
-import DatePickerOne from '../../components/Forms/DatePicker/DatePickerOne';
-import DatePickerTwo from '../../components/Forms/DatePicker/DatePickerTwo';
-import SelectGroupTwo from '../../components/Forms/SelectGroup/SelectGroupTwo';
-import MultiSelect from '../../components/Forms/MultiSelect';
+import DropzoneImage from '../../shared/DropzoneImage';
+
+interface ProductData {
+    name: string;
+    productType: string;
+    categoryId: string;
+    brandId?: string;
+    unit?: string;
+    weight?: string;
+    tags?: string;
+}
+
+const AddProduct: React.FC = () => {
+    const [productData, setProductData] = useState<ProductData>({
+        name: '',
+        productType: 'Physical',
+        categoryId: '',
+        brandId: '',
+        unit: '',
+        weight: '',
+        tags: '',
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setProductData((prevData) => ({ ...prevData, [name]: value }));
+    };
+
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [previewGallery, setPreviewGallery] = useState<(string | null)[]>([null, null, null, null, null]);
+
+    const onFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            if (fieldName === 'image') {
+                const result = reader.result as string;
+                setPreviewImage(result);
+                setProductData((prevData) => ({ ...prevData, image: file }));
+            } else if (fieldName.startsWith('gallery')) {
+                const index = parseInt(fieldName.slice(-1)) - 1;
+                const result = reader.result as string;
+                const newPreviewGallery = [...previewGallery];
+                newPreviewGallery[index] = result;
+                setPreviewGallery(newPreviewGallery);
+                setProductData((prevData) => ({ ...prevData, [fieldName]: file }));
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
 
-export const AddProduct = () => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+    };
+
     return (
         <>
-            <Breadcrumb pageName="Form Elements" />
+            <Breadcrumb pageName="Product Information" />
 
-            <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-                <div className="flex flex-col gap-9">
-                    {/* <!-- Input Fields --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Input Fields
-                            </h3>
+            <div className="p-4 bg-gray-100 min-h-screen">
+                <form onSubmit={handleSubmit}>
+
+                    <div className='flex lg:flex-row flex-col gap-3'>
+
+                        <div className="bg-white lg:w-[70%] w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">
+                                        Product Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="sm:col-span-2">
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                            name="name"
+                                            value={productData.name}
+                                            onChange={handleInputChange}
+                                            placeholder="Product Name"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">
+                                        Product Type <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="sm:col-span-2">
+                                        <select
+                                            className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                            name="productType"
+                                            value={productData.productType}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            <option value="Physical" className="text-body dark:text-bodydark">Physical</option>
+                                            <option value="Digital" className="text-body dark:text-bodydark"> Digital</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center text-black dark:text-white">
+                                    <label className="text-gray-700 text-sm font-medium">
+                                        Category <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="sm:col-span-2 ">
+                                        <select
+                                            className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                            name="categoryId"
+                                            value={productData.categoryId}
+                                            onChange={handleInputChange}
+                                            required
+                                        >
+                                            <option value="" className="text-body dark:text-bodydark">Select Category</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">Brand</label>
+                                    <div className="sm:col-span-2">
+                                        <select
+                                            className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                            name="brandId"
+                                            value={productData.brandId}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option value="">Select Brand</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">Unit</label>
+                                    <div className="sm:col-span-2">
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                            name="unit"
+                                            value={productData.unit}
+                                            onChange={handleInputChange}
+                                            placeholder="e.g., pieces, kg, etc."
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">Weight</label>
+                                    <div className="sm:col-span-2">
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                            name="weight"
+                                            value={productData.weight}
+                                            onChange={handleInputChange}
+                                            placeholder="Product weight"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <label className="text-gray-700 text-sm font-medium">Tags</label>
+                                    <div className="sm:col-span-2">
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                            name="tags"
+                                            value={productData.tags}
+                                            onChange={handleInputChange}
+                                            placeholder="Comma-separated tags"
+                                        />
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Default Input
-                                </label>
+
+                        <div className='lg:w-[30%] w-full flex lg:flex-col flex-row gap-4'>
+
+                            {/* Cash on Delivery Box */}
+                            <div className="bg-white  rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                                <h5 className="text-xl font-semibold mb-4">Cash on Delivery</h5>
+                                <SwitcherThree />
+                            </div>
+
+                            {/* Estimated Shipping Time Box */}
+                            <div className="bg-white text-graydark dark:text-white dark:bg-black p-6 shadow-lg rounded-md border-none ">
+                                <h5 className="text-xl font-semibold mb-4">Estimated Shipping Time</h5>
                                 <input
                                     type="text"
-                                    placeholder="Default Input"
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    name="estimated_shipping_time"
+                                    placeholder="Enter estimated shipping time"
                                 />
                             </div>
 
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Active Input
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Active Input"
-                                    className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
-                                />
+                            {/* VAT & TAX */}
+                            <div className="lg:col-span-2 ">
+                                <div className="bg-white text-graydark dark:text-white dark:bg-black p-6 shadow-lg rounded-md">
+                                    <h5 className="text-xl font-semibold mb-4">VAT & TAX</h5>
+                                    <input
+                                        type="number"
+                                        className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                        placeholder="0"
+                                    />
+                                </div>
                             </div>
 
-                            <div>
-                                <label className="mb-3 block font-medium text-black dark:text-white">
-                                    Disabled label
-                                </label>
-                                <input
-                                    type="text"
-                                    placeholder="Disabled label"
-                                    disabled
-                                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
-                                />
-                            </div>
                         </div>
                     </div>
 
-                    {/* <!-- Toggle switch input --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Toggle switch input
-                            </h3>
-                        </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <SwitcherOne />
-                            <SwitcherTwo />
-                            <SwitcherThree />
-                            <SwitcherFour />
-                        </div>
-                    </div>
 
-                    {/* <!-- Time and date --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Time and date
-                            </h3>
+                    <div className="bg-white mt-4  w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                        <div className='block w-full ml-4 xl:mt-14 lg:mt-24 md:mt-28 mt-56'>
+                            <p>Thumbnail</p>
+                            <DropzoneImage
+                                onChange={(event) => onFileUpload(event, 'image')}
+                                image={previewImage}
+                                id="thumbnail-upload"
+                            />
                         </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <DatePickerOne />
-                            <DatePickerTwo />
-                        </div>
-                    </div>
 
-                    {/* <!-- File upload --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                File upload
-                            </h3>
-                        </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Attach file
-                                </label>
-                                <input
-                                    type="file"
-                                    className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:py-3 file:px-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-form-strokedark dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Attach file
-                                </label>
-                                <input
-                                    type="file"
-                                    className="w-full rounded-md border border-stroke p-3 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-9">
-                    {/* <!-- Textarea Fields --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Textarea Fields
-                            </h3>
-                        </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Default textarea
-                                </label>
-                                <textarea
-                                    rows={6}
-                                    placeholder="Default textarea"
-                                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                ></textarea>
-                            </div>
-
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Active textarea
-                                </label>
-                                <textarea
-                                    rows={6}
-                                    placeholder="Active textarea"
-                                    className="w-full rounded-lg border-[1.5px] border-primary bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white"
-                                ></textarea>
-                            </div>
-
-                            <div>
-                                <label className="mb-3 block text-black dark:text-white">
-                                    Disabled textarea
-                                </label>
-                                <textarea
-                                    rows={6}
-                                    disabled
-                                    placeholder="Disabled textarea"
-                                    className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary dark:disabled:bg-black"
-                                ></textarea>
+                        <div className="mt-10">
+                            <p>Gallery Images</p>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <DropzoneImage
+                                        key={index}
+                                        onChange={(event) => onFileUpload(event, `gallery${index + 1}`)}
+                                        image={previewGallery[index]} 
+                                        id={`gallery-upload-${index + 1}`} 
+                                    />
+                                ))}
                             </div>
                         </div>
                     </div>
 
-                    {/* <!-- Checkbox and radio --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Checkbox and radio
-                            </h3>
-                        </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <CheckboxOne />
-                            <CheckboxTwo />
-                            <CheckboxThree />
-                            <CheckboxFour />
-                            <CheckboxFive />
-                        </div>
-                    </div>
 
-                    {/* <!-- Select input --> */}
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                            <h3 className="font-medium text-black dark:text-white">
-                                Select input
-                            </h3>
-                        </div>
-                        <div className="flex flex-col gap-5.5 p-6.5">
-                            <SelectGroupTwo />
-                            <MultiSelect id="multiSelect" />
-                        </div>
-                    </div>
-                </div>
+
+                </form>
             </div>
         </>
     );
 };
+
+export default AddProduct;
+
 

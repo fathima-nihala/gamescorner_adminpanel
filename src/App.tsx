@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-
 import Calendar from './pages/Calendar';
 import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
@@ -17,7 +15,6 @@ import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
 import PrivateRoute from './pages/PrivateRoute';
 import Login from './Login/Login';
-import { AddProduct } from './pages/Product/AddProduct';
 import Category from './pages/Product/Category';
 import CategoryDetails from './pages/Product/CategoryDetails';
 import Attributes from './pages/Product/Attributes';
@@ -25,6 +22,7 @@ import AttributeDetails from './pages/Product/AttributeDetails';
 import ForgotPassword from './Login/ForgotPassword';
 import VerifyOtp from './Login/VerifyOtp';
 import Resetpassword from './Login/Resetpassword';
+import  AddProduct  from './pages/Product/AddProduct';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);

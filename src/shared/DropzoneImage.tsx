@@ -32,7 +32,7 @@ const DropzoneImage: React.FC<DropzoneImageProps> = ({ onChange, image, id }) =>
                 />
             </label>
             {image && (
-                <img src={image} alt="preview" className="w-[25%] mt-6" />
+                <img src={image} alt="preview" className="w-[15%]  mt-6" />
             )}
         </div>
     );
