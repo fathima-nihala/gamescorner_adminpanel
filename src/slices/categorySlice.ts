@@ -8,7 +8,6 @@ const api = axios.create({
 export interface Category {
   _id: string;
   parent_category: string;
-  // name: string[];
   name: { _id: string; value: string }[];
   image: string;
   icon: string;
