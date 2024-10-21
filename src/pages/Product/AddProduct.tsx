@@ -229,13 +229,20 @@ const AddProduct: React.FC = () => {
                                     <DropzoneImage
                                         key={index}
                                         onChange={(event) => onFileUpload(event, `gallery${index + 1}`)}
-                                        image={previewGallery[index]} 
-                                        id={`gallery-upload-${index + 1}`} 
+                                        image={previewGallery[index]}
+                                        id={`gallery-upload-${index + 1}`}
                                     />
                                 ))}
                             </div>
                         </div>
                     </div>
+
+
+                    <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                            <div className="p-6  rounded-md">
+                                <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
+                            </div>
+                    </div> 
 
 
 
