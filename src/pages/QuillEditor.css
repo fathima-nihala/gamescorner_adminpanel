@@ -1,0 +1,12 @@
+.quill-wrapper {
+    height: 100%;
+  }
+  
+  .quill-wrapper .ql-container {
+    min-height: 100px;
+    height: calc(100% - 42px);
+  }
+  
+  .quill-wrapper .ql-editor {
+    min-height: 100px;
+  }
