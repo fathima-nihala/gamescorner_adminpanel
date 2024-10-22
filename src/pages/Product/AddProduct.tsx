@@ -142,6 +142,12 @@ const AddProduct: React.FC = () => {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [previewGallery, setPreviewGallery] = useState<(string | null)[]>([null, null, null, null, null]);
 
+    const [cashOnDelivery, setCashOnDelivery] = useState(false);
+
+    const handleToggleCashOnDelivery = (enabled: boolean) => {
+        setCashOnDelivery(enabled);
+    };
+
     useEffect(() => {
         if (success) {
             enqueueSnackbar('Product added successfully!', {
@@ -332,7 +338,7 @@ const AddProduct: React.FC = () => {
                             {/* Cash on Delivery Box */}
                             <div className="bg-white rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
                                 <h5 className="text-xl font-semibold mb-4">Cash on Delivery</h5>
-                                <SwitcherThree />
+                                <SwitcherThree onToggle={handleToggleCashOnDelivery} />
                             </div>
 
                             {/* Estimated Shipping Time Box */}
