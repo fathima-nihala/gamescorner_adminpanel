@@ -456,9 +456,6 @@ const AddProduct: React.FC = () => {
                         </button>
                     </div>
 
-
-
-
                 </form>
             </div>
         </>
