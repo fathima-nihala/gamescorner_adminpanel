@@ -10,8 +10,6 @@ const SelectGroupTwo: React.FC = () => {
 
   const { list: countries } = useSelector((state: RootState) => state.country);
 
-  console.log(countries, 'country');
-
   useEffect(() => {
     dispatch(getCountries());
   }, [dispatch])

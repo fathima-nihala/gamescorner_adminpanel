@@ -1,10 +1,18 @@
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SwitcherThree from '../../components/Switchers/SwitcherThree';
 import DropzoneImage from '../../shared/DropzoneImage';
 import SelectGroupTwo from '../../components/Forms/SelectGroup/SelectGroupTwo';
 import 'react-quill/dist/quill.snow.css';
 import QuillEditor from '../QuillEditor';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
+import { resetSuccess } from '../../slices/productSlice';
+import { useSnackbar } from 'notistack';
+import { fetchBrands } from '../../slices/brandSlice';
+import { fetchAttributes } from '../../slices/attributeSlice';
+import { fetchCategories, fetchCategoryNames, selectCategoryNames } from '../../slices/categorySlice';
+
 
 interface CountryPricing {
     country_id: string;
@@ -43,6 +51,18 @@ interface ProductData {
 }
 
 const AddProduct: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { success, error } = useSelector((state: RootState) => state.product);
+    const brands = useSelector((state: RootState) => state.brands.brands);
+    const { categories } = useSelector((state: RootState) => state.category);
+    const { enqueueSnackbar } = useSnackbar();
+    const categoryNames = useSelector(selectCategoryNames);
+
+    useEffect(() => {
+        dispatch(fetchCategoryNames(productData.parent_category));
+    }, [dispatch]);
+
+
     const [productData, setProductData] = useState<ProductData>({
         name: '',
         product_type: 'physical',
@@ -72,9 +92,44 @@ const AddProduct: React.FC = () => {
         meta_desc: ''
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    useEffect(() => {
+        dispatch(fetchBrands());
+        dispatch(fetchAttributes());
+        dispatch(fetchCategories(''));
+    }, [dispatch])
+
+    useEffect(() => {
+        dispatch(fetchCategoryNames(productData.parent_category));
+    }, [dispatch, productData.parent_category]);
+
+
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
-        setProductData((prevData) => ({ ...prevData, [name]: value }));
+
+        setProductData((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+
+        if (name === 'parent_category') {
+            setProductData((prevData) => ({
+                ...prevData,
+                parent_category: value.trim(),
+                sub_category: []
+            }));
+            dispatch(fetchCategoryNames(value.trim()));
+        }
+
+        if (name === 'attribute') {
+            setProductData((prevData) => ({
+                ...prevData,
+                attribute: value,
+                attribute_value: []
+            }));
+        }
     };
 
     const handleDescriptionChange = (value: string) => {
@@ -84,10 +139,31 @@ const AddProduct: React.FC = () => {
         }));
     };
 
-
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [previewGallery, setPreviewGallery] = useState<(string | null)[]>([null, null, null, null, null]);
-    // const [editorContent, setEditorContent] = useState<string>('');
+
+    useEffect(() => {
+        if (success) {
+            enqueueSnackbar('Product added successfully!', {
+                variant: 'success',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'right',
+                },
+            });
+            dispatch(resetSuccess());
+        }
+        if (error) {
+            enqueueSnackbar(error, {
+                variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'right',
+                },
+            });
+        }
+    }, [success, error, dispatch, enqueueSnackbar]);
+
 
 
     const onFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
@@ -116,9 +192,6 @@ const AddProduct: React.FC = () => {
         };
         reader.readAsDataURL(file);
     };
-
-
-
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -158,7 +231,7 @@ const AddProduct: React.FC = () => {
                                     <div className="sm:col-span-2">
                                         <select
                                             className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                            name="productType"
+                                            name="product_type"
                                             value={productData.product_type}
                                             onChange={handleInputChange}
                                             required
@@ -173,15 +246,20 @@ const AddProduct: React.FC = () => {
                                     <label className="text-gray-700 text-sm font-medium">
                                         Category <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="sm:col-span-2 ">
+                                    <div className="sm:col-span-2">
                                         <select
-                                            className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                            name="categoryId"
+                                            className="w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                            name="parent_category"
                                             value={productData.parent_category}
                                             onChange={handleInputChange}
                                             required
                                         >
-                                            <option value="" className="text-body dark:text-bodydark">Select Category</option>
+                                            <option value="">Select Category</option>
+                                            {categories?.map((category) => (
+                                                <option key={category._id} value={category._id}>
+                                                    {category.parent_category}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
@@ -191,14 +269,20 @@ const AddProduct: React.FC = () => {
                                     <div className="sm:col-span-2">
                                         <select
                                             className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                            name="brandId"
+                                            name="brand"
                                             value={productData.brand}
                                             onChange={handleInputChange}
                                         >
                                             <option value="">Select Brand</option>
+                                            {brands && brands.map((brand) => (
+                                                <option key={brand._id} value={brand._id}>
+                                                    {brand.name}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">Unit</label>
                                     <div className="sm:col-span-2">
@@ -257,7 +341,7 @@ const AddProduct: React.FC = () => {
                                 <input
                                     type="text"
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                    name="estimated_shipping_time"
+                                    name="shipping_time"
                                     placeholder="Enter estimated shipping time"
                                 />
                             </div>
@@ -269,6 +353,7 @@ const AddProduct: React.FC = () => {
                                     type="number"
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     placeholder="0"
+                                    name='tax'
                                 />
                             </div>
 
@@ -312,7 +397,7 @@ const AddProduct: React.FC = () => {
                             <div className="sm:col-span-2 ">
                                 <select
                                     className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                    name="categoryId"
+                                    name="attribute"
                                     value={productData.attribute}
                                     onChange={handleInputChange}
                                     required
@@ -396,6 +481,7 @@ const AddProduct: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -445,7 +531,6 @@ const AddProduct: React.FC = () => {
                             </div>
                         </div>
                     </div>
-
 
                     <div className="flex justify-end space-x-4 mt-4">
                         <button
