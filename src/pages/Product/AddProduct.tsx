@@ -57,10 +57,7 @@ const AddProduct: React.FC = () => {
     const { categories } = useSelector((state: RootState) => state.category);
     const { enqueueSnackbar } = useSnackbar();
     const categoryNames = useSelector(selectCategoryNames);
-
-    useEffect(() => {
-        dispatch(fetchCategoryNames(productData.parent_category));
-    }, [dispatch]);
+    console.log(categoryNames, 'categoryNames');
 
 
     const [productData, setProductData] = useState<ProductData>({
@@ -99,9 +96,10 @@ const AddProduct: React.FC = () => {
     }, [dispatch])
 
     useEffect(() => {
-        dispatch(fetchCategoryNames(productData.parent_category));
-    }, [dispatch, productData.parent_category]);
-
+        if (productData?.parent_category) {
+            dispatch(fetchCategoryNames(productData.parent_category));
+        }
+    }, [dispatch, productData]);
 
 
     const handleInputChange = (
@@ -201,6 +199,9 @@ const AddProduct: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        const formData = new FormData();
+        formData.append('cash_on_delivery', cashOnDelivery.toString());
+
     };
 
     return (
@@ -269,6 +270,28 @@ const AddProduct: React.FC = () => {
                                         </select>
                                     </div>
                                 </div>
+
+                                {productData?.parent_category && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center text-black dark:text-white">
+                                        <label className="text-gray-700 text-sm font-medium">Sub Category</label>
+                                        <div className="sm:col-span-2">
+                                            <select
+                                                className="w-full border border-gray-300 rounded-md bg-transparent py-3 px-3 outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                                name="sub_category"
+                                                value={productData.sub_category || ''}
+                                                onChange={handleInputChange}
+                                                required
+                                            >
+                                                <option value="">Select Subcategory</option>
+                                                {Array.isArray(categoryNames?.name) && categoryNames?.name?.map((subcategory) => (
+                                                    <option key={subcategory._id} value={subcategory._id}>
+                                                        {subcategory.value}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">Brand</label>

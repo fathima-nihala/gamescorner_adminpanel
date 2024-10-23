@@ -71,7 +71,7 @@ import { FC, useState } from 'react';
 
 // Define the props interface
 interface SwitcherThreeProps {
-  onToggle: (enabled: boolean) => void; // Specify the type of the onToggle function
+  onToggle: (enabled: boolean) => void; 
 }
 
 const SwitcherThree: FC<SwitcherThreeProps> = ({ onToggle }) => {
