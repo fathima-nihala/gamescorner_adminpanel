@@ -7,12 +7,13 @@ import 'react-quill/dist/quill.snow.css';
 import QuillEditor from '../QuillEditor';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { resetSuccess } from '../../slices/productSlice';
+import { addProduct, resetSuccess } from '../../slices/productSlice';
 import { useSnackbar } from 'notistack';
 import { fetchBrands } from '../../slices/brandSlice';
-import { fetchAttributes } from '../../slices/attributeSlice';
+import { fetchAttributes, fetchAttributeValues } from '../../slices/attributeSlice';
 import { fetchCategories, fetchCategoryNames, selectCategoryNames } from '../../slices/categorySlice';
-
+import CustomInput from '../../shared/CustomInput';
+import { Typography } from '@mui/material';
 
 interface CountryPricing {
     country_id: string;
@@ -21,6 +22,11 @@ interface CountryPricing {
     currency_code: string;
     unit_price: number;
     discount?: number;
+}
+
+interface AttributeValue {
+    _id: string;
+    value: string;
 }
 
 interface ProductData {
@@ -57,8 +63,10 @@ const AddProduct: React.FC = () => {
     const { categories } = useSelector((state: RootState) => state.category);
     const { enqueueSnackbar } = useSnackbar();
     const categoryNames = useSelector(selectCategoryNames);
-    console.log(categoryNames, 'categoryNames');
-
+    const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+    const { attributes, attributeValues } = useSelector((state: RootState) => state.attribute);
+    console.log(attributes, 'attribute');
+    console.log(attributeValues, 'attributeValues');
 
     const [productData, setProductData] = useState<ProductData>({
         name: '',
@@ -101,16 +109,32 @@ const AddProduct: React.FC = () => {
         }
     }, [dispatch, productData]);
 
+    useEffect(() => {
+        if (productData?.attribute) {
+            dispatch(fetchAttributeValues(productData.attribute))
+        }
+    }, [dispatch, productData])
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
 
-        setProductData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
+        // setProductData((prevData) => ({
+        //     ...prevData,
+        //     [name]: value
+        // }));
+
+        if (name === 'attribute_value') {
+            const selectedOptions = Array.from((e.target as HTMLSelectElement).selectedOptions).map(option => option.value);
+            setProductData(prevData => ({
+                ...prevData,
+                attribute_value: selectedOptions
+            }));
+        } else {
+            setProductData((prevData) => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
 
         if (name === 'parent_category') {
             setProductData((prevData) => ({
@@ -127,7 +151,9 @@ const AddProduct: React.FC = () => {
                 attribute: value,
                 attribute_value: []
             }));
+            dispatch(fetchAttributeValues(value))
         }
+
     };
 
     const handleDescriptionChange = (value: string) => {
@@ -139,7 +165,6 @@ const AddProduct: React.FC = () => {
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [previewGallery, setPreviewGallery] = useState<(string | null)[]>([null, null, null, null, null]);
-
     const [cashOnDelivery, setCashOnDelivery] = useState(false);
 
     const handleToggleCashOnDelivery = (enabled: boolean) => {
@@ -197,10 +222,80 @@ const AddProduct: React.FC = () => {
         reader.readAsDataURL(file);
     };
 
+    const validateInput = () => {
+        let validationErrors = {
+            name: productData.name ? "" : "Name is required",
+            product_type: productData.product_type ? "" : "Product type is required",
+            image: productData.image ? "" : "Image is required",
+            parent_category: productData.parent_category ? "" : "Parent category is required",
+            description: productData.description ? "" : "Description is required",
+            brand: productData.brand ? "" : "Brand is required",
+            gallery1: productData.gallery1 ? "" : "At least one gallery image is required",
+        };
+        setLocalErrors(validationErrors);
+        return Object.values(validationErrors).every(value => !value);
+    };
+
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const formData = new FormData();
-        formData.append('cash_on_delivery', cashOnDelivery.toString());
+        const isValid = validateInput();
+        if (isValid) {
+
+            const formData = new FormData();
+            formData.append('name', productData.name);
+            formData.append('product_type', productData.product_type);
+            formData.append('parent_category', productData.parent_category);
+            formData.append('brand', productData.brand);
+            formData.append('attribute', productData.attribute);
+            formData.append('description', productData.description);
+            formData.append('quantity', productData.quantity || '');
+            formData.append('shipping_time', productData.shipping_time || '');
+            formData.append('tax', productData.tax || '');
+            formData.append('unit', productData.unit || '');
+            formData.append('weight', productData.weight || '');
+            formData.append('tags', productData.tags || '');
+            formData.append('cash_on_delivery', cashOnDelivery.toString());
+            formData.append('meta_title', productData.meta_title || '');
+            formData.append('meta_desc', productData.meta_desc || '');
+
+            if (Array.isArray(productData.sub_category)) {
+                productData.sub_category.forEach(subCat => {
+                    formData.append('sub_category[]', subCat);
+                });
+            }
+
+            if (Array.isArray(productData.attribute_value)) {
+                productData.attribute_value.forEach(attrVal => {
+                    formData.append('attribute_value[]', attrVal);
+                });
+            }
+
+            if (productData.image instanceof File) {
+                formData.append('image', productData.image);
+            }
+
+            if (productData.gallery1) {
+                formData.append('gallery1', productData.gallery1);
+            }
+            if (productData.gallery2) {
+                formData.append('gallery2', productData.gallery2);
+            }
+            if (productData.gallery3) {
+                formData.append('gallery3', productData.gallery3);
+            }
+            if (productData.gallery4) {
+                formData.append('gallery4', productData.gallery4);
+            }
+            if (productData.gallery5) {
+                formData.append('gallery5', productData.gallery5);
+            }
+
+            productData.country_pricing.forEach(country => {
+                formData.append('country_pricing[]', JSON.stringify(country)); 
+            });
+            dispatch(addProduct(formData));
+        }
 
     };
 
@@ -220,17 +315,18 @@ const AddProduct: React.FC = () => {
                                         Product Name <span className="text-red-500">*</span>
                                     </label>
                                     <div className="sm:col-span-2">
-                                        <input
+                                        <CustomInput
                                             type="text"
-                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                             name="name"
                                             value={productData.name}
                                             onChange={handleInputChange}
                                             placeholder="Product Name"
-                                            required
+                                            localErrors={!!localErrors.name}
+                                            helperText={localErrors.name}
                                         />
                                     </div>
                                 </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">
                                         Product Type <span className="text-red-500">*</span>
@@ -241,7 +337,7 @@ const AddProduct: React.FC = () => {
                                             name="product_type"
                                             value={productData.product_type}
                                             onChange={handleInputChange}
-                                            required
+
                                         >
                                             <option value="Physical" className="text-body dark:text-bodydark">Physical</option>
                                             <option value="Digital" className="text-body dark:text-bodydark"> Digital</option>
@@ -259,7 +355,7 @@ const AddProduct: React.FC = () => {
                                             name="parent_category"
                                             value={productData.parent_category}
                                             onChange={handleInputChange}
-                                            required
+
                                         >
                                             <option value="">Select Category</option>
                                             {categories?.map((category) => (
@@ -268,6 +364,7 @@ const AddProduct: React.FC = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        {localErrors.parent_category && <p className="text-red-500 text-xs">{localErrors.parent_category}</p>}
                                     </div>
                                 </div>
 
@@ -280,7 +377,6 @@ const AddProduct: React.FC = () => {
                                                 name="sub_category"
                                                 value={productData.sub_category || ''}
                                                 onChange={handleInputChange}
-                                                required
                                             >
                                                 <option value="">Select Subcategory</option>
                                                 {Array.isArray(categoryNames?.name) && categoryNames?.name?.map((subcategory) => (
@@ -309,15 +405,15 @@ const AddProduct: React.FC = () => {
                                                 </option>
                                             ))}
                                         </select>
+                                        {localErrors.brand && <p className="text-red-500 text-xs">{localErrors.brand}</p>}
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">Unit</label>
                                     <div className="sm:col-span-2">
-                                        <input
+                                        <CustomInput
                                             type="text"
-                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                             name="unit"
                                             value={productData.unit}
                                             onChange={handleInputChange}
@@ -325,12 +421,12 @@ const AddProduct: React.FC = () => {
                                         />
                                     </div>
                                 </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">Weight</label>
                                     <div className="sm:col-span-2">
-                                        <input
+                                        <CustomInput
                                             type="text"
-                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                             name="weight"
                                             value={productData.weight}
                                             onChange={handleInputChange}
@@ -338,12 +434,12 @@ const AddProduct: React.FC = () => {
                                         />
                                     </div>
                                 </div>
+
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                     <label className="text-gray-700 text-sm font-medium">Tags</label>
                                     <div className="sm:col-span-2">
-                                        <input
+                                        <CustomInput
                                             type="text"
-                                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                             name="tags"
                                             value={productData.tags}
                                             onChange={handleInputChange}
@@ -400,6 +496,7 @@ const AddProduct: React.FC = () => {
                                 image={previewImage}
                                 id="thumbnail-upload"
                             />
+                            {localErrors.image && <Typography color="error">{localErrors.image}</Typography>}
                         </div>
 
                         <div className="mt-10">
@@ -423,17 +520,53 @@ const AddProduct: React.FC = () => {
                         <div className="p-6  rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
 
-                            <div className="sm:col-span-2 ">
-                                <select
-                                    className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                    name="attribute"
-                                    value={productData.attribute}
-                                    onChange={handleInputChange}
-                                    required
-                                >
-                                    <option value="" className="text-body dark:text-bodydark">Select attribute</option>
-                                </select>
+                            {/* <div className="sm:col-span-2 "> */}
+                            <div className="flex flex-col md:flex-row gap-4">
+                                {/* Attribute Dropdown */}
+                                <div className="w-full">
+                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
+                                    <select
+                                        className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                        name="attribute"
+                                        value={productData.attribute}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="" className="text-body dark:text-bodydark">Select attribute</option>
+                                        {attributes.map((attribute) => (
+                                            <option key={attribute._id} value={attribute._id} className="text-body dark:text-bodydark">
+                                                {attribute.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
+
+                            {productData.attribute && (
+                                <div className="w-full">
+                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute Value</label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded-md py-3 px-3 bg-transparent outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                        name="attribute_value"
+                                        value={productData.attribute_value || []}
+                                        onChange={handleInputChange}
+                                        multiple
+                                    >
+                                        <option value="" disabled>Select Attribute Value</option>
+
+                                        {Array.isArray(attributeValues) && attributeValues.map((value: AttributeValue) => (
+                                            <option
+                                                key={value._id}
+                                                value={value._id}
+                                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            >
+                                                {value.value}
+                                            </option>
+                                        ))}
+
+                                    </select>
+                                </div>
+                            )}
+
                         </div>
                     </div>
 
@@ -467,7 +600,6 @@ const AddProduct: React.FC = () => {
                                                     placeholder="Unit price"
                                                     min="0"
                                                     step="0.01"
-                                                    required
                                                 />
                                             </div>
                                         </div>
@@ -486,7 +618,7 @@ const AddProduct: React.FC = () => {
                                                     placeholder="Discount"
                                                     min="0"
                                                     step="0.01"
-                                                    required
+
                                                 />
                                             </div>
                                         </div>
@@ -505,7 +637,6 @@ const AddProduct: React.FC = () => {
                                                     placeholder="Quantity"
                                                     min="0"
                                                     step="1"
-                                                    required
                                                 />
                                             </div>
                                         </div>
@@ -524,6 +655,7 @@ const AddProduct: React.FC = () => {
                                     onChange={handleDescriptionChange}
                                     placeholder="Enter your description here"
                                 />
+                                {localErrors.description && (<p className="text-red-500 text-xs mt-1">{localErrors.description}</p>)}
                             </div>
                         </div>
                     </div>
@@ -542,7 +674,7 @@ const AddProduct: React.FC = () => {
                                         type="text"
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Meta Title"
-                                        required
+
                                     />
                                 </div>
                             </div>
@@ -554,7 +686,7 @@ const AddProduct: React.FC = () => {
                                     <textarea
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Description"
-                                        required
+
                                     />
                                 </div>
                             </div>

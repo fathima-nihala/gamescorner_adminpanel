@@ -185,7 +185,6 @@ export const fetchCategoryNames = createAsyncThunk(
   async (id: string, { rejectWithValue }) => {
     try {
       const response = await api.get(`/cat/${id}/name`);
-      console.log(response.data);
       return response.data.catnames;
     } catch (error: any) {
       return rejectWithValue(
