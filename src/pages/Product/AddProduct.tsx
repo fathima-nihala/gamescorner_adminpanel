@@ -15,6 +15,7 @@ import { fetchCategories, fetchCategoryNames, selectCategoryNames } from '../../
 import CustomInput from '../../shared/CustomInput';
 import { Typography } from '@mui/material';
 
+
 interface CountryPricing {
     country_id: string;
     country: string;
@@ -23,7 +24,6 @@ interface CountryPricing {
     unit_price: number;
     discount?: number;
 }
-
 
 interface ProductData {
     name: string;
@@ -112,6 +112,7 @@ const AddProduct: React.FC = () => {
             dispatch(fetchAttributeValues(productData.attribute))
         }
     }, [dispatch, productData])
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -535,14 +536,14 @@ const AddProduct: React.FC = () => {
 
                             {productData.attribute && (
                                 <div className="w-full">
-                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
+                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute Value</label>
                                     <select
                                         className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
                                         name="attribute_value"
                                         value={productData.attribute_value}
                                         onChange={handleInputChange}
                                     >
-                                        <option value="" className="text-body dark:text-bodydark">Select attribute</option>
+                                        <option value="" className="text-body dark:text-bodydark">Select attribute Value</option>
 
                                         {attributeValues?.value && Array.isArray(attributeValues.value) &&
                                             attributeValues.value.map((item) => (
@@ -554,15 +555,13 @@ const AddProduct: React.FC = () => {
                                                     {item.value}
                                                 </option>
                                             ))}
-
                                     </select>
                                 </div>
                             )}
 
+
                         </div>
                     </div>
-
-
 
                     {/* proice stock and description */}
                     <div className='flex lg:flex-row flex-col gap-3'>
