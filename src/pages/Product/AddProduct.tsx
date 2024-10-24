@@ -14,6 +14,8 @@ import { fetchAttributes, fetchAttributeValues } from '../../slices/attributeSli
 import { fetchCategories, fetchCategoryNames, selectCategoryNames } from '../../slices/categorySlice';
 import CustomInput from '../../shared/CustomInput';
 import { Typography } from '@mui/material';
+import MultiSelect from '../../components/Forms/MultiSelect';
+import { getAllColors } from '../../slices/colorSlice';
 
 
 interface CountryPricing {
@@ -50,6 +52,7 @@ interface ProductData {
     gallery5?: string | File;
     meta_title?: string;
     meta_desc?: string;
+    color: string[];
 }
 
 const AddProduct: React.FC = () => {
@@ -92,13 +95,15 @@ const AddProduct: React.FC = () => {
         gallery4: '',
         gallery5: '',
         meta_title: '',
-        meta_desc: ''
+        meta_desc: '',
+        color:[]
     });
 
     useEffect(() => {
         dispatch(fetchBrands());
         dispatch(fetchAttributes());
         dispatch(fetchCategories(''));
+        dispatch(getAllColors());
     }, [dispatch])
 
     useEffect(() => {
@@ -292,6 +297,15 @@ const AddProduct: React.FC = () => {
         }
 
     };
+
+
+    const handleAttributeValuesChange = (values: string[]) => {
+        setProductData(prev => ({
+            ...prev,
+            attribute_value: values
+        }));
+    };
+
 
     return (
         <>
@@ -510,10 +524,8 @@ const AddProduct: React.FC = () => {
 
                     {/* Attribute */}
                     <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
-                        <div className="p-6  rounded-md">
+                        <div className=" rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
-
-                            {/* <div className="sm:col-span-2 "> */}
                             <div className="flex flex-col md:flex-row gap-4">
                                 {/* Attribute Dropdown */}
                                 <div className="w-full">
@@ -535,33 +547,18 @@ const AddProduct: React.FC = () => {
                             </div>
 
                             {productData.attribute && (
-                                <div className="w-full">
-                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute Value</label>
-                                    <select
-                                        className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                        name="attribute_value"
-                                        value={productData.attribute_value}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="" className="text-body dark:text-bodydark">Select attribute Value</option>
-
-                                        {attributeValues?.value && Array.isArray(attributeValues.value) &&
-                                            attributeValues.value.map((item) => (
-                                                <option
-                                                    key={item._id}
-                                                    value={item._id}
-                                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                >
-                                                    {item.value}
-                                                </option>
-                                            ))}
-                                    </select>
+                                <div className='mt-2'> 
+                                    <MultiSelect
+                                        attributeId={productData.attribute}
+                                        selectedValues={productData.attribute_value}
+                                        onChange={handleAttributeValuesChange}
+                                    />
                                 </div>
                             )}
 
-
                         </div>
                     </div>
+
 
                     {/* proice stock and description */}
                     <div className='flex lg:flex-row flex-col gap-3'>

@@ -27,7 +27,6 @@ interface AttributeValuesResponse {
 interface AttributeState {
   attributes: Attribute[];
   attribute: Attribute | null;
-  // attributeValues: AttributeValue[];
   attributeValues: AttributeValuesResponse; 
 
   loading: boolean;
@@ -38,7 +37,6 @@ interface AttributeState {
 const initialState: AttributeState = {
   attributes: [],
   attribute: null,
-  // attributeValues: [],
   attributeValues: {
     value: [] 
   },
@@ -350,14 +348,6 @@ const attributeSlice = createSlice({
       .addCase(fetchAttributeValues.pending, (state) => {
         state.loading = true;
       })
-      // .addCase(
-      //   fetchAttributeValues.fulfilled,
-      //   (state, action: PayloadAction<AttributeValue[]>) => {
-      //     state.loading = false;
-      //     state.attributeValues = action.payload; // Save the attribute values
-      //   },
-      // )
-
       .addCase(
         fetchAttributeValues.fulfilled,
         (state, action: PayloadAction<AttributeValuesResponse>) => {

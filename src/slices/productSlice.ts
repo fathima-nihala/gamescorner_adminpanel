@@ -44,6 +44,7 @@ export interface Product {
   meta_desc?: string;
   createdAt: string;
   updatedAt: string;
+  color?: string[];
 }
 
 interface ProductState {
