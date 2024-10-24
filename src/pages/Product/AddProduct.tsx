@@ -24,10 +24,6 @@ interface CountryPricing {
     discount?: number;
 }
 
-interface AttributeValue {
-    _id: string;
-    value: string;
-}
 
 interface ProductData {
     name: string;
@@ -64,9 +60,11 @@ const AddProduct: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const categoryNames = useSelector(selectCategoryNames);
     const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
-    const { attributes, attributeValues } = useSelector((state: RootState) => state.attribute);
+    const { attributes } = useSelector((state: RootState) => state.attribute);
     console.log(attributes, 'attribute');
+    const attributeValues = useSelector((state: RootState) => state.attribute.attributeValues);
     console.log(attributeValues, 'attributeValues');
+
 
     const [productData, setProductData] = useState<ProductData>({
         name: '',
@@ -117,11 +115,6 @@ const AddProduct: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-
-        // setProductData((prevData) => ({
-        //     ...prevData,
-        //     [name]: value
-        // }));
 
         if (name === 'attribute_value') {
             const selectedOptions = Array.from((e.target as HTMLSelectElement).selectedOptions).map(option => option.value);
@@ -292,7 +285,7 @@ const AddProduct: React.FC = () => {
             }
 
             productData.country_pricing.forEach(country => {
-                formData.append('country_pricing[]', JSON.stringify(country)); 
+                formData.append('country_pricing[]', JSON.stringify(country));
             });
             dispatch(addProduct(formData));
         }
@@ -355,7 +348,6 @@ const AddProduct: React.FC = () => {
                                             name="parent_category"
                                             value={productData.parent_category}
                                             onChange={handleInputChange}
-
                                         >
                                             <option value="">Select Category</option>
                                             {categories?.map((category) => (
@@ -543,25 +535,25 @@ const AddProduct: React.FC = () => {
 
                             {productData.attribute && (
                                 <div className="w-full">
-                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute Value</label>
+                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
                                     <select
-                                        className="w-full border border-gray-300 rounded-md py-3 px-3 bg-transparent outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                        className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
                                         name="attribute_value"
-                                        value={productData.attribute_value || []}
+                                        value={productData.attribute_value}
                                         onChange={handleInputChange}
-                                        multiple
                                     >
-                                        <option value="" disabled>Select Attribute Value</option>
+                                        <option value="" className="text-body dark:text-bodydark">Select attribute</option>
 
-                                        {Array.isArray(attributeValues) && attributeValues.map((value: AttributeValue) => (
-                                            <option
-                                                key={value._id}
-                                                value={value._id}
-                                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                            >
-                                                {value.value}
-                                            </option>
-                                        ))}
+                                        {attributeValues?.value && Array.isArray(attributeValues.value) &&
+                                            attributeValues.value.map((item) => (
+                                                <option
+                                                    key={item._id}
+                                                    value={item._id}
+                                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                >
+                                                    {item.value}
+                                                </option>
+                                            ))}
 
                                     </select>
                                 </div>

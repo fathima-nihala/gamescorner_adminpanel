@@ -19,11 +19,17 @@ export interface AttributeValue {
   value: string;
 }
 
+interface AttributeValuesResponse {
+  value: AttributeValue[];
+}
+
 // Define the initial state type
 interface AttributeState {
   attributes: Attribute[];
   attribute: Attribute | null;
-  attributeValues: AttributeValue[];
+  // attributeValues: AttributeValue[];
+  attributeValues: AttributeValuesResponse; 
+
   loading: boolean;
   error: string | null;
 }
@@ -32,7 +38,10 @@ interface AttributeState {
 const initialState: AttributeState = {
   attributes: [],
   attribute: null,
-  attributeValues: [],
+  // attributeValues: [],
+  attributeValues: {
+    value: [] 
+  },
   loading: false,
   error: null,
 };
@@ -201,7 +210,7 @@ export const fetchAttributeValues = createAsyncThunk(
   'attributes/fetchValues',
   async (id: string, { rejectWithValue }) => {
     try {
-      const response = await api.get<{ AttributeValues: AttributeValue[] }>(
+      const response = await api.get<{ AttributeValues: AttributeValuesResponse }>(
         `/attributes/${id}/value`,
       );
       return response.data.AttributeValues; // Updated to return an array
@@ -341,11 +350,19 @@ const attributeSlice = createSlice({
       .addCase(fetchAttributeValues.pending, (state) => {
         state.loading = true;
       })
+      // .addCase(
+      //   fetchAttributeValues.fulfilled,
+      //   (state, action: PayloadAction<AttributeValue[]>) => {
+      //     state.loading = false;
+      //     state.attributeValues = action.payload; // Save the attribute values
+      //   },
+      // )
+
       .addCase(
         fetchAttributeValues.fulfilled,
-        (state, action: PayloadAction<AttributeValue[]>) => {
+        (state, action: PayloadAction<AttributeValuesResponse>) => {
           state.loading = false;
-          state.attributeValues = action.payload; // Save the attribute values
+          state.attributeValues = action.payload;
         },
       )
       .addCase(fetchAttributeValues.rejected, (state, action) => {
