@@ -22,7 +22,8 @@ import AttributeDetails from './pages/Product/AttributeDetails';
 import ForgotPassword from './Login/ForgotPassword';
 import VerifyOtp from './Login/VerifyOtp';
 import Resetpassword from './Login/Resetpassword';
-import  AddProduct  from './pages/Product/AddProduct';
+import AddProduct from './pages/Product/AddProduct';
+import Color from './pages/Product/Color';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,7 +69,7 @@ function App() {
           </>
         }
       />
-       <Route
+      <Route
         path="/reset-password"
         element={
           <>
@@ -122,6 +123,17 @@ function App() {
                     </>
                   }
                 />
+
+                <Route
+                  path="/product/product-color"
+                  element={
+                    <>
+                      <PageTitle title="Color | Games Corner" />
+                      <Color />
+                    </>
+                  }
+                />
+
                 <Route
                   path="/product/product-category"
                   element={

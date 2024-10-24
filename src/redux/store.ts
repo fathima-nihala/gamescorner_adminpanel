@@ -6,6 +6,7 @@ import categoryReducer from '../slices/categorySlice.ts';
 import attributeReducer from '../slices/attributeSlice.ts';
 import countryReducer from '../slices/countrSlice.ts'; 
 import productReducer from '../slices/productSlice.ts';
+import colorReducer from '../slices/colorSlice.ts';
 
  const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ import productReducer from '../slices/productSlice.ts';
     attribute: attributeReducer,
     country: countryReducer,
     product: productReducer,
+    color: colorReducer,
   },
 });
 
