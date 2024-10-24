@@ -20,7 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../shared/ConfirmationModal";
 import { AppDispatch, RootState } from "../../redux/store";
-import { deleteColor, getColors, addColor } from "../../slices/colorSlice";
+import { deleteColor, addColor, getAllColors } from "../../slices/colorSlice";
 import EditColor from "./EditColor";
 
 interface Color {
@@ -42,8 +42,24 @@ const Color: React.FC = () => {
 
     const { colors, loading, error: stateError } = useSelector((state: RootState) => state.color);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const brandsPerPage = 10;
+
+    // Pagination logic
+    const indexOfLastBrand = currentPage * brandsPerPage;
+    const indexOfFirstBrand = indexOfLastBrand - brandsPerPage;
+    const currentColors = colors.slice(indexOfFirstBrand, indexOfLastBrand);
+    const totalPages = Math.ceil(colors.length / brandsPerPage);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
     useEffect(() => {
-        dispatch(getColors({}));
+        // dispatch(getColors({}));
+        dispatch(getAllColors());
+
     }, [dispatch]);
 
     useEffect(() => {
@@ -214,6 +230,25 @@ const Color: React.FC = () => {
                         </Box>
                     </Box>
                 </Box>
+
+                 {/* Pagination Controls */}
+            <div className="flex justify-between items-center py-4 px-4">
+                <button
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                >
+                    Previous
+                </button>
+                <p>{`Page ${currentPage} of ${totalPages}`}</p>
+                <button
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
             </div>
 
             <ConfirmationModal
@@ -221,6 +256,8 @@ const Color: React.FC = () => {
                 delHandleClose={() => setDelOpen(false)}
                 onDelete={onDelete}
             />
+
+
         </div>
     );
 };
