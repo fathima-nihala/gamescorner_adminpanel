@@ -96,7 +96,7 @@ const AddProduct: React.FC = () => {
         gallery5: '',
         meta_title: '',
         meta_desc: '',
-        color:[]
+        color: []
     });
 
     useEffect(() => {
@@ -526,6 +526,41 @@ const AddProduct: React.FC = () => {
                     <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
                         <div className=" rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
+
+                            {/* colors */}
+                            <div className='w-full'>
+                                <label className='block text-gray-700 dark:text-white mb-2'>Colours</label>
+
+                                <div className="flex items-center justify-between gap-4">
+                                    {/* Colors Dropdown */}
+                                    <div className="w-full">
+                                        <select
+                                            className='w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input'
+                                            name='colors'
+                                        >
+                                            <option value="" className="text-body dark:text-bodydark">Select color</option>
+                                            <option value="red" className="text-body dark:text-bodydark">Red</option>
+                                            <option value="blue" className="text-body dark:text-bodydark">Blue</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Toggle Bar */}
+                                    {/* <div className="flex items-center">
+                                            <div className="relative cursor-pointer" onClick={() => document.getElementById('color-toggle').click()}>
+                                                <input
+                                                    type="checkbox"
+                                                    id="color-toggle"
+                                                    className="sr-only peer" 
+                                                />
+                                                <div className="w-10 h-5 bg-gray-300 rounded-full dark:bg-gray-600 peer-checked:bg-primary transition-colors duration-200"></div>
+                                                <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white border border-gray-300 rounded-full transition-transform duration-200 transform peer-checked:translate-x-5 dark:border-gray-500"></div>
+                                            </div>
+                                    </div> */}
+                                </div>
+                            </div>
+
+
+
                             <div className="flex flex-col md:flex-row gap-4">
                                 {/* Attribute Dropdown */}
                                 <div className="w-full">
@@ -547,7 +582,7 @@ const AddProduct: React.FC = () => {
                             </div>
 
                             {productData.attribute && (
-                                <div className='mt-2'> 
+                                <div className='mt-2'>
                                     <MultiSelect
                                         attributeId={productData.attribute}
                                         selectedValues={productData.attribute_value}
