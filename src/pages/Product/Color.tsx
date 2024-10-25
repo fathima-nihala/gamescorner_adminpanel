@@ -57,7 +57,6 @@ const Color: React.FC = () => {
     };
 
     useEffect(() => {
-        // dispatch(getColors({}));
         dispatch(getAllColors());
 
     }, [dispatch]);
@@ -154,7 +153,7 @@ const Color: React.FC = () => {
                                 </TableHead>
                                 <TableBody>
                                     {colors && colors.length > 0 ? (
-                                        colors.map((color, index) => (
+                                        currentColors.map((color, index) => (
                                             <TableRow key={color._id}>
                                                 <TableCell className="text-black dark:text-white">{index + 1}</TableCell>
                                                 <TableCell className="text-black dark:text-white">{color.name}</TableCell>
@@ -250,14 +249,11 @@ const Color: React.FC = () => {
                 </button>
             </div>
             </div>
-
             <ConfirmationModal
                 delOpen={delOpen}
                 delHandleClose={() => setDelOpen(false)}
                 onDelete={onDelete}
             />
-
-
         </div>
     );
 };

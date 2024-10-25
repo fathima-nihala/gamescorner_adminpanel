@@ -16,6 +16,7 @@ import CustomInput from '../../shared/CustomInput';
 import { Typography } from '@mui/material';
 import MultiSelect from '../../components/Forms/MultiSelect';
 import { getAllColors } from '../../slices/colorSlice';
+import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 
 
 interface CountryPricing {
@@ -64,9 +65,6 @@ const AddProduct: React.FC = () => {
     const categoryNames = useSelector(selectCategoryNames);
     const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
     const { attributes } = useSelector((state: RootState) => state.attribute);
-    console.log(attributes, 'attribute');
-    const attributeValues = useSelector((state: RootState) => state.attribute.attributeValues);
-    console.log(attributeValues, 'attributeValues');
 
 
     const [productData, setProductData] = useState<ProductData>({
@@ -152,7 +150,6 @@ const AddProduct: React.FC = () => {
             }));
             dispatch(fetchAttributeValues(value))
         }
-
     };
 
     const handleDescriptionChange = (value: string) => {
@@ -219,6 +216,20 @@ const AddProduct: React.FC = () => {
             }
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleAttributeValuesChange = (values: string[]) => {
+        setProductData(prev => ({
+            ...prev,
+            attribute_value: values
+        }));
+    };
+
+    const handleColorChange = (selectedColors: string[]) => {
+        setProductData(prev => ({
+            ...prev,
+            color: selectedColors
+        }));
     };
 
     const validateInput = () => {
@@ -293,18 +304,16 @@ const AddProduct: React.FC = () => {
             productData.country_pricing.forEach(country => {
                 formData.append('country_pricing[]', JSON.stringify(country));
             });
+
+            productData.color.forEach((color) => {
+                formData.append('color', color);
+            });
+
             dispatch(addProduct(formData));
         }
 
     };
 
-
-    const handleAttributeValuesChange = (values: string[]) => {
-        setProductData(prev => ({
-            ...prev,
-            attribute_value: values
-        }));
-    };
 
 
     return (
@@ -527,36 +536,12 @@ const AddProduct: React.FC = () => {
                         <div className=" rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
 
-                            {/* colors */}
                             <div className='w-full'>
-                                <label className='block text-gray-700 dark:text-white mb-2'>Colours</label>
-
-                                <div className="flex items-center justify-between gap-4">
-                                    {/* Colors Dropdown */}
-                                    <div className="w-full">
-                                        <select
-                                            className='w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input'
-                                            name='colors'
-                                        >
-                                            <option value="" className="text-body dark:text-bodydark">Select color</option>
-                                            <option value="red" className="text-body dark:text-bodydark">Red</option>
-                                            <option value="blue" className="text-body dark:text-bodydark">Blue</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Toggle Bar */}
-                                    {/* <div className="flex items-center">
-                                            <div className="relative cursor-pointer" onClick={() => document.getElementById('color-toggle').click()}>
-                                                <input
-                                                    type="checkbox"
-                                                    id="color-toggle"
-                                                    className="sr-only peer" 
-                                                />
-                                                <div className="w-10 h-5 bg-gray-300 rounded-full dark:bg-gray-600 peer-checked:bg-primary transition-colors duration-200"></div>
-                                                <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white border border-gray-300 rounded-full transition-transform duration-200 transform peer-checked:translate-x-5 dark:border-gray-500"></div>
-                                            </div>
-                                    </div> */}
-                                </div>
+                                <MultipleColorSelect
+                                    selectedColors={productData.color}
+                                    onChange={handleColorChange}
+                                    className="mb-4"
+                                />
                             </div>
 
 
