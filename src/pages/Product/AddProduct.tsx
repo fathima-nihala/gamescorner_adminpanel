@@ -65,6 +65,9 @@ const AddProduct: React.FC = () => {
     const categoryNames = useSelector(selectCategoryNames);
     const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
     const { attributes } = useSelector((state: RootState) => state.attribute);
+    const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+    const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string }>>({});
+
 
 
     const [productData, setProductData] = useState<ProductData>({
@@ -190,7 +193,6 @@ const AddProduct: React.FC = () => {
     }, [success, error, dispatch, enqueueSnackbar]);
 
 
-
     const onFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -231,6 +233,25 @@ const AddProduct: React.FC = () => {
             color: selectedColors
         }));
     };
+
+    const handleCountrySelectionChange = (countries: string[]) => {
+        setSelectedCountries(countries);
+        const updatedPriceDiscounts = countries.reduce((acc, country) => {
+            acc[country] = priceDiscounts[country] || { price: '', discount: '' };
+            return acc;
+        }, {} as Record<string, { price: string; discount: string }>);
+
+        setPriceDiscounts(updatedPriceDiscounts);
+    };
+
+    const handleCountryChange = (country: string, field: 'price' | 'discount', value: string) => {
+        setPriceDiscounts((prev) => ({
+            ...prev,
+            [country]: { ...prev[country], [field]: value }
+        }));
+    };
+
+    console.log(selectedCountries, 'cccccccccccccccccc');
 
     const validateInput = () => {
         let validationErrors = {
@@ -311,9 +332,7 @@ const AddProduct: React.FC = () => {
 
             dispatch(addProduct(formData));
         }
-
     };
-
 
 
     return (
@@ -544,8 +563,6 @@ const AddProduct: React.FC = () => {
                                 />
                             </div>
 
-
-
                             <div className="flex flex-col md:flex-row gap-4">
                                 {/* Attribute Dropdown */}
                                 <div className="w-full">
@@ -592,48 +609,52 @@ const AddProduct: React.FC = () => {
                                     </div>
 
                                     <div className=" ">
-                                        <SelectGroupTwo />
+                                        <SelectGroupTwo
+                                            selectedCountries={selectedCountries}
+                                            onChange={handleCountrySelectionChange}
+                                        />
                                     </div>
 
-                                    {/* Unit Price */}
-                                    <div className="col-span-12 mt-5">
-                                        <div className="grid grid-cols-12 gap-4 mb-4">
-                                            <label className="col-span-3 text-gray-700 text-sm font-medium ">
-                                                Unit Price <span className="text-red-500">*</span>
-                                            </label>
-                                            <div className="col-span-9">
-                                                <input
-                                                    type="number"
-                                                    className=" dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                                    placeholder="Unit price"
-                                                    min="0"
-                                                    step="0.01"
-                                                />
+                                    {selectedCountries.map(country => (
+                                        <div key={country} className="col-span-12 mt-5">
+                                            <div className="grid grid-cols-12 gap-4 mb-4">
+                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                                    Unit Price for {country} <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="col-span-9">
+                                                    <input
+                                                        type="number"
+                                                        className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                        placeholder="Unit price"
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={priceDiscounts[country]?.price || ''}
+                                                        onChange={(e) => handleCountryChange(country, 'price', e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-12 gap-4 mb-4">
+                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                                    Discount for {country} <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="col-span-9">
+                                                    <input
+                                                        type="number"
+                                                        className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                        placeholder="Discount"
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={priceDiscounts[country]?.discount || ''}
+                                                        onChange={(e) => handleCountryChange(country, 'discount', e.target.value)}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    {/* Discount */}
-                                    <div className="col-span-12">
-                                        <div className="grid grid-cols-12 gap-4 mb-4">
-                                            <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                Discount <span className="text-red-500">*</span>
-                                            </label>
-                                            <div className="col-span-9">
-                                                <input
-                                                    type="number"
-                                                    className=" dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200 "
-                                                    placeholder="Discount"
-                                                    min="0"
-                                                    step="0.01"
-
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
 
                                     {/* Quantity */}
-                                    <div className="col-span-12">
+                                    <div className="col-span-12 mt-2">
                                         <div className="grid grid-cols-12 gap-4 mb-4 ">
                                             <label className=" col-span-3 text-gray-700 text-sm font-medium">
                                                 Quantity <span className="text-red-500">*</span>
