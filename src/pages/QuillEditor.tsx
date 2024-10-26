@@ -31,7 +31,7 @@ const QuillEditor = forwardRef<ReactQuill, QuillEditorProps>((props, ref) => {
                 onChange={onChange}
                 modules={modules}
                 placeholder={placeholder}
-                className="md:h-60 text-gray-700 dark:text-white [&_.ql-editor.ql-blank::before]:text-black [&_.ql-editor.ql-blank::before]:dark:text-white"
+                className="md:h-full text-gray-700 dark:text-white [&_.ql-editor.ql-blank::before]:text-black [&_.ql-editor.ql-blank::before]:dark:text-white"
             />
         </div>
     );
@@ -40,3 +40,4 @@ const QuillEditor = forwardRef<ReactQuill, QuillEditorProps>((props, ref) => {
 QuillEditor.displayName = 'QuillEditor';
 
 export default QuillEditor;
+

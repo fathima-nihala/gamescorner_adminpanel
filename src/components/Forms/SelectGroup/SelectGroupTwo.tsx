@@ -8,11 +8,12 @@ interface Country {
   _id: string;
   country: string;
   currency_code: string;
+  currency: string;
 }
 
 interface MultipleCountrySelectProps {
-  selectedCountries: string[];
-  onChange: (countries: string[]) => void;
+  selectedCountries: Country[];
+  onChange: (countries: Country[]) => void;
   className?: string;
 }
 
@@ -29,13 +30,16 @@ const SelectGroupTwo: React.FC<MultipleCountrySelectProps> = ({
   }, [dispatch]);
 
   const handleCountryChange = (event: any) => {
-    const selectedOptions = event.target.value;
-    onChange(selectedOptions);
+    const selectedIds = event.target.value;
+    const selectedCountryDetails = selectedIds.map((id: string) =>
+      countries.find((country: Country) => country._id === id)
+    ).filter(Boolean) as Country[]; // Filter out any undefined values
+    onChange(selectedCountryDetails);
   };
 
   return (
     <FormControl fullWidth className={`w-full ${className}`}>
-      <InputLabel>
+      <InputLabel className='block text-gray-700 dark:text-white mb-2'>
         <Box display="flex" alignItems="center">
           <Box mr={1} display="flex" alignItems="center">
             <svg
@@ -71,48 +75,25 @@ const SelectGroupTwo: React.FC<MultipleCountrySelectProps> = ({
         </Box>
       </InputLabel>
       <Select
+        className=' dark:border-form-strokedark dark:bg-form-input text-gray-700 dark:text-white'
         label=" 🌏︎ Select Countries"
-        value={selectedCountries}
+        value={selectedCountries.map((country) => country._id)}
         onChange={handleCountryChange}
         multiple
-        renderValue={(selected) => (
-          (selected as string[]).map(id => {
-            const selectedCountry = countries.find((country: Country) => country._id === id);
-            return selectedCountry ? selectedCountry.country : '';
-          }).join(', ')
-        )}
+        renderValue={(selected) =>
+          (selected as string[])
+            .map((id) => countries.find((country) => country._id === id)?.country)
+            .join(', ')
+        }
       >
         {countries.map((country: Country) => (
-          <MenuItem key={country._id} value={country._id}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Box
-                component="span"
-                sx={{
-                  width: 24,
-                  height: 24,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 1,
-                }}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g opacity="0.8">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M10.0007 2.50065C5.85852 2.50065 2.50065 5.85852 2.50065 10.0007C2.50065 14.1428 5.85852 17.5007 10.0007 17.5007C14.1428 17.5007 17.5007 14.1428 17.5007 10.0007C17.5007 5.85852 14.1428 2.50065 10.0007 2.50065ZM0.833984 10.0007C0.833984 4.93804 4.93804 0.833984 10.0007 0.833984C15.0633 0.833984 19.1673 4.93804 19.1673 10.0007C19.1673 15.0633 15.0633 19.1673 10.0007 19.1673C4.93804 19.1673 0.833984 15.0633 0.833984 10.0007Z"
-                      fill="#637381"
-                    />
-                  </g>
-                </svg>
-              </Box>
+          <MenuItem key={country._id} value={country._id} 
+          >
+            <Box sx={{
+              display: 'flex', alignItems: 'center',
+              
+            }}
+            >
               {country.country}
             </Box>
           </MenuItem>

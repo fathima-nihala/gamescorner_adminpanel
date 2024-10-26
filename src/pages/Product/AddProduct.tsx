@@ -18,7 +18,6 @@ import MultiSelect from '../../components/Forms/MultiSelect';
 import { getAllColors } from '../../slices/colorSlice';
 import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 
-
 interface CountryPricing {
     country_id: string;
     country: string;
@@ -30,7 +29,8 @@ interface CountryPricing {
 
 interface ProductData {
     name: string;
-    product_type: string;
+    // product_type: string;
+    product_type: 'digital' | 'physical';
     parent_category: string;
     brand: string;
     unit?: string;
@@ -42,8 +42,8 @@ interface ProductData {
     cash_on_delivery: boolean;
     country_pricing: CountryPricing[];
     quantity?: string;
-    shipping_time?: string;
-    tax?: string;
+    shipping_time: string;
+    tax: string;
     description: string;
     image?: string | File;
     gallery1?: string | File;
@@ -56,6 +56,13 @@ interface ProductData {
     color: string[];
 }
 
+interface Country {
+    _id: string;
+    country: string;
+    currency_code: string;
+    currency: string;
+}
+
 const AddProduct: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { success, error } = useSelector((state: RootState) => state.product);
@@ -65,10 +72,8 @@ const AddProduct: React.FC = () => {
     const categoryNames = useSelector(selectCategoryNames);
     const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
     const { attributes } = useSelector((state: RootState) => state.attribute);
-    const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+    const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
     const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string }>>({});
-
-
 
     const [productData, setProductData] = useState<ProductData>({
         name: '',
@@ -118,7 +123,6 @@ const AddProduct: React.FC = () => {
             dispatch(fetchAttributeValues(productData.attribute))
         }
     }, [dispatch, productData])
-
 
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -192,7 +196,6 @@ const AddProduct: React.FC = () => {
         }
     }, [success, error, dispatch, enqueueSnackbar]);
 
-
     const onFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -234,24 +237,27 @@ const AddProduct: React.FC = () => {
         }));
     };
 
-    const handleCountrySelectionChange = (countries: string[]) => {
+    const handleCountrySelectionChange = (countries: Country[]) => {
         setSelectedCountries(countries);
+        
         const updatedPriceDiscounts = countries.reduce((acc, country) => {
-            acc[country] = priceDiscounts[country] || { price: '', discount: '' };
+            acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '' };
             return acc;
         }, {} as Record<string, { price: string; discount: string }>);
 
         setPriceDiscounts(updatedPriceDiscounts);
     };
 
-    const handleCountryChange = (country: string, field: 'price' | 'discount', value: string) => {
-        setPriceDiscounts((prev) => ({
+    const handleCountryChange = (countryId: string, field: 'price' | 'discount', value: string) => {
+        setPriceDiscounts(prev => ({
             ...prev,
-            [country]: { ...prev[country], [field]: value }
+            [countryId]: { 
+                ...prev[countryId], 
+                [field]: value 
+            }
         }));
     };
 
-    console.log(selectedCountries, 'cccccccccccccccccc');
 
     const validateInput = () => {
         let validationErrors = {
@@ -295,17 +301,14 @@ const AddProduct: React.FC = () => {
                     formData.append('sub_category[]', subCat);
                 });
             }
-
             if (Array.isArray(productData.attribute_value)) {
                 productData.attribute_value.forEach(attrVal => {
                     formData.append('attribute_value[]', attrVal);
                 });
             }
-
             if (productData.image instanceof File) {
                 formData.append('image', productData.image);
             }
-
             if (productData.gallery1) {
                 formData.append('gallery1', productData.gallery1);
             }
@@ -321,14 +324,24 @@ const AddProduct: React.FC = () => {
             if (productData.gallery5) {
                 formData.append('gallery5', productData.gallery5);
             }
-
-            productData.country_pricing.forEach(country => {
-                formData.append('country_pricing[]', JSON.stringify(country));
-            });
-
+            // productData.country_pricing.forEach(country => {
+            //     formData.append('country_pricing[]', JSON.stringify(country));
+            // });
             productData.color.forEach((color) => {
                 formData.append('color', color);
             });
+
+            const countryPricingData = selectedCountries.map(country => ({
+                country_id: country._id,
+                country: country.country,
+                currency: country.currency,
+                currency_code: country.currency_code,
+                unit_price: parseFloat(priceDiscounts[country._id]?.price || '0'),
+                discount: parseFloat(priceDiscounts[country._id]?.discount || '0')
+            }));
+
+            formData.append('country_pricing', JSON.stringify(countryPricingData));
+
 
             dispatch(addProduct(formData));
         }
@@ -373,10 +386,9 @@ const AddProduct: React.FC = () => {
                                             name="product_type"
                                             value={productData.product_type}
                                             onChange={handleInputChange}
-
                                         >
-                                            <option value="Physical" className="text-body dark:text-bodydark">Physical</option>
-                                            <option value="Digital" className="text-body dark:text-bodydark"> Digital</option>
+                                            <option value="Physical" className="text-body dark:text-bodydark">physical</option>
+                                            <option value="Digital" className="text-body dark:text-bodydark">digital</option>
                                         </select>
                                     </div>
                                 </div>
@@ -503,6 +515,7 @@ const AddProduct: React.FC = () => {
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     name="shipping_time"
                                     placeholder="Enter estimated shipping time"
+                                    onChange={handleInputChange}
                                 />
                             </div>
 
@@ -514,6 +527,7 @@ const AddProduct: React.FC = () => {
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     placeholder="0"
                                     name='tax'
+                                    onChange={handleInputChange}
                                 />
                             </div>
 
@@ -550,7 +564,7 @@ const AddProduct: React.FC = () => {
                     </div>
 
 
-                    {/* Attribute */}
+                    {/* Product Variation */}
                     <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
                         <div className=" rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
@@ -568,7 +582,7 @@ const AddProduct: React.FC = () => {
                                 <div className="w-full">
                                     <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
                                     <select
-                                        className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                        className="w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
                                         name="attribute"
                                         value={productData.attribute}
                                         onChange={handleInputChange}
@@ -615,11 +629,11 @@ const AddProduct: React.FC = () => {
                                         />
                                     </div>
 
-                                    {selectedCountries.map(country => (
-                                        <div key={country} className="col-span-12 mt-5">
+                                    {selectedCountries.map((country) => (
+                                        <div key={country._id} className="col-span-12 mt-5 ">
                                             <div className="grid grid-cols-12 gap-4 mb-4">
                                                 <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                    Unit Price for {country} <span className="text-red-500">*</span>
+                                                    Unit Price for {country.currency_code}<span className="text-red-500">*</span>
                                                 </label>
                                                 <div className="col-span-9">
                                                     <input
@@ -628,15 +642,15 @@ const AddProduct: React.FC = () => {
                                                         placeholder="Unit price"
                                                         min="0"
                                                         step="0.01"
-                                                        value={priceDiscounts[country]?.price || ''}
-                                                        onChange={(e) => handleCountryChange(country, 'price', e.target.value)}
+                                                        value={priceDiscounts[country._id]?.price || ''}
+                                                        onChange={(e) => handleCountryChange(country._id, 'price', e.target.value)}
                                                     />
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-12 gap-4 mb-4">
                                                 <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                    Discount for {country} <span className="text-red-500">*</span>
+                                                    Discount for {country.currency_code} <span className="text-red-500">*</span>
                                                 </label>
                                                 <div className="col-span-9">
                                                     <input
@@ -645,8 +659,8 @@ const AddProduct: React.FC = () => {
                                                         placeholder="Discount"
                                                         min="0"
                                                         step="0.01"
-                                                        value={priceDiscounts[country]?.discount || ''}
-                                                        onChange={(e) => handleCountryChange(country, 'discount', e.target.value)}
+                                                        value={priceDiscounts[country._id]?.discount || ''}
+                                                        onChange={(e) => handleCountryChange(country._id, 'discount', e.target.value)}
                                                     />
                                                 </div>
                                             </div>
@@ -661,11 +675,13 @@ const AddProduct: React.FC = () => {
                                             </label>
                                             <div className="col-span-9 ">
                                                 <input
+                                                    name='quantity'
                                                     type="number"
                                                     className=" dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300  rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200 "
                                                     placeholder="Quantity"
                                                     min="0"
                                                     step="1"
+                                                    onChange={handleInputChange}
                                                 />
                                             </div>
                                         </div>
@@ -676,7 +692,7 @@ const AddProduct: React.FC = () => {
                         </div>
 
                         {/* description */}
-                        <div className="bg-white shadow-lg rounded-md p-6 dark:bg-black  mt-5  lg:w-[40%] w-full">
+                        <div className="bg-white shadow-lg rounded-md p-6 dark:bg-black  mt-5  lg:w-[40%] w-full ">
                             <h2 className="text-lg font-semibold mb-5">Product Description</h2>
                             <div className="">
                                 <QuillEditor
@@ -700,22 +716,24 @@ const AddProduct: React.FC = () => {
                                 </label>
                                 <div className="col-span-9">
                                     <input
+                                        name='meta_title'
                                         type="text"
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Meta Title"
-
+                                        onChange={handleInputChange}
                                     />
                                 </div>
                             </div>
                             <div className="grid grid-cols-12 gap-4 mb-4">
                                 <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                    Description <span className="text-red-500">*</span>
+                                    Meta Description <span className="text-red-500">*</span>
                                 </label>
                                 <div className="col-span-9">
                                     <textarea
+                                        name='meta_desc'
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Description"
-
+                                        onChange={handleInputChange}
                                     />
                                 </div>
                             </div>

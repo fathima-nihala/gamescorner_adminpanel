@@ -34,9 +34,10 @@ const MultipleColorSelect: React.FC<MultipleColorSelectProps> = ({
     };
 
     return (
-        <FormControl fullWidth className={`w-full ${className}`}>
-            <InputLabel>Color</InputLabel>
+        <FormControl fullWidth className={`w-full dark:bg-form-input bg-white text-graydark dark:text-white ${className}`}>
+            <InputLabel className='block text-gray-700 dark:text-white mb-2'>Color</InputLabel>
             <Select
+                className="border border-gray-300 rounded-md border-stroke bg-transparent outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input text-gray-700 dark:text-white"
                 label="Color"
                 name="color"
                 value={selectedColors}
@@ -50,7 +51,23 @@ const MultipleColorSelect: React.FC<MultipleColorSelectProps> = ({
                 )}
             >
                 {colors && colors.map((co: Color) => (
-                    <MenuItem key={co._id} value={co._id}>
+                    <MenuItem key={co._id} value={co._id}
+                    className="dark:bg-form-input bg-white text-graydark dark:text-white dark:hover:bg-slate-500 dark:focus:bg-black"
+
+                    sx={{
+                        '&.Mui-selected': {
+                            backgroundColor: 'rgb(75 85 99) !important', 
+                            color: 'white !important',
+                            '&:hover': {
+                                backgroundColor: 'rgb(55 65 81) !important', 
+                            },
+                        },
+                        '&.Mui-selected.Mui-focusVisible': {
+                            backgroundColor: 'rgb(75 85 99) !important',
+                        }
+                    }}
+
+                    >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Box
                                 sx={{
@@ -71,3 +88,5 @@ const MultipleColorSelect: React.FC<MultipleColorSelectProps> = ({
 };
 
 export default MultipleColorSelect;
+
+
