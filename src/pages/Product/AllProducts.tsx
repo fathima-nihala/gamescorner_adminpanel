@@ -18,6 +18,8 @@ import { useSnackbar } from 'notistack';
 import ConfirmationModal from '../../shared/ConfirmationModal';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
+import { Switch } from "@mui/material";
+
 
 interface Product {
     _id: string;
@@ -46,7 +48,7 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        
+
         // Previous button
         pageNumbers.push(
             <button
@@ -64,9 +66,8 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
             <button
                 key={1}
                 onClick={() => onPageChange(1)}
-                className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                    currentPage === 1 ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
-                }`}
+                className={`w-8 h-8 flex items-center justify-center rounded-full ${currentPage === 1 ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                    }`}
             >
                 1
             </button>
@@ -91,9 +92,8 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 <button
                     key={i}
                     onClick={() => onPageChange(i)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                        currentPage === i ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${currentPage === i ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                        }`}
                 >
                     {i}
                 </button>
@@ -115,9 +115,8 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 <button
                     key={totalPages}
                     onClick={() => onPageChange(totalPages)}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
-                        currentPage === totalPages ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${currentPage === totalPages ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                        }`}
                 >
                     {totalPages}
                 </button>
@@ -245,9 +244,8 @@ const AllProducts: React.FC = () => {
     return (
         <>
             <Breadcrumb pageName="All Products" />
-
             <div className="min-h-screen bg-gray-100">
-                <div className="p-4 md:p-2">
+                <div className="p-1 md:p-2">
                     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                         <div className='flex p-2 justify-between'>
                             <div className="flex flex-col md:flex-row items-center md:space-x-4 mb-6">
@@ -273,16 +271,16 @@ const AllProducts: React.FC = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className="p-4">
-                            <div className="">
-                                <table className="min-w-full text-left ">
+                        <div className="md:p-4 p-2  overflow-x-auto">
+                            <div className="min-w-[800px]">
+                                <table className="min-w-full  table-auto">
                                     <thead>
-                                        <tr className="border-b text-black dark:text-white">
+                                        <tr className="border-b text-black dark:text-white gap-2">
                                             <th className="w-8 pb-3"></th>
-                                            <th className="pb-3 ">Index</th>
-                                            <th className="pb-3 ">Name</th>
-                                            <th className="pb-3 ">Type</th>
-                                            <th className="pb-3 ">Qty</th>
+                                            <th className="pb-3 text-start">Index</th>
+                                            <th className="pb-3 text-start">Name</th>
+                                            <th className="pb-3 text-start">Type</th>
+                                            <th className="pb-3 text-start">Qty</th>
                                             <th className="pb-3 text-center">Today's Deal</th>
                                             <th className="pb-3 text-center">Featured</th>
                                             <th className="pb-3 text-center">Options</th>
@@ -296,7 +294,7 @@ const AllProducts: React.FC = () => {
                                                     {indexOfFirstProduct + index + 1}
                                                 </td>
                                                 <td className="py-4">
-                                                    <div className="flex items-center space-x-3">
+                                                    <div className="flex items-center text-start gap-4">
                                                         <img
                                                             src={product.image}
                                                             alt={product.name}
@@ -307,8 +305,8 @@ const AllProducts: React.FC = () => {
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 text-sm">{product.product_type}</td>
-                                                <td className="py-4 text-sm">
+                                                <td className="py-4 text-sm text-start">{product.product_type}</td>
+                                                <td className="py-4 text-sm text-start">
                                                     {product.quantity}
                                                 </td>
                                                 <td className="py-4 text-center">
@@ -333,7 +331,7 @@ const AllProducts: React.FC = () => {
                                                 </td>
                                                 <td className="py-4 text-center">
                                                     <button
-                                                        className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100" 
+                                                        className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100"
                                                         onClick={() => navigate(`/edit-product/${product._id}`)}
                                                     >
                                                         <Edit className="w-4 h-4 text-blue-500" />
@@ -350,7 +348,7 @@ const AllProducts: React.FC = () => {
                                     </tbody>
                                 </table>
 
-                                <Pagination 
+                                <Pagination
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={handlePageChange}
