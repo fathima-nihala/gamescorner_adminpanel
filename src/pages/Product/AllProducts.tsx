@@ -156,6 +156,8 @@ const AllProducts: React.FC = () => {
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
+    const [checkedStates, setCheckedStates] = useState<Record<string, boolean>>({});
+    const [checkedStatesTwo, setCheckedStatesTwo] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
@@ -171,13 +173,30 @@ const AllProducts: React.FC = () => {
     );
 
 
-    const toggleFeatured = async (product: Product): Promise<void> => {
-        const formData = new FormData();
-        formData.append('featured', (!product.featured).toString());
-        await dispatch(editProduct({ id: product._id, formData }));
+    const toggleFeatured = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+        id: string
+    ) => {
+        const newFeaturedStatus = event.target.checked;
+        setCheckedStates((prevState) => ({
+            ...prevState,
+            [id]: newFeaturedStatus,
+        }));
+
+        try {
+            await dispatch(toggleFeatured({ id, featured: newFeaturedStatus })).unwrap();
+            enqueueSnackbar("Featured status updated successfully!", { variant: "success" });
+        } catch (error) {
+            setCheckedStates((prevState) => ({
+                ...prevState,
+                [id]: !newFeaturedStatus,
+            }));
+            enqueueSnackbar("Failed to update featured status", { variant: "error" });
+        }
     };
 
-    const toggleTodaysDeal = async (product: Product): Promise<void> => {
+
+    const toggleTodaysDeal = async (product: Product) => {
         const formData = new FormData();
         formData.append('todaysDeal', (!product.todaysDeal).toString());
         await dispatch(editProduct({ id: product._id, formData }));
@@ -320,14 +339,22 @@ const AllProducts: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="py-4 text-center">
-                                                    <div className="flex justify-center items-center">
+                                                    {/* <div className="flex justify-center items-center">
                                                         <div
                                                             className={`w-12 h-6 rounded-full ${product.featured ? "bg-green-500" : "bg-gray-300"}`}
                                                             onClick={() => toggleFeatured(product)}
                                                         >
                                                             <div className={`h-6 w-6 bg-white rounded-full transform ${product.featured ? "translate-x-6" : "translate-x-0"}`}></div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
+                                                    <Switch
+                                                        checked={
+                                                            checkedStatesTwo[product?._id] || product?.featured || false
+                                                        }
+                                                        onChange={(e) => toggleFeatured(e, product?._id)}
+                                                        inputProps={{ "aria-label": "controlled" }}
+                                                        color="secondary"
+                                                    />
                                                 </td>
                                                 <td className="py-4 text-center">
                                                     <button
