@@ -86,9 +86,10 @@ const AddProduct: React.FC = () => {
         attribute: '',
         attribute_value: [],
         cash_on_delivery: false,
-        country_pricing: [
-            { country_id: '', country: '', currency: '', currency_code: '', unit_price: 0, discount: 0 }
-        ],
+        // country_pricing: [
+        //     { country_id: '', country: '', currency: '', currency_code: '', unit_price: 0, discount: 0 }
+        // ],
+        country_pricing: [],
         quantity: '',
         shipping_time: '',
         tax: '',
@@ -171,7 +172,6 @@ const AddProduct: React.FC = () => {
     const handleToggleCashOnDelivery = (enabled: boolean) => {
         setCashOnDelivery(enabled);
 
-        //new
         setProductData((prevData) => ({
             ...prevData,
             cash_on_delivery: enabled,
@@ -197,7 +197,7 @@ const AddProduct: React.FC = () => {
                 ],
                 quantity: '',
                 shipping_time: '',
-                tax:'',
+                tax: '',
                 description: '',
                 image: '',
                 gallery1: '',
@@ -282,7 +282,7 @@ const AddProduct: React.FC = () => {
 
     const handleCountrySelectionChange = (countries: Country[]) => {
         setSelectedCountries(countries);
-        
+
         const updatedPriceDiscounts = countries.reduce((acc, country) => {
             acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '' };
             return acc;
@@ -294,12 +294,12 @@ const AddProduct: React.FC = () => {
     const handleCountryChange = (countryId: string, field: 'price' | 'discount', value: string) => {
         setPriceDiscounts(prev => ({
             ...prev,
-            [countryId]: { 
-                ...prev[countryId], 
-                [field]: value 
+            [countryId]: {
+                ...prev[countryId],
+                [field]: value
             }
         }));
-    };   
+    };
 
     const validateInput = () => {
         let validationErrors = {
@@ -339,11 +339,6 @@ const AddProduct: React.FC = () => {
             formData.append('meta_desc', productData.meta_desc || '');
             formData.append('sub_category', productData.sub_category || '');
 
-            // if (Array.isArray(productData.sub_category)) {
-            //     productData.sub_category.forEach(subCat => {
-            //         formData.append('sub_category[]', subCat);
-            //     });
-            // }
             if (Array.isArray(productData.attribute_value)) {
                 productData.attribute_value.forEach(attrVal => {
                     formData.append('attribute_value[]', attrVal);
@@ -367,7 +362,7 @@ const AddProduct: React.FC = () => {
             if (productData.gallery5) {
                 formData.append('gallery5', productData.gallery5);
             }
-           
+
             productData.color.forEach((color) => {
                 formData.append('color', color);
             });
@@ -377,8 +372,8 @@ const AddProduct: React.FC = () => {
                 country: country.country,
                 currency: country.currency,
                 currency_code: country.currency_code,
-                unit_price: parseFloat(priceDiscounts[country._id]?.price || '0'),
-                discount: parseFloat(priceDiscounts[country._id]?.discount || '0')
+                unit_price: Number(priceDiscounts[country._id]?.price || '0'),
+                discount: Number(priceDiscounts[country._id]?.discount || '0')
             }));
 
             formData.append('country_pricing', JSON.stringify(countryPricingData));
@@ -542,8 +537,8 @@ const AddProduct: React.FC = () => {
                             {/* Cash on Delivery Box */}
                             <div className="bg-white rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
                                 <h5 className="text-xl font-semibold mb-4">Cash on Delivery</h5>
-                                <SwitcherThree onToggle={handleToggleCashOnDelivery} 
-                                initialState={productData.cash_on_delivery}
+                                <SwitcherThree onToggle={handleToggleCashOnDelivery}
+                                    initialState={productData.cash_on_delivery}
                                 />
                             </div>
 
@@ -651,7 +646,6 @@ const AddProduct: React.FC = () => {
 
                         </div>
                     </div>
-
 
                     {/* proice stock and description */}
                     <div className='flex lg:flex-row flex-col gap-3'>
