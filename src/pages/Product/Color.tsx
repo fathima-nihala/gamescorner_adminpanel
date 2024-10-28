@@ -22,6 +22,7 @@ import ConfirmationModal from "../../shared/ConfirmationModal";
 import { AppDispatch, RootState } from "../../redux/store";
 import { deleteColor, addColor, getAllColors } from "../../slices/colorSlice";
 import EditColor from "./EditColor";
+import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 
 interface Color {
     _id: string;
@@ -120,9 +121,11 @@ const Color: React.FC = () => {
 
     return (
         <div>
+            <Breadcrumb pageName="Colour" />
+
             <div className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white">
                 <Box sx={{ p: 3 }}>
-                    <Typography variant="h5" gutterBottom>Colors</Typography>
+                    {/* <Typography variant="h5" gutterBottom>Colors</Typography> */}
                     <Box
                         sx={{
                             display: {
@@ -147,7 +150,7 @@ const Color: React.FC = () => {
                                     <TableRow>
                                         <TableCell className="text-black dark:text-white">#</TableCell>
                                         <TableCell className="text-black dark:text-white">Name</TableCell>
-                                        <TableCell className="text-black dark:text-white">Color Code</TableCell>
+                                        <TableCell className="text-black dark:text-white">Colour Code</TableCell>
                                         <TableCell className="text-black dark:text-white">Options</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -190,7 +193,7 @@ const Color: React.FC = () => {
                                 },
                             }}
                         >
-                            <Typography variant="h6" gutterBottom>Add New Color</Typography>
+                            <Typography variant="h6" gutterBottom>Add New Colour</Typography>
                             <TextField
                                 fullWidth
                                 label="Name"
@@ -230,24 +233,24 @@ const Color: React.FC = () => {
                     </Box>
                 </Box>
 
-                 {/* Pagination Controls */}
-            <div className="flex justify-between items-center py-4 px-4">
-                <button
-                    disabled={currentPage === 1}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
-                >
-                    Previous
-                </button>
-                <p>{`Page ${currentPage} of ${totalPages}`}</p>
-                <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center py-4 px-4">
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+                    <p>{`Page ${currentPage} of ${totalPages}`}</p>
+                    <button
+                        disabled={currentPage === totalPages}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
             <ConfirmationModal
                 delOpen={delOpen}

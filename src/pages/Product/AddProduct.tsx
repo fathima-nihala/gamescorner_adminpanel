@@ -86,9 +86,6 @@ const AddProduct: React.FC = () => {
         attribute: '',
         attribute_value: [],
         cash_on_delivery: false,
-        // country_pricing: [
-        //     { country_id: '', country: '', currency: '', currency_code: '', unit_price: 0, discount: 0 }
-        // ],
         country_pricing: [],
         quantity: '',
         shipping_time: '',

@@ -24,6 +24,7 @@ import VerifyOtp from './Login/VerifyOtp';
 import Resetpassword from './Login/Resetpassword';
 import AddProduct from './pages/Product/AddProduct';
 import Color from './pages/Product/Color';
+import AllProducts from './pages/Product/AllProducts';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -123,7 +124,6 @@ function App() {
                     </>
                   }
                 />
-
                 <Route
                   path="/product/product-color"
                   element={
@@ -133,7 +133,6 @@ function App() {
                     </>
                   }
                 />
-
                 <Route
                   path="/product/product-category"
                   element={
@@ -176,6 +175,15 @@ function App() {
                     <>
                       <PageTitle title="Form Layout | Games Corner" />
                       <FormLayout />
+                    </>
+                  }
+                />
+                 <Route
+                  path="/product/all-product"
+                  element={
+                    <>
+                      <PageTitle title="Products | Games Corner" />
+                      <AllProducts/>
                     </>
                   }
                 />

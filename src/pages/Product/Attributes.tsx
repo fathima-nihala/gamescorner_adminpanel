@@ -23,6 +23,7 @@ import ConfirmationModal from "../../shared/ConfirmationModal";
 import { Link } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import EditAttributeName from "./EditAttributeName";
+import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 
 const Attributes: React.FC = () => {
     const [newAttributeName, setNewAttributeName] = useState("");
@@ -99,30 +100,27 @@ const Attributes: React.FC = () => {
 
     return (
         <div>
-            {/* <Card sx={{ my: 5, px: 4, py: 4, mx: 5 }} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white"> */}
+            <Breadcrumb pageName="Attribute" />
+
             <div className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark text-black dark:text-white">
                 <Box sx={{ p: 3 }}>
-                    <Typography variant="h5" gutterBottom>Attributes</Typography>
+                    {/* <Typography variant="h5" gutterBottom>Attributes</Typography> */}
                     <Box
                         sx={{
                             display: {
-                                xs: 'block', 
-                                md: 'flex',  
+                                xs: 'block',
+                                md: 'flex',
                             },
                         }}
                     >
-                        <TableContainer component={Paper}  className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark "
-                        sx={{ mr: 2 ,
-                            width: '65%',
-                            // width: {
-                            //     md:'65%',
-                            //     sm:'100%',
-                            //     lg:'100%'
-                            // },
-                            '@media (max-width: 834px)': {
-                                width: '100%',  
-                              },
-                        }}
+                        <TableContainer component={Paper} className="bg-white shadow-default dark:border-strokedark dark:bg-boxdark "
+                            sx={{
+                                mr: 2,
+                                width: '65%',
+                                '@media (max-width: 834px)': {
+                                    width: '100%',
+                                },
+                            }}
                         >
                             <Table>
                                 <TableHead>
@@ -174,12 +172,13 @@ const Attributes: React.FC = () => {
                             </Table>
                         </TableContainer>
 
-                        <Box sx={{ width: '35%',
+                        <Box sx={{
+                            width: '35%',
                             '@media (max-width: 834px)': {
-                                width: '100%',  
-                                marginTop:'8px'
-                              },
-                         }}>
+                                width: '100%',
+                                marginTop: '8px'
+                            },
+                        }}>
                             <Typography variant="h6" gutterBottom>Add New Attribute</Typography>
                             <TextField
                                 fullWidth
@@ -209,7 +208,7 @@ const Attributes: React.FC = () => {
                         </Box>
                     </Box>
                 </Box>
-            {/* </Card> */}
+                {/* </Card> */}
             </div>
             <ConfirmationModal
                 delOpen={delOpen}
