@@ -19,7 +19,7 @@ export interface Product {
   name: string;
   product_type: 'digital' | 'physical';
   parent_category: string;
-  sub_category: string[];
+  sub_category: string;
   brand: string;
   unit?: string;
   weight?: string;

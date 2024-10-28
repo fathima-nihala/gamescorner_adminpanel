@@ -36,7 +36,7 @@ interface ProductData {
     weight?: string;
     tags?: string;
     attribute: string;
-    sub_category: string[];
+    sub_category: string;
     attribute_value: string[];
     cash_on_delivery: boolean;
     country_pricing: CountryPricing[];
@@ -78,7 +78,7 @@ const AddProduct: React.FC = () => {
         name: '',
         product_type: 'physical',
         parent_category: '',
-        sub_category: [],
+        sub_category: '',
         brand: '',
         unit: '',
         weight: '',
@@ -142,7 +142,7 @@ const AddProduct: React.FC = () => {
             setProductData((prevData) => ({
                 ...prevData,
                 parent_category: value.trim(),
-                sub_category: []
+                sub_category: ''
             }));
             dispatch(fetchCategoryNames(value.trim()));
         }
@@ -170,7 +170,51 @@ const AddProduct: React.FC = () => {
 
     const handleToggleCashOnDelivery = (enabled: boolean) => {
         setCashOnDelivery(enabled);
+
+        //new
+        setProductData((prevData) => ({
+            ...prevData,
+            cash_on_delivery: enabled,
+        }));
     };
+
+    const handleClose = () => {
+        if (success) {
+            setProductData({
+                name: '',
+                product_type: 'physical',
+                parent_category: '',
+                sub_category: '',
+                brand: '',
+                unit: '',
+                weight: '',
+                tags: '',
+                attribute: '',
+                attribute_value: [],
+                cash_on_delivery: false,
+                country_pricing: [
+                    { country_id: '', country: '', currency: '', currency_code: '', unit_price: 0, discount: 0 }
+                ],
+                quantity: '',
+                shipping_time: '',
+                tax:'',
+                description: '',
+                image: '',
+                gallery1: '',
+                gallery2: '',
+                gallery3: '',
+                gallery4: '',
+                gallery5: '',
+                meta_title: '',
+                meta_desc: '',
+                color: []
+            })
+            setCashOnDelivery(false);
+            setPreviewGallery([]);
+            setPreviewImage(null);
+            setSelectedCountries([]);
+        }
+    }
 
     useEffect(() => {
         if (success) {
@@ -181,6 +225,7 @@ const AddProduct: React.FC = () => {
                     horizontal: 'right',
                 },
             });
+            handleClose();
             dispatch(resetSuccess());
         }
         if (error) {
@@ -254,10 +299,7 @@ const AddProduct: React.FC = () => {
                 [field]: value 
             }
         }));
-    };
-
-    
-
+    };   
 
     const validateInput = () => {
         let validationErrors = {
@@ -295,12 +337,13 @@ const AddProduct: React.FC = () => {
             formData.append('cash_on_delivery', cashOnDelivery.toString());
             formData.append('meta_title', productData.meta_title || '');
             formData.append('meta_desc', productData.meta_desc || '');
+            formData.append('sub_category', productData.sub_category || '');
 
-            if (Array.isArray(productData.sub_category)) {
-                productData.sub_category.forEach(subCat => {
-                    formData.append('sub_category[]', subCat);
-                });
-            }
+            // if (Array.isArray(productData.sub_category)) {
+            //     productData.sub_category.forEach(subCat => {
+            //         formData.append('sub_category[]', subCat);
+            //     });
+            // }
             if (Array.isArray(productData.attribute_value)) {
                 productData.attribute_value.forEach(attrVal => {
                     formData.append('attribute_value[]', attrVal);
@@ -499,7 +542,9 @@ const AddProduct: React.FC = () => {
                             {/* Cash on Delivery Box */}
                             <div className="bg-white rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
                                 <h5 className="text-xl font-semibold mb-4">Cash on Delivery</h5>
-                                <SwitcherThree onToggle={handleToggleCashOnDelivery} />
+                                <SwitcherThree onToggle={handleToggleCashOnDelivery} 
+                                initialState={productData.cash_on_delivery}
+                                />
                             </div>
 
                             {/* Estimated Shipping Time Box */}
@@ -510,6 +555,7 @@ const AddProduct: React.FC = () => {
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     name="shipping_time"
                                     placeholder="Enter estimated shipping time"
+                                    value={productData.shipping_time}
                                     onChange={handleInputChange}
                                 />
                             </div>
@@ -522,6 +568,7 @@ const AddProduct: React.FC = () => {
                                     className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     placeholder="0"
                                     name='tax'
+                                    value={productData.tax}
                                     onChange={handleInputChange}
                                 />
                             </div>
@@ -676,6 +723,7 @@ const AddProduct: React.FC = () => {
                                                     placeholder="Quantity"
                                                     min="0"
                                                     step="1"
+                                                    value={productData.quantity}
                                                     onChange={handleInputChange}
                                                 />
                                             </div>
@@ -715,6 +763,7 @@ const AddProduct: React.FC = () => {
                                         type="text"
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Meta Title"
+                                        value={productData.meta_title}
                                         onChange={handleInputChange}
                                     />
                                 </div>
@@ -728,6 +777,7 @@ const AddProduct: React.FC = () => {
                                         name='meta_desc'
                                         className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
                                         placeholder="Description"
+                                        value={productData.meta_desc}
                                         onChange={handleInputChange}
                                     />
                                 </div>
