@@ -29,7 +29,6 @@ interface CountryPricing {
 
 interface ProductData {
     name: string;
-    // product_type: string;
     product_type: 'digital' | 'physical';
     parent_category: string;
     brand: string;
@@ -126,7 +125,6 @@ const AddProduct: React.FC = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-
         if (name === 'attribute_value') {
             const selectedOptions = Array.from((e.target as HTMLSelectElement).selectedOptions).map(option => option.value);
             setProductData(prevData => ({
@@ -258,6 +256,8 @@ const AddProduct: React.FC = () => {
         }));
     };
 
+    
+
 
     const validateInput = () => {
         let validationErrors = {
@@ -324,9 +324,7 @@ const AddProduct: React.FC = () => {
             if (productData.gallery5) {
                 formData.append('gallery5', productData.gallery5);
             }
-            // productData.country_pricing.forEach(country => {
-            //     formData.append('country_pricing[]', JSON.stringify(country));
-            // });
+           
             productData.color.forEach((color) => {
                 formData.append('color', color);
             });
@@ -341,8 +339,6 @@ const AddProduct: React.FC = () => {
             }));
 
             formData.append('country_pricing', JSON.stringify(countryPricingData));
-
-
             dispatch(addProduct(formData));
         }
     };
@@ -497,7 +493,6 @@ const AddProduct: React.FC = () => {
 
                             </div>
                         </div>
-
 
                         <div className="lg:w-[30%] w-full flex flex-col gap-4">
 
