@@ -37,40 +37,151 @@ interface Product {
     tags: string;
 }
 
-const ITEMS_PER_PAGE = 10;
+interface PaginationProps {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        
+        // Previous button
+        pageNumbers.push(
+            <button
+                key="prev"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-orange-100  disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <ChevronLeft className="w-4 h-4" />
+            </button>
+        );
+
+        // First page button
+        pageNumbers.push(
+            <button
+                key={1}
+                onClick={() => onPageChange(1)}
+                className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                    currentPage === 1 ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                }`}
+            >
+                1
+            </button>
+        );
+
+        // Calculate the range of page numbers to show
+        let startPage = Math.max(2, currentPage - 1);
+        let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+        // Add ellipsis if necessary
+        if (startPage > 2) {
+            pageNumbers.push(
+                <span key="ellipsis1" className="w-8 h-8 flex items-center justify-center text-gray-500">
+                    ...
+                </span>
+            );
+        }
+
+        // Add middle page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(
+                <button
+                    key={i}
+                    onClick={() => onPageChange(i)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                        currentPage === i ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                >
+                    {i}
+                </button>
+            );
+        }
+
+        // Add ellipsis if necessary
+        if (endPage < totalPages - 1) {
+            pageNumbers.push(
+                <span key="ellipsis2" className="w-8 h-8 flex items-center justify-center text-gray-500">
+                    ...
+                </span>
+            );
+        }
+
+        // Last page button
+        if (totalPages > 1) {
+            pageNumbers.push(
+                <button
+                    key={totalPages}
+                    onClick={() => onPageChange(totalPages)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                        currentPage === totalPages ? 'bg-orange-400 text-white' : 'text-gray-500 hover:bg-gray-100'
+                    }`}
+                >
+                    {totalPages}
+                </button>
+            );
+        }
+
+        // Next button
+        pageNumbers.push(
+            <button
+                key="next"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <ChevronRight className="w-4 h-4" />
+            </button>
+        );
+
+        return pageNumbers;
+    };
+
+    return (
+        <div className="flex items-center justify-center gap-1 mt-4">
+            {renderPageNumbers()}
+        </div>
+    );
+};
+
+const ITEMS_PER_PAGE = 20;
 
 const AllProducts: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { products, loading, error } = useSelector<RootState, { products: Product[]; loading: boolean; error: string | null; }>((state) => state.product);
-    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [query, setQuery] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { enqueueSnackbar } = useSnackbar();
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
 
-
     useEffect(() => {
-        dispatch(fetchProducts({ name: searchTerm }));
-    }, [dispatch, searchTerm, currentPage]);
+        dispatch(fetchProducts({ name: '' }));
+    }, [dispatch]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setSearchTerm(e.target.value);
+        setQuery(e.target.value);
         setCurrentPage(1);
     };
+
+    const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(query.toLowerCase())
+    );
+
 
     const toggleFeatured = async (product: Product): Promise<void> => {
         const formData = new FormData();
         formData.append('featured', (!product.featured).toString());
         await dispatch(editProduct({ id: product._id, formData }));
-        dispatch(fetchProducts({ name: searchTerm }));
     };
 
     const toggleTodaysDeal = async (product: Product): Promise<void> => {
         const formData = new FormData();
         formData.append('todaysDeal', (!product.todaysDeal).toString());
         await dispatch(editProduct({ id: product._id, formData }));
-        dispatch(fetchProducts({ name: searchTerm }));
     };
 
     const delHandleClose = () => {
@@ -87,7 +198,6 @@ const AllProducts: React.FC = () => {
         if (selectedItem) {
             try {
                 await dispatch(deleteProduct(selectedItem._id)).unwrap();
-                dispatch(fetchProducts({ name: searchTerm }));
                 enqueueSnackbar('Product deleted successfully!', {
                     variant: 'success',
                     anchorOrigin: { vertical: 'top', horizontal: 'right' },
@@ -109,8 +219,8 @@ const AllProducts: React.FC = () => {
 
     const indexOfLastProduct = currentPage * ITEMS_PER_PAGE;
     const indexOfFirstProduct = indexOfLastProduct - ITEMS_PER_PAGE;
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-    const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -138,7 +248,7 @@ const AllProducts: React.FC = () => {
 
             <div className="min-h-screen bg-gray-100">
                 <div className="p-4 md:p-2">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                         <div className='flex p-2 justify-between'>
                             <div className="flex flex-col md:flex-row items-center md:space-x-4 mb-6">
                                 <div className="relative w-full md:w-64">
@@ -146,7 +256,7 @@ const AllProducts: React.FC = () => {
                                         type="text"
                                         placeholder="Search products..."
                                         className="border rounded-md px-4 py-2 w-full"
-                                        value={searchTerm}
+                                        value={query}
                                         onChange={handleSearch}
                                     />
                                     <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -156,7 +266,7 @@ const AllProducts: React.FC = () => {
                             <div className="flex justify-end mb-4">
                                 <button
                                     onClick={handlePrint}
-                                    className="flex items-center space-x-3 p-3 bg-blue-400 text-white hover:bg-blue-600 transition"
+                                    className="flex items-center space-x-3 p-3 bg-blue-400 text-white hover:bg-blue-600 transition rounded-md"
                                 >
                                     <Printer className="w-4 h-4" />
                                     <span>Print</span>
@@ -165,24 +275,24 @@ const AllProducts: React.FC = () => {
                         </div>
                         <div className="p-4">
                             <div className="">
-                                <table className="min-w-full text-left">
+                                <table className="min-w-full text-left ">
                                     <thead>
-                                        <tr className="border-b">
+                                        <tr className="border-b text-black dark:text-white">
                                             <th className="w-8 pb-3"></th>
-                                            <th className="pb-3 text-black">Index</th>
-                                            <th className="pb-3 text-black">Name</th>
-                                            <th className="pb-3 text-black">Type</th>
-                                            <th className="pb-3 text-black">Qty</th>
-                                            <th className="pb-3 text-center text-black">Today's Deal</th>
-                                            <th className="pb-3 text-center text-black">Featured</th>
-                                            <th className="pb-3 text-center text-black">Options</th>
+                                            <th className="pb-3 ">Index</th>
+                                            <th className="pb-3 ">Name</th>
+                                            <th className="pb-3 ">Type</th>
+                                            <th className="pb-3 ">Qty</th>
+                                            <th className="pb-3 text-center">Today's Deal</th>
+                                            <th className="pb-3 text-center">Featured</th>
+                                            <th className="pb-3 text-center">Options</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className='text-black dark:text-white'>
                                         {currentProducts.map((product, index) => (
                                             <tr key={product._id} className="border-b hover:bg-gray-50">
                                                 <td className="py-4"></td>
-                                                <td className="py-4 text-sm text-black">
+                                                <td className="py-4 text-sm ">
                                                     {indexOfFirstProduct + index + 1}
                                                 </td>
                                                 <td className="py-4">
@@ -192,13 +302,13 @@ const AllProducts: React.FC = () => {
                                                             alt={product.name}
                                                             className="w-12 h-12 object-cover rounded"
                                                         />
-                                                        <span className="text-sm font-medium text-black">
+                                                        <span className="text-sm font-medium">
                                                             {product.name}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 text-sm text-black">{product.product_type}</td>
-                                                <td className="py-4 text-sm text-black">
+                                                <td className="py-4 text-sm">{product.product_type}</td>
+                                                <td className="py-4 text-sm">
                                                     {product.quantity}
                                                 </td>
                                                 <td className="py-4 text-center">
@@ -223,16 +333,16 @@ const AllProducts: React.FC = () => {
                                                 </td>
                                                 <td className="py-4 text-center">
                                                     <button
-                                                        className="text-blue-500 hover:underline"
+                                                        className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100" 
                                                         onClick={() => navigate(`/edit-product/${product._id}`)}
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-4 h-4 text-blue-500" />
                                                     </button>
                                                     <button
-                                                        className="text-red-500 hover:underline ml-2"
+                                                        className=" ml-2 p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100"
                                                         onClick={() => handleDeleteClick(product)}
                                                     >
-                                                        <Trash className="w-4 h-4" />
+                                                        <Trash className="w-4 h-4 text-red-500" />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -240,24 +350,11 @@ const AllProducts: React.FC = () => {
                                     </tbody>
                                 </table>
 
-                                {/* Pagination */}
-                                <div className="flex justify-between items-center mt-4">
-                                    <button
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                        className={`bg-gray-200 text-gray-600 p-2 rounded ${currentPage === 1 ? 'cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                                    >
-                                        <ChevronLeft />
-                                    </button>
-                                    <span>Page {currentPage} of {totalPages}</span>
-                                    <button
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                        className={`bg-gray-200 text-gray-600 p-2 rounded ${currentPage === totalPages ? 'cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                                    >
-                                        <ChevronRight />
-                                    </button>
-                                </div>
+                                <Pagination 
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                />
                             </div>
                         </div>
                     </div>
@@ -269,10 +366,8 @@ const AllProducts: React.FC = () => {
                 delHandleClose={delHandleClose}
                 onDelete={onDelete}
             />
-
         </>
     );
 };
 
 export default AllProducts;
-
