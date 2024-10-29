@@ -12,6 +12,7 @@ import {
     fetchProducts,
     deleteProduct,
     editProduct,
+    toggleFeatured,
 } from '../../slices/productSlice';
 import { AppDispatch, RootState } from '../../redux/store';
 import { useSnackbar } from 'notistack';
@@ -19,6 +20,7 @@ import ConfirmationModal from '../../shared/ConfirmationModal';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from "@mui/material";
+import SwitcherOne from '../../components/Switchers/SwitcherOne';
 
 
 interface Product {
@@ -157,7 +159,6 @@ const AllProducts: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
     const [checkedStates, setCheckedStates] = useState<Record<string, boolean>>({});
-    const [checkedStatesTwo, setCheckedStatesTwo] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
@@ -172,11 +173,8 @@ const AllProducts: React.FC = () => {
         product.name.toLowerCase().includes(query.toLowerCase())
     );
 
-
-    const toggleFeatured = async (
-        event: React.ChangeEvent<HTMLInputElement>,
-        id: string
-    ) => {
+    //toggleFeatured
+    const handleToggleFeatured = async (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
         const newFeaturedStatus = event.target.checked;
         setCheckedStates((prevState) => ({
             ...prevState,
@@ -185,21 +183,14 @@ const AllProducts: React.FC = () => {
 
         try {
             await dispatch(toggleFeatured({ id, featured: newFeaturedStatus })).unwrap();
-            enqueueSnackbar("Featured status updated successfully!", { variant: "success" });
+            enqueueSnackbar("Featured status updated successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right', }, });
         } catch (error) {
             setCheckedStates((prevState) => ({
                 ...prevState,
                 [id]: !newFeaturedStatus,
             }));
-            enqueueSnackbar("Failed to update featured status", { variant: "error" });
+            enqueueSnackbar("Failed to update featured status", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right', } });
         }
-    };
-
-
-    const toggleTodaysDeal = async (product: Product) => {
-        const formData = new FormData();
-        formData.append('todaysDeal', (!product.todaysDeal).toString());
-        await dispatch(editProduct({ id: product._id, formData }));
     };
 
     const delHandleClose = () => {
@@ -305,9 +296,9 @@ const AllProducts: React.FC = () => {
                                             <th className="pb-3 text-center">Options</th>
                                         </tr>
                                     </thead>
-                                    <tbody className='text-black dark:text-white'>
+                                    <tbody className='text-black dark:text-white text-[16px]'>
                                         {currentProducts.map((product, index) => (
-                                            <tr key={product._id} className="border-b hover:bg-gray-50">
+                                            <tr key={product._id} className="border-b hover:bg-gray-50 ">
                                                 <td className="py-4"></td>
                                                 <td className="py-4 text-sm ">
                                                     {indexOfFirstProduct + index + 1}
@@ -319,39 +310,23 @@ const AllProducts: React.FC = () => {
                                                             alt={product.name}
                                                             className="w-12 h-12 object-cover rounded"
                                                         />
-                                                        <span className="text-sm font-medium">
+                                                        <span className=" font-medium">
                                                             {product.name}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 text-sm text-start">{product.product_type}</td>
-                                                <td className="py-4 text-sm text-start">
+                                                <td className="py-4  text-start">{product.product_type}</td>
+                                                <td className="py-4  text-start">
                                                     {product.quantity}
                                                 </td>
+                                                <td className="py-4 text-center flex justify-center items-center">
+                                                    <SwitcherOne id={product._id} />                                                </td>
                                                 <td className="py-4 text-center">
-                                                    <div className="flex justify-center items-center">
-                                                        <div
-                                                            className={`w-12 h-6 rounded-full ${product.todaysDeal ? "bg-green-500" : "bg-gray-300"}`}
-                                                            onClick={() => toggleTodaysDeal(product)}
-                                                        >
-                                                            <div className={`h-6 w-6 bg-white rounded-full transform ${product.todaysDeal ? "translate-x-6" : "translate-x-0"}`}></div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 text-center">
-                                                    {/* <div className="flex justify-center items-center">
-                                                        <div
-                                                            className={`w-12 h-6 rounded-full ${product.featured ? "bg-green-500" : "bg-gray-300"}`}
-                                                            onClick={() => toggleFeatured(product)}
-                                                        >
-                                                            <div className={`h-6 w-6 bg-white rounded-full transform ${product.featured ? "translate-x-6" : "translate-x-0"}`}></div>
-                                                        </div>
-                                                    </div> */}
                                                     <Switch
                                                         checked={
-                                                            checkedStatesTwo[product?._id] || product?.featured || false
+                                                            checkedStates[product?._id] || product?.featured || false
                                                         }
-                                                        onChange={(e) => toggleFeatured(e, product?._id)}
+                                                        onChange={(e) => handleToggleFeatured(e, product?._id)}
                                                         inputProps={{ "aria-label": "controlled" }}
                                                         color="secondary"
                                                     />
