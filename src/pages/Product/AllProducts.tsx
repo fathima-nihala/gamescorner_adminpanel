@@ -18,7 +18,6 @@ import { useSnackbar } from 'notistack';
 import ConfirmationModal from '../../shared/ConfirmationModal';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
-// import { Switch } from "@mui/material";
 import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 
@@ -186,6 +185,7 @@ const AllProducts: React.FC = () => {
         if (selectedItem) {
             try {
                 await dispatch(deleteProduct(selectedItem._id)).unwrap();
+                dispatch(fetchProducts({ name: '' }));
                 enqueueSnackbar('Product deleted successfully!', {
                     variant: 'success',
                     anchorOrigin: { vertical: 'top', horizontal: 'right' },
