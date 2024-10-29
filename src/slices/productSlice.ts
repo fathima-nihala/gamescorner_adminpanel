@@ -97,7 +97,7 @@ export const fetchProducts = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-        'Something went wrong while fetching products',
+          'Something went wrong while fetching products',
       );
     }
   },
@@ -113,7 +113,7 @@ export const getProductById = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-        'Something went wrong while fetching the product',
+          'Something went wrong while fetching the product',
       );
     }
   },
@@ -152,7 +152,7 @@ export const deleteProduct = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message ||
-        'Something went wrong while deleting the product',
+          'Something went wrong while deleting the product',
       );
     }
   },
@@ -161,28 +161,39 @@ export const deleteProduct = createAsyncThunk(
 // Thunk to toggle todaysDeal
 export const toggleTodaysDeal = createAsyncThunk(
   'product/toggleTodaysDeal',
-  async ({ id, todaysDeal }: { id: string; todaysDeal: boolean }, { rejectWithValue }) => {
+  async (
+    { id, todaysDeal }: { id: string; todaysDeal: boolean },
+    { rejectWithValue },
+  ) => {
     try {
-      const response = await api.patch(`/product/${id}/todays-deal`, { todaysDeal });
+      const response = await api.patch(`/product/${id}/todays-deal`, {
+        todaysDeal,
+      });
       return { id, todaysDeal, data: response.data };
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update Today's Deal status");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update Today's Deal status",
+      );
     }
-  }
+  },
 );
-
 
 // Thunk to toggle featured
 export const toggleFeatured = createAsyncThunk(
   'product/toggleFeatured',
-  async ({ id, featured }: { id: string; featured: boolean }, { rejectWithValue }) => {
+  async (
+    { id, featured }: { id: string; featured: boolean },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await api.patch(`/product/${id}/featured`, { featured });
-      return response.data;
-    } catch (error:any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update featured status');
+      return { id, featured, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to update featured status',
+      );
     }
-  }
+  },
 );
 
 // Product Slice
@@ -311,24 +322,30 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.success = false;
       },
-    )
+    );
 
     // Toggle Featured
-    builder.addCase(toggleFeatured.pending, (state) => {
-      state.loading = true;
-      state.success = false;
-      state.error = null;
-    });
-    builder.addCase(toggleFeatured.fulfilled, (state, action: PayloadAction<any>) => {
-      state.loading = false;
-      state.success = true;
-      state.product = action.payload.toggles;
-    });
-    builder.addCase(toggleFeatured.rejected, (state, action: PayloadAction<any>) => {
-      state.loading = false;
-      state.success = false;
-      state.error = action.payload;
-    });
+    builder
+      .addCase(toggleFeatured.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        toggleFeatured.fulfilled,
+        (state, action: PayloadAction<{ id: string; featured: boolean }>) => {
+          state.loading = false;
+          const { id, featured } = action.payload;
+          const product = state.products.find((product) => product._id === id);
+          if (product) {
+            product.featured = featured;
+          }
+          state.success = true;
+        },
+      )
+      .addCase(toggleFeatured.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
 
     // Toggle Today’s Deal
     builder.addCase(toggleTodaysDeal.pending, (state) => {
@@ -339,18 +356,21 @@ const productSlice = createSlice({
     builder.addCase(toggleTodaysDeal.fulfilled, (state, action) => {
       state.loading = false;
       state.success = true;
-      state.products = state.products.map(product => 
-        product._id === action.payload.id 
+      state.products = state.products.map((product) =>
+        product._id === action.payload.id
           ? { ...product, todaysDeal: action.payload.todaysDeal }
-          : product
+          : product,
       );
       state.product = action.payload.data.toggles;
     });
-    builder.addCase(toggleTodaysDeal.rejected, (state, action: PayloadAction<any>) => {
-      state.loading = false;
-      state.success = false;
-      state.error = action.payload;
-    });
+    builder.addCase(
+      toggleTodaysDeal.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      },
+    );
   },
 });
 

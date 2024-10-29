@@ -12,15 +12,15 @@ import {
     fetchProducts,
     deleteProduct,
     editProduct,
-    toggleFeatured,
 } from '../../slices/productSlice';
 import { AppDispatch, RootState } from '../../redux/store';
 import { useSnackbar } from 'notistack';
 import ConfirmationModal from '../../shared/ConfirmationModal';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
-import { Switch } from "@mui/material";
+// import { Switch } from "@mui/material";
 import SwitcherOne from '../../components/Switchers/SwitcherOne';
+import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 
 
 interface Product {
@@ -158,7 +158,6 @@ const AllProducts: React.FC = () => {
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
-    const [checkedStates, setCheckedStates] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
@@ -172,26 +171,6 @@ const AllProducts: React.FC = () => {
     const filteredProducts = products.filter((product) =>
         product.name.toLowerCase().includes(query.toLowerCase())
     );
-
-    //toggleFeatured
-    const handleToggleFeatured = async (event: React.ChangeEvent<HTMLInputElement>, id: string) => {
-        const newFeaturedStatus = event.target.checked;
-        setCheckedStates((prevState) => ({
-            ...prevState,
-            [id]: newFeaturedStatus,
-        }));
-
-        try {
-            await dispatch(toggleFeatured({ id, featured: newFeaturedStatus })).unwrap();
-            enqueueSnackbar("Featured status updated successfully!", { variant: "success", anchorOrigin: { vertical: 'top', horizontal: 'right', }, });
-        } catch (error) {
-            setCheckedStates((prevState) => ({
-                ...prevState,
-                [id]: !newFeaturedStatus,
-            }));
-            enqueueSnackbar("Failed to update featured status", { variant: "error", anchorOrigin: { vertical: 'top', horizontal: 'right', } });
-        }
-    };
 
     const delHandleClose = () => {
         setDelOpen(false);
@@ -319,19 +298,18 @@ const AllProducts: React.FC = () => {
                                                 <td className="py-4  text-start">
                                                     {product.quantity}
                                                 </td>
-                                                <td className="py-4 text-center flex justify-center items-center">
-                                                    <SwitcherOne id={product._id} />                                                </td>
                                                 <td className="py-4 text-center">
-                                                    <Switch
-                                                        checked={
-                                                            checkedStates[product?._id] || product?.featured || false
-                                                        }
-                                                        onChange={(e) => handleToggleFeatured(e, product?._id)}
-                                                        inputProps={{ "aria-label": "controlled" }}
-                                                        color="secondary"
-                                                    />
+                                                    <div className="flex justify-center items-center">
+                                                        <SwitcherOne id={product._id} />
+                                                    </div>
                                                 </td>
                                                 <td className="py-4 text-center">
+                                                    <div className="flex justify-center items-center">
+                                                        <SwitcherTwo id={product._id} />
+                                                    </div>
+                                                </td>
+
+                                                <td className="py-4 text-center flex justify-center items-center">
                                                     <button
                                                         className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100"
                                                         onClick={() => navigate(`/edit-product/${product._id}`)}
