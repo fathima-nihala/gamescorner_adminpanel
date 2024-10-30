@@ -20,6 +20,7 @@ import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
 import { useNavigate } from 'react-router-dom';
 import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
+import { DownloadSVG } from "../DownloadSVG";
 
 
 interface Product {
@@ -158,6 +159,8 @@ const AllProducts: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
 
+    console.log(products,'oioioio');
+    
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
     }, [dispatch]);
@@ -201,10 +204,6 @@ const AllProducts: React.FC = () => {
         delHandleClose();
     };
 
-    const handlePrint = (): void => {
-        window.print();
-    };
-
     const indexOfLastProduct = currentPage * ITEMS_PER_PAGE;
     const indexOfFirstProduct = indexOfLastProduct - ITEMS_PER_PAGE;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -230,6 +229,7 @@ const AllProducts: React.FC = () => {
         );
     }
 
+
     return (
         <>
             <Breadcrumb pageName="All Products" />
@@ -252,11 +252,11 @@ const AllProducts: React.FC = () => {
 
                             <div className="flex justify-end mb-4">
                                 <button
-                                    onClick={handlePrint}
-                                    className="flex items-center space-x-3 p-3 bg-blue-400 text-white hover:bg-blue-600 transition rounded-md"
+                                    onClick={() => DownloadSVG(products)}
+                                    className="flex items-center space-x-3 p-3 bg-green-800 text-white hover:bg-green-600 transition rounded-md"
                                 >
                                     <Printer className="w-4 h-4" />
-                                    <span>Print</span>
+                                    <span>CSV</span>
                                 </button>
                             </div>
                         </div>
