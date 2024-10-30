@@ -22,6 +22,12 @@ import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 import { DownloadSVG } from "../DownloadSVG";
 
+interface Category {
+    _id: string;
+    parent_category: string;
+}
+
+
 
 interface Product {
     _id: string;
@@ -39,6 +45,11 @@ interface Product {
     }>;
     description: string;
     tags: string;
+    brand: {
+        _id: string;
+        name: string;
+    };
+    parent_category: Category[];
 }
 
 interface PaginationProps {
@@ -159,8 +170,8 @@ const AllProducts: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
 
-    console.log(products,'oioioio');
-    
+    console.log(products, 'oioioio');
+
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
     }, [dispatch]);
@@ -269,6 +280,8 @@ const AllProducts: React.FC = () => {
                                             <th className="pb-3 text-start">Index</th>
                                             <th className="pb-3 text-start">Name</th>
                                             <th className="pb-3 text-start">Type</th>
+                                            <th className="pb-3 text-start">Brand</th>
+                                            <th className="pb-3 text-start">Category</th>
                                             <th className="pb-3 text-start">Qty</th>
                                             <th className="pb-3 text-center">Today's Deal</th>
                                             <th className="pb-3 text-center">Featured</th>
@@ -295,6 +308,15 @@ const AllProducts: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="py-4  text-start">{product.product_type}</td>
+                                                <td className="py-4  text-start">{product.brand.name}</td>
+                                                <td className="py-4  text-start">
+                                                    {product.parent_category.map((category) => (
+                                                        <div key={category._id}>
+                                                            <p>{category.parent_category}</p>
+                                                        </div>
+                                                    ))}
+                                                </td>
+
                                                 <td className="py-4  text-start">
                                                     {product.quantity}
                                                 </td>
