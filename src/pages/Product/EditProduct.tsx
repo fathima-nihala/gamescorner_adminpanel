@@ -56,7 +56,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
     return (
         <div>
-            <Dialog open={open} maxWidth="md" fullWidth sx={{ borderRadius: '15px'}}>
+            <Dialog open={open} maxWidth="md" fullWidth sx={{ borderRadius: '15px' }}>
                 <DialogTitle className='text-[24px] font-medium  text-black dark:text-white bg-white dark:bg-black'>
                     Edit Product
                     <IconButton
