@@ -178,12 +178,12 @@ function App() {
                     </>
                   }
                 />
-                 <Route
+                <Route
                   path="/product/all-product"
                   element={
                     <>
                       <PageTitle title="Products | Games Corner" />
-                      <AllProducts/>
+                      <AllProducts />
                     </>
                   }
                 />
@@ -242,6 +242,8 @@ function App() {
                   }
                 />
               </Routes>
+
+                
             </DefaultLayout>
           </PrivateRoute>
         }

@@ -11,7 +11,6 @@ import {
 import {
     fetchProducts,
     deleteProduct,
-    editProduct,
 } from '../../slices/productSlice';
 import { AppDispatch, RootState } from '../../redux/store';
 import { useSnackbar } from 'notistack';
@@ -21,13 +20,12 @@ import { useNavigate } from 'react-router-dom';
 import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 import { DownloadSVG } from "../DownloadSVG";
+import EditProduct from './EditProduct';
 
 interface Category {
     _id: string;
     parent_category: string;
 }
-
-
 
 interface Product {
     _id: string;
@@ -169,8 +167,9 @@ const AllProducts: React.FC = () => {
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
     const navigate = useNavigate();
+    const [editProductId, setEditProductId] = useState<string | null>(null);
+    const [open, setOpen] = useState(false);
 
-    console.log(products, 'oioioio');
 
     useEffect(() => {
         dispatch(fetchProducts({ name: '' }));
@@ -239,6 +238,16 @@ const AllProducts: React.FC = () => {
             </div>
         );
     }
+
+    const handleOpen = (productId: string) => {
+        setOpen(true);
+        setEditProductId(productId);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setEditProductId(null);
+    };
 
 
     return (
@@ -334,7 +343,7 @@ const AllProducts: React.FC = () => {
                                                 <td className="py-4 text-center flex justify-center items-center">
                                                     <button
                                                         className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100"
-                                                        onClick={() => navigate(`/edit-product/${product._id}`)}
+                                                        onClick={() => handleOpen(product._id)}
                                                     >
                                                         <Edit className="w-4 h-4 text-blue-500" />
                                                     </button>
@@ -366,6 +375,14 @@ const AllProducts: React.FC = () => {
                 delHandleClose={delHandleClose}
                 onDelete={onDelete}
             />
+
+            {!!editProductId && (
+                <EditProduct
+                    id={editProductId}
+                    open={open}
+                    handleClose={handleClose}
+                />
+            )}
         </>
     );
 };
