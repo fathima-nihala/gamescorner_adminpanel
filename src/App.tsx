@@ -9,7 +9,7 @@ import Brands from './pages/Product/Brands';
 import FormLayout from './pages/Product/FormLayout';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-import Tables from './pages/Tables';
+import Tables from './pages/Order';
 import Alerts from './pages/UiElements/Alerts';
 import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
@@ -25,6 +25,7 @@ import Resetpassword from './Login/Resetpassword';
 import AddProduct from './pages/Product/AddProduct';
 import Color from './pages/Product/Color';
 import AllProducts from './pages/Product/AllProducts';
+import Customers from './pages/Customers';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -200,7 +201,7 @@ function App() {
                   path="/tables"
                   element={
                     <>
-                      <PageTitle title="Tables | Games Corner" />
+                      <PageTitle title="Order | Games Corner" />
                       <Tables />
                     </>
                   }
@@ -232,6 +233,8 @@ function App() {
                     </>
                   }
                 />
+
+
                 <Route
                   path="/ui/buttons"
                   element={
@@ -241,9 +244,20 @@ function App() {
                     </>
                   }
                 />
+
+
+                <Route
+                  path="/Customers"
+                  element={
+                    <>
+                      <PageTitle title="Customers | Games Corner" />
+                      <Customers/>
+                    </>
+                  }
+                />
               </Routes>
 
-                
+
             </DefaultLayout>
           </PrivateRoute>
         }
