@@ -7,6 +7,9 @@ import attributeReducer from '../slices/attributeSlice.ts';
 import countryReducer from '../slices/countrSlice.ts'; 
 import productReducer from '../slices/productSlice.ts';
 import colorReducer from '../slices/colorSlice.ts';
+import customerReducer from '../slices/customerSlice'
+
+
 
  const store = configureStore({
   reducer: {
@@ -18,11 +21,14 @@ import colorReducer from '../slices/colorSlice.ts';
     country: countryReducer,
     product: productReducer,
     color: colorReducer,
+    customer: customerReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+
 
 
 export default store;

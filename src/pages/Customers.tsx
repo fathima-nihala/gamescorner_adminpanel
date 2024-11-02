@@ -1,17 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCustomers,
+ 
+} from "../slices/customerSlice";
+import { AppDispatch, RootState } from "../redux/store";
 
-type Customer = {
-  id: number;
-  email: string;
-  name: string;
-};
+// type CustomerType = {
+//   id: number;
+//   email: string;
+//   name: string;
+// };
 
 const Customers: React.FC = () => {
-  const customerData: Customer[] = [
-    { id: 1, email: "example@example.com", name: "John Doe" },
-    { id: 2, email: "sample@sample.com", name: "Jane Smith" },
-    { id: 3, email: "sample2@sample.com", name: "Alex Johnson" }
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+ 
+  const {customers, loading, error} = useSelector((state:RootState) => state.customer);
+
+  console.log(customers,'ffff');
+  
+
+  useEffect(() => {
+    dispatch(fetchCustomers());
+  }, [dispatch]);
+
+  if (loading) return <p>Loading customers...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="p-4 sm:p-6 bg-gray-100 min-h-screen">
@@ -20,6 +34,9 @@ const Customers: React.FC = () => {
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200">
             Customers List
           </h2>
+          <ul>
+           
+          </ul>
         </div>
         <div className="overflow-x-auto sm:overflow-x-hidden p-4">
           <table className="min-w-full bg-white dark:bg-form-input rounded-lg">
@@ -40,11 +57,13 @@ const Customers: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {customerData.map((customer, index) => (
+              {customers?.map((customer, index) => (
                 <tr
-                  key={customer.id}
+                  key={customer._id}
                   className={`${
-                    index % 2 === 0 ? "bg-gray-50" : "bg-white dark:bg-form-input"
+                    index % 2 === 0
+                      ? "bg-gray-50"
+                      : "bg-white dark:bg-form-input"
                   } hover:bg-blue-50 dark:bg-form-input dark:hover:bg-gray-700 transition duration-150`}
                 >
                   <td className="px-4 sm:px-6 py-4 w-1/12 text-left text-sm font-medium text-gray-900 dark:text-gray-300">
