@@ -2,27 +2,25 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCustomers,
- 
+  deleteCustomer,
+  clearCustomerError,
 } from "../slices/customerSlice";
 import { AppDispatch, RootState } from "../redux/store";
 
-// type CustomerType = {
-//   id: number;
-//   email: string;
-//   name: string;
-// };
-
 const Customers: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
- 
-  const {customers, loading, error} = useSelector((state:RootState) => state.customer);
-
-  console.log(customers,'ffff');
-  
+  const { customers, loading, error } = useSelector(
+    (state: RootState) => state.customer
+  );
 
   useEffect(() => {
     dispatch(fetchCustomers());
   }, [dispatch]);
+
+  const handleDelete = (customerId: string) => {
+    dispatch(clearCustomerError()); 
+    dispatch(deleteCustomer(customerId));
+  };
 
   if (loading) return <p>Loading customers...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -34,9 +32,6 @@ const Customers: React.FC = () => {
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 dark:text-gray-200">
             Customers List
           </h2>
-          <ul>
-           
-          </ul>
         </div>
         <div className="overflow-x-auto sm:overflow-x-hidden p-4">
           <table className="min-w-full bg-white dark:bg-form-input rounded-lg">
@@ -76,7 +71,10 @@ const Customers: React.FC = () => {
                     {customer.name}
                   </td>
                   <td className="px-4 sm:px-6 py-4 w-3/12 text-left text-sm font-medium">
-                    <button className="text-red-600 hover:text-red-700 transition duration-150">
+                    <button
+                      onClick={() => handleDelete(customer._id)}
+                      className="text-red-600 hover:text-red-700 transition duration-150"
+                    >
                       Remove
                     </button>
                   </td>

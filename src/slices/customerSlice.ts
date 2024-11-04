@@ -28,15 +28,33 @@ export const fetchCustomers = createAsyncThunk(
   'customer/fetchCustomers',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/web_customers'); 
-      return response.data.customer;      
+      const response = await api.get('/web_customers');
+      return response.data.customer;
     } catch (error: any) {
+      console.error("Fetch customers error:", error.response || error);
       return rejectWithValue(
         error.response?.data?.message || 'An error occurred while fetching customers'
       );
     }
   }
 );
+
+// Thunk to delete a customer
+export const deleteCustomer = createAsyncThunk(
+  'customer/deleteCustomer',
+  async (customerId: string, { rejectWithValue }) => {
+    try {
+      await api.delete(`/web_delete/${customerId}`);
+      return customerId; 
+    } catch (error: any) {
+      console.error("Error deleting customer:", error.response?.data); 
+      return rejectWithValue(
+        error.response?.data?.message || 'An error occurred while deleting customer'
+      );
+    }
+  }
+);
+
 
 export const customerSlice = createSlice({
   name: 'customer',
@@ -61,16 +79,36 @@ export const customerSlice = createSlice({
     );
     builder.addCase(
       fetchCustomers.rejected,
-      (state, action: PayloadAction<any>) => {
+      (state, action: PayloadAction<string | unknown>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to fetch customers';
+      }
+    );
+
+    // Delete customer reducers
+    builder.addCase(deleteCustomer.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(
+      deleteCustomer.fulfilled,
+      (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.customers = state.customers.filter(
+          (customer) => customer._id !== action.payload
+        );
+        state.error = null;
+      }
+    );
+    builder.addCase(
+      deleteCustomer.rejected,
+      (state, action: PayloadAction<string | unknown>) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : 'Failed to delete customer';
       }
     );
   },
 });
 
 export const { clearCustomerError } = customerSlice.actions;
-
-
-
 export default customerSlice.reducer;

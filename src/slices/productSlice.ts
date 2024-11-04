@@ -286,7 +286,7 @@ const productSlice = createSlice({
           p._id === action.payload.product._id ? action.payload.product : p,
         );
       },
-    );
+    );  
     builder.addCase(
       editProduct.rejected,
       (state, action: PayloadAction<any>) => {
