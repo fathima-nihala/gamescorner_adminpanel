@@ -56,22 +56,40 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
     return (
         <div>
-            <Dialog open={open} maxWidth="md" fullWidth sx={{ borderRadius: '15px' }}>
-                <DialogTitle className='text-[24px] font-medium  text-black dark:text-white bg-white dark:bg-black'>
-                    Edit Product
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleClose}
-                        sx={{ position: 'absolute', right: 8, top: 8, color: (theme) => theme.palette.grey[500] }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <Divider />
-                <DialogContent className="bg-white dark:bg-black text-black dark:text-white">
-                </DialogContent>
-            </Dialog>
+            <div>
+                <Dialog
+                    open={open}
+                    fullWidth // Ensure full width
+                    maxWidth="md" // You can change this to "lg" or "xl" as needed
+                    className="w-full lg:w-[90vw] lg:h-[90vh] lg:ml-auto" // Added lg:ml-auto for right positioning
+                    sx={{
+                        borderRadius: '15px',
+                    }}
+                >
+                    <DialogTitle className="text-[24px] font-medium text-black dark:text-white bg-white dark:bg-black">
+                        Edit Product
+                        <IconButton
+                            aria-label="close"
+                            onClick={handleClose}
+                            sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: 8,
+                                color: (theme) => theme.palette.grey[500],
+                            }}
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+                    <Divider />
+                    <DialogContent className="bg-white dark:bg-black text-black dark:text-white">
+                        {/* Dialog content goes here */}
+                    </DialogContent>
+                </Dialog>
+            </div>
+
         </div>
+
     );
 };
 
