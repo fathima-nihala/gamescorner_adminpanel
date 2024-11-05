@@ -7,9 +7,11 @@ import {
 } from "../slices/customerSlice";
 import { AppDispatch, RootState } from "../redux/store";
 import Breadcrumb from "../components/Breadcrumbs/Breadcrumb";
+import { useSnackbar } from 'notistack';
 
 const Customers: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { enqueueSnackbar } = useSnackbar();
   const { customers, loading, error } = useSelector(
     (state: RootState) => state.customer
   );
@@ -20,7 +22,25 @@ const Customers: React.FC = () => {
 
   const handleDelete = (customerId: string) => {
     dispatch(clearCustomerError());
-    dispatch(deleteCustomer(customerId));
+    dispatch(deleteCustomer(customerId)).then((result) => {
+      if (result.meta.requestStatus === 'fulfilled') {
+        enqueueSnackbar('Customer deleted successfully!', {
+          variant: 'success',
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+        });
+      } else {
+        enqueueSnackbar('Failed to delete customer.', {
+          variant: 'error',
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right',
+          },
+        });
+      }
+    });
   };
 
   if (loading) return <p>Loading customers...</p>;
@@ -47,7 +67,7 @@ const Customers: React.FC = () => {
                   <th className="px-4 py-4 w-4/12 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
                     Name
                   </th>
-                  <th className="px-4 py-4 w-3/12 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                  <th className="px-4 py-4  text-xs font-semibold text-gray-700 uppercase tracking-wide">
                     Option
                   </th>
                 </tr>
@@ -57,8 +77,8 @@ const Customers: React.FC = () => {
                   <tr
                     key={customer._id}
                     className={`${index % 2 === 0
-                        ? "bg-gray-50"
-                        : "bg-white dark:bg-form-input"
+                      ? "bg-gray-50"
+                      : "bg-white dark:bg-form-input"
                       } hover:bg-slate-50 dark:bg-form-input dark:hover:bg-gray-700 transition duration-150`}
                   >
                     <td className="px-4 py-4 w-1/12 text-left text-[16px] font-medium text-gray-900 dark:text-gray-300">
@@ -73,7 +93,12 @@ const Customers: React.FC = () => {
                     <td className="px-4 py-4 w-4/12 text-left text-[16px] text-gray-600 dark:text-gray-400">
                       {customer.name}
                     </td>
-                    <td className="px-4 py-4 w-3/12 text-left text-[16px] font-medium">
+                    <td className="px-4 py-4 flex justify-center text-left text-[16px] font-medium gap-12">
+                      <button
+                        className="text-red-600 hover:text-red-700 dark:hover:text-white transition duration-150"
+                      >
+                        Logout
+                      </button>
                       <button
                         onClick={() => handleDelete(customer._id)}
                         className="text-red-600 hover:text-red-700 dark:hover:text-white transition duration-150"
