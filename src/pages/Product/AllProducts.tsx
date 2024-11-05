@@ -16,7 +16,6 @@ import { AppDispatch, RootState } from '../../redux/store';
 import { useSnackbar } from 'notistack';
 import ConfirmationModal from '../../shared/ConfirmationModal';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
-// import { useNavigate } from 'react-router-dom';
 import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 import { DownloadSVG } from "../DownloadSVG";
@@ -166,7 +165,6 @@ const AllProducts: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
-    // const navigate = useNavigate();
     const [editProductId, setEditProductId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 

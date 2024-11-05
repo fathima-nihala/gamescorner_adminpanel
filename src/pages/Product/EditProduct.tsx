@@ -59,9 +59,9 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             <div>
                 <Dialog
                     open={open}
-                    fullWidth // Ensure full width
-                    maxWidth="md" // You can change this to "lg" or "xl" as needed
-                    className="w-full lg:w-[90vw] lg:h-[90vh] lg:ml-auto" // Added lg:ml-auto for right positioning
+                    fullWidth 
+                    maxWidth="md" 
+                    className="w-full lg:w-[90vw] lg:h-[90vh] lg:ml-auto" 
                     sx={{
                         borderRadius: '15px',
                     }}
@@ -83,7 +83,8 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     </DialogTitle>
                     <Divider />
                     <DialogContent className="bg-white dark:bg-black text-black dark:text-white">
-                        {/* Dialog content goes here */}
+
+
                     </DialogContent>
                 </Dialog>
             </div>
