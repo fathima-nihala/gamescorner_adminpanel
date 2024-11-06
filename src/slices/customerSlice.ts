@@ -10,6 +10,7 @@ export interface Customer {
   name: string;
   email: string;
   customerId: string;
+  isLoggedIn: boolean; // Added property to track login status
 }
 
 interface CustomerState {
@@ -56,6 +57,14 @@ export const deleteCustomer = createAsyncThunk(
   }
 );
 
+// Thunk to logout a customer
+export const logoutCustomer = createAsyncThunk(
+  'customer/logoutCustomer',
+  async (customerId: string) => {
+     
+    return customerId; // Returning the customer ID to handle in the reducer
+  }
+);
 
 export const customerSlice = createSlice({
   name: 'customer',
@@ -108,6 +117,15 @@ export const customerSlice = createSlice({
         state.error = typeof action.payload === 'string' ? action.payload : 'Failed to delete customer';
       }
     );
+
+    // Logout customer reducers
+    builder.addCase(logoutCustomer.fulfilled, (state, action: PayloadAction<string>) => {
+      const customerId = action.payload;
+      const customer = state.customers.find(c => c._id === customerId);
+      if (customer) {
+        customer.isLoggedIn = false; // Update the login status
+      }
+    });
   },
 });
 

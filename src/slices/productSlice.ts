@@ -32,6 +32,7 @@ export interface Product {
   country_pricing: CountryPricing[];
   quantity?: string;
   shipping_time?: string;
+  shipping_price: string;
   tax?: string;
   description: string;
   image: string;

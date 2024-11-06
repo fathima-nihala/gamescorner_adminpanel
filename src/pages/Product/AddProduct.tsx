@@ -41,6 +41,7 @@ interface ProductData {
     cash_on_delivery: boolean;
     country_pricing: CountryPricing[];
     quantity?: string;
+    shipping_price: string;
     shipping_time: string;
     tax: string;
     description: string;
@@ -88,6 +89,7 @@ const AddProduct: React.FC = () => {
         cash_on_delivery: false,
         country_pricing: [],
         quantity: '',
+        shipping_price:'',
         shipping_time: '',
         tax: '',
         description: '',
@@ -194,6 +196,7 @@ const AddProduct: React.FC = () => {
                 ],
                 quantity: '',
                 shipping_time: '',
+                shipping_price: '',
                 tax: '',
                 description: '',
                 image: '',
@@ -326,6 +329,7 @@ const AddProduct: React.FC = () => {
             formData.append('attribute', productData.attribute);
             formData.append('description', productData.description);
             formData.append('quantity', productData.quantity || '');
+            formData.append('shipping_price', productData.shipping_price || '');
             formData.append('shipping_time', productData.shipping_time || '');
             formData.append('tax', productData.tax || '');
             formData.append('unit', productData.unit || '');
@@ -565,228 +569,242 @@ const AddProduct: React.FC = () => {
                                 />
                             </div>
 
-                        </div>
+                       
 
-                    </div>
-
-
-                    {/* images  */}
-                    <div className="bg-white mt-4  w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
-                        <div className='block w-full lg:mt-8'>
-                            <p>Thumbnail</p>
-                            <DropzoneImage
-                                onChange={(event) => onFileUpload(event, 'image')}
-                                image={previewImage}
-                                id="thumbnail-upload"
+                        <div className="bg-white rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black  ">
+                            <h5 className="text-xl font-semibold mb-4">Estimated Shipping Price</h5>
+                            <input
+                                type="text"
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                name="shipping_price"
+                                placeholder="Enter estimated shipping price"
+                                value={productData.shipping_price}
+                                onChange={handleInputChange}
                             />
-                            {localErrors.image && <Typography color="error">{localErrors.image}</Typography>}
                         </div>
+                    
+                    </div>
 
-                        <div className="mt-10">
-                            <p>Gallery Images</p>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                    <DropzoneImage
-                                        key={index}
-                                        onChange={(event) => onFileUpload(event, `gallery${index + 1}`)}
-                                        image={previewGallery[index]}
-                                        id={`gallery-upload-${index + 1}`}
-                                    />
+            </div>
+
+
+            {/* images  */}
+            <div className="bg-white mt-4  w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                <div className='block w-full lg:mt-8'>
+                    <p>Thumbnail</p>
+                    <DropzoneImage
+                        onChange={(event) => onFileUpload(event, 'image')}
+                        image={previewImage}
+                        id="thumbnail-upload"
+                    />
+                    {localErrors.image && <Typography color="error">{localErrors.image}</Typography>}
+                </div>
+
+                <div className="mt-10">
+                    <p>Gallery Images</p>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                            <DropzoneImage
+                                key={index}
+                                onChange={(event) => onFileUpload(event, `gallery${index + 1}`)}
+                                image={previewGallery[index]}
+                                id={`gallery-upload-${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+
+            {/* Product Variation */}
+            <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                <div className=" rounded-md">
+                    <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
+
+                    <div className='w-full'>
+                        <MultipleColorSelect
+                            selectedColors={productData.color}
+                            onChange={handleColorChange}
+                            className="mb-4"
+                        />
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-4">
+                        {/* Attribute Dropdown */}
+                        <div className="w-full">
+                            <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
+                            <select
+                                className="w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                name="attribute"
+                                value={productData.attribute}
+                                onChange={handleInputChange}
+                            >
+                                <option value="" className="text-body dark:text-bodydark">Select attribute</option>
+                                {attributes.map((attribute) => (
+                                    <option key={attribute._id} value={attribute._id} className="text-body dark:text-bodydark">
+                                        {attribute.name}
+                                    </option>
                                 ))}
-                            </div>
+                            </select>
                         </div>
                     </div>
 
+                    {productData.attribute && (
+                        <div className='mt-2'>
+                            <MultiSelect
+                                attributeId={productData.attribute}
+                                selectedValues={productData.attribute_value}
+                                onChange={handleAttributeValuesChange}
+                            />
+                        </div>
+                    )}
 
-                    {/* Product Variation */}
-                    <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
-                        <div className=" rounded-md">
-                            <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
+                </div>
+            </div>
 
-                            <div className='w-full'>
-                                <MultipleColorSelect
-                                    selectedColors={productData.color}
-                                    onChange={handleColorChange}
-                                    className="mb-4"
+            {/* proice stock and description */}
+            <div className='flex lg:flex-row flex-col gap-3'>
+
+                {/* stock */}
+                <div className="bg-white shadow-lg rounded-md  dark:bg-black  mt-5 grid lg:w-[60%] w-full">
+                    <div className="col-span-2 p-3">
+                        <div className="p-6 bg-white  dark:bg-black   ">
+                            <div className="flex justify-between items-center mb-4">
+                                <h5 className="text-xl font-semibold">Price and Stock Information</h5>
+                            </div>
+
+                            <div className=" ">
+                                <SelectGroupTwo
+                                    selectedCountries={selectedCountries}
+                                    onChange={handleCountrySelectionChange}
                                 />
                             </div>
 
-                            <div className="flex flex-col md:flex-row gap-4">
-                                {/* Attribute Dropdown */}
-                                <div className="w-full">
-                                    <label className="block text-gray-700 dark:text-white mb-2">Attribute</label>
-                                    <select
-                                        className="w-full border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
-                                        name="attribute"
-                                        value={productData.attribute}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="" className="text-body dark:text-bodydark">Select attribute</option>
-                                        {attributes.map((attribute) => (
-                                            <option key={attribute._id} value={attribute._id} className="text-body dark:text-bodydark">
-                                                {attribute.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {productData.attribute && (
-                                <div className='mt-2'>
-                                    <MultiSelect
-                                        attributeId={productData.attribute}
-                                        selectedValues={productData.attribute_value}
-                                        onChange={handleAttributeValuesChange}
-                                    />
-                                </div>
-                            )}
-
-                        </div>
-                    </div>
-
-                    {/* proice stock and description */}
-                    <div className='flex lg:flex-row flex-col gap-3'>
-
-                        {/* stock */}
-                        <div className="bg-white shadow-lg rounded-md  dark:bg-black  mt-5 grid lg:w-[60%] w-full">
-                            <div className="col-span-2 p-3">
-                                <div className="p-6 bg-white  dark:bg-black   ">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h5 className="text-xl font-semibold">Price and Stock Information</h5>
+                            {selectedCountries.map((country) => (
+                                <div key={country._id} className="col-span-12 mt-5 ">
+                                    <div className="grid grid-cols-12 gap-4 mb-4">
+                                        <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                            Unit Price for {country.currency_code}<span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="col-span-9">
+                                            <input
+                                                type="number"
+                                                className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                placeholder="Unit price"
+                                                min="0"
+                                                step="0.01"
+                                                value={priceDiscounts[country._id]?.price || ''}
+                                                onChange={(e) => handleCountryChange(country._id, 'price', e.target.value)}
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className=" ">
-                                        <SelectGroupTwo
-                                            selectedCountries={selectedCountries}
-                                            onChange={handleCountrySelectionChange}
+                                    <div className="grid grid-cols-12 gap-4 mb-4">
+                                        <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                            Discount for {country.currency_code} <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="col-span-9">
+                                            <input
+                                                type="number"
+                                                className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                placeholder="Discount"
+                                                min="0"
+                                                step="0.01"
+                                                value={priceDiscounts[country._id]?.discount || ''}
+                                                onChange={(e) => handleCountryChange(country._id, 'discount', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Quantity */}
+                            <div className="col-span-12 mt-2">
+                                <div className="grid grid-cols-12 gap-4 mb-4 ">
+                                    <label className=" col-span-3 text-gray-700 text-sm font-medium">
+                                        Quantity <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="col-span-9 ">
+                                        <input
+                                            name='quantity'
+                                            type="number"
+                                            className=" dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300  rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200 "
+                                            placeholder="Quantity"
+                                            min="0"
+                                            step="1"
+                                            value={productData.quantity}
+                                            onChange={handleInputChange}
                                         />
                                     </div>
-
-                                    {selectedCountries.map((country) => (
-                                        <div key={country._id} className="col-span-12 mt-5 ">
-                                            <div className="grid grid-cols-12 gap-4 mb-4">
-                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                    Unit Price for {country.currency_code}<span className="text-red-500">*</span>
-                                                </label>
-                                                <div className="col-span-9">
-                                                    <input
-                                                        type="number"
-                                                        className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                                        placeholder="Unit price"
-                                                        min="0"
-                                                        step="0.01"
-                                                        value={priceDiscounts[country._id]?.price || ''}
-                                                        onChange={(e) => handleCountryChange(country._id, 'price', e.target.value)}
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-12 gap-4 mb-4">
-                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                    Discount for {country.currency_code} <span className="text-red-500">*</span>
-                                                </label>
-                                                <div className="col-span-9">
-                                                    <input
-                                                        type="number"
-                                                        className="dark:bg-form-input form-control w-full px-4 py-2 border border-gray-300 bg-white rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                                        placeholder="Discount"
-                                                        min="0"
-                                                        step="0.01"
-                                                        value={priceDiscounts[country._id]?.discount || ''}
-                                                        onChange={(e) => handleCountryChange(country._id, 'discount', e.target.value)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Quantity */}
-                                    <div className="col-span-12 mt-2">
-                                        <div className="grid grid-cols-12 gap-4 mb-4 ">
-                                            <label className=" col-span-3 text-gray-700 text-sm font-medium">
-                                                Quantity <span className="text-red-500">*</span>
-                                            </label>
-                                            <div className="col-span-9 ">
-                                                <input
-                                                    name='quantity'
-                                                    type="number"
-                                                    className=" dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300  rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200 "
-                                                    placeholder="Quantity"
-                                                    min="0"
-                                                    step="1"
-                                                    value={productData.quantity}
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
-                        </div>
 
-                        {/* description */}
-                        <div className="bg-white shadow-lg rounded-md p-6 dark:bg-black  mt-5  lg:w-[40%] w-full ">
-                            <h2 className="text-lg font-semibold mb-5">Product Description</h2>
-                            <div className="">
-                                <QuillEditor
-                                    value={productData.description}
-                                    onChange={handleDescriptionChange}
-                                    placeholder="Enter your description here"
-                                />
-                                {localErrors.description && (<p className="text-red-500 text-xs mt-1">{localErrors.description}</p>)}
-                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className='bg-white shadow-lg rounded-md p-6 dark:bg-black mt-5 w-full'>
-                        <div className="border-b p-4 mb-4">
-                            <h5 className="text-xl font-semibold">{'SEO Meta Tags'}</h5>
-                        </div>
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-12 gap-4 mb-4">
-                                <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                    Meta Title <span className="text-red-500">*</span>
-                                </label>
-                                <div className="col-span-9">
-                                    <input
-                                        name='meta_title'
-                                        type="text"
-                                        className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
-                                        placeholder="Meta Title"
-                                        value={productData.meta_title}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-12 gap-4 mb-4">
-                                <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                    Meta Description <span className="text-red-500">*</span>
-                                </label>
-                                <div className="col-span-9">
-                                    <textarea
-                                        name='meta_desc'
-                                        className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
-                                        placeholder="Description"
-                                        value={productData.meta_desc}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                {/* description */}
+                <div className="bg-white shadow-lg rounded-md p-6 dark:bg-black  mt-5  lg:w-[40%] w-full ">
+                    <h2 className="text-lg font-semibold mb-5">Product Description</h2>
+                    <div className="">
+                        <QuillEditor
+                            value={productData.description}
+                            onChange={handleDescriptionChange}
+                            placeholder="Enter your description here"
+                        />
+                        {localErrors.description && (<p className="text-red-500 text-xs mt-1">{localErrors.description}</p>)}
                     </div>
-
-                    <div className="flex justify-end space-x-4 mt-4">
-                        <button
-                            type="submit"
-                            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-                        >
-                            Save Product
-                        </button>
-                    </div>
-
-                </form>
+                </div>
             </div>
+
+            <div className='bg-white shadow-lg rounded-md p-6 dark:bg-black mt-5 w-full'>
+                <div className="border-b p-4 mb-4">
+                    <h5 className="text-xl font-semibold">{'SEO Meta Tags'}</h5>
+                </div>
+                <div className="space-y-6">
+                    <div className="grid grid-cols-12 gap-4 mb-4">
+                        <label className="col-span-3 text-gray-700 text-sm font-medium">
+                            Meta Title <span className="text-red-500">*</span>
+                        </label>
+                        <div className="col-span-9">
+                            <input
+                                name='meta_title'
+                                type="text"
+                                className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
+                                placeholder="Meta Title"
+                                value={productData.meta_title}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-12 gap-4 mb-4">
+                        <label className="col-span-3 text-gray-700 text-sm font-medium">
+                            Meta Description <span className="text-red-500">*</span>
+                        </label>
+                        <div className="col-span-9">
+                            <textarea
+                                name='meta_desc'
+                                className="border border-gray-300 p-2 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-300 dark:bg-form-input"
+                                placeholder="Description"
+                                value={productData.meta_desc}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex justify-end space-x-4 mt-4">
+                <button
+                    type="submit"
+                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                >
+                    Save Product
+                </button>
+            </div>
+
+        </form >
+            </div >
         </>
     );
 };
