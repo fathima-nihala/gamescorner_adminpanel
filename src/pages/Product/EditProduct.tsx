@@ -65,8 +65,8 @@ interface Country {
 
 const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
-    console.log(id,'iiiiidddd');
-    
+    console.log(id, 'iiiiidddd');
+
     if (!open) return null;
     const dispatch = useDispatch<AppDispatch>();
     const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -175,7 +175,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                 open={open}
                 fullWidth
                 maxWidth="md"
-                className="relative w-full lg:w-[90vw] lg:h-[90vh] lg:ml-auto "
+                className="relative w-full lg:w-[90vw] lg:h-[90vh] lg:ml-60 "
                 sx={{ borderRadius: '15px', padding: '1rem', }}
             >
                 <IconButton
@@ -197,17 +197,18 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                 </DialogTitle>
                 <Divider />
                 <DialogContent className="bg-white dark:bg-black text-black dark:text-white space-y-6 p-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium">Product Name</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
-                                value={productData.name}
-                                onChange={(e) => setProductData({ ...productData, name: e.target.value })}
-                            />
-                        </div>
-                        <div>
+                    <div className="col-span-2">
+                        <label className="block text-sm font-medium">Product Name</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={productData.name}
+                            onChange={(e) => setProductData({ ...productData, name: e.target.value })}
+                        />
+                    </div>
+
+                    <div className='flex md:flex-row flex-col gap-6'>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Categories</label>
                             <input
                                 type="text"
@@ -216,7 +217,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, parent_category: e.target.value })}
                             />
                         </div>
-                        <div>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Subcategories</label>
                             <input
                                 type="text"
@@ -225,7 +226,10 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, sub_category: e.target.value })}
                             />
                         </div>
-                        <div>
+                    </div>
+
+                    <div className='flex md:flex-row flex-col gap-4'>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Brand</label>
                             <input
                                 type="text"
@@ -234,7 +238,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, brand: e.target.value })}
                             />
                         </div>
-                        <div>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Unit</label>
                             <input
                                 type="text"
@@ -243,7 +247,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, unit: e.target.value })}
                             />
                         </div>
-                        <div>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Weight</label>
                             <input
                                 type="text"
@@ -252,8 +256,10 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, weight: e.target.value })}
                             />
                         </div>
+                    </div>
 
-                        <div>
+                    <div className='flex md:flex-row flex-col gap-4'>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Tax</label>
                             <input
                                 type="text"
@@ -262,9 +268,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
                         </div>
-
-
-                        <div >
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Estimated Shipping Price</label>
                             <input
                                 type="text"
@@ -273,8 +277,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
                         </div>
-
-                        <div>
+                        <div className='w-full'>
                             <label className="block text-sm font-medium">Estimated Shipping Time</label>
                             <input
                                 type="text"
@@ -283,19 +286,19 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
                         </div>
-
-
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium">Tags</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
-                                value={productData.tax}
-                                onChange={(e) => setProductData({ ...productData, tags: e.target.value })}
-                            />
-                        </div>
-
                     </div>
+
+
+                    <div className="col-span-2">
+                        <label className="block text-sm font-medium">Tags</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            value={productData.tax}
+                            onChange={(e) => setProductData({ ...productData, tags: e.target.value })}
+                        />
+                    </div>
+
 
 
 
