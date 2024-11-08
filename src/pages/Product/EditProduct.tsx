@@ -1,19 +1,17 @@
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, IconButton, Divider, DialogContent } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
 import { fetchBrands } from '../../slices/brandSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/store';
-import { fetchAttributes } from '../../slices/attributeSlice';
-import { fetchCategories } from '../../slices/categorySlice';
+import { fetchAttributes, fetchAttributeValues } from '../../slices/attributeSlice';
+import { fetchCategories, fetchCategoryNames, selectCategoryNames } from '../../slices/categorySlice';
 import { getAllColors } from '../../slices/colorSlice';
 import DropzoneImage from '../../shared/DropzoneImage';
 import SelectGroupTwo from '../../components/Forms/SelectGroup/SelectGroupTwo';
-import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 import MultiSelect from '../../components/Forms/MultiSelect';
 import QuillEditor from '../QuillEditor';
-
-
+import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 
 interface CountryPricing {
     country_id: string;
@@ -22,9 +20,11 @@ interface CountryPricing {
     currency_code: string;
     unit_price: number;
     discount?: number;
+    quantity?: string;
 }
 
 interface ProductData {
+    _id?: string;
     name: string;
     parent_category: string;
     brand: string;
@@ -34,7 +34,6 @@ interface ProductData {
     attribute: string;
     sub_category: string;
     attribute_value: string[];
-
     country_pricing: CountryPricing[];
     quantity?: string;
     shipping_time: string;
@@ -46,7 +45,6 @@ interface ProductData {
     gallery3?: string | File;
     gallery4?: string | File;
     gallery5?: string | File;
-
     color: string[];
 }
 
@@ -64,60 +62,134 @@ interface Country {
 }
 
 const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
-
-    console.log(id, 'iiiiidddd');
-
-    if (!open) return null;
     const dispatch = useDispatch<AppDispatch>();
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const [previewGallery, setPreviewGallery] = useState<(string | null)[]>([null, null, null, null, null]);
-    const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
-    const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string }>>({});
+    const { products } = useSelector((state: RootState) => state.product);
+    const { attributes } = useSelector((state: RootState) => state.attribute);
+    const brands = useSelector((state: RootState) => state.brands.brands);
+    const categoryNames = useSelector(selectCategoryNames);
+    const { categories } = useSelector((state: RootState) => state.category);
 
     const [productData, setProductData] = useState<ProductData>({
         name: '',
         parent_category: '',
+        brand: '',
         unit: '',
         weight: '',
         tags: '',
-        brand: '',
         attribute: '',
         sub_category: '',
         attribute_value: [],
         country_pricing: [],
+        quantity: '',
         shipping_time: '',
         tax: '',
         description: '',
-        color: [],
+        image: '',
+        gallery1: '',
+        gallery2: '',
+        gallery3: '',
+        gallery4: '',
+        gallery5: '',
+        color: []
     });
 
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [previewGallery, setPreviewGallery] = useState<(string | null)[]>(Array(5).fill(null));
+    const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
+    const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string; quantity: string }>>({});
 
     useEffect(() => {
+        if (products && id) {
+            const proToEdit = products.find((prod) => prod?._id === id);
+            if (proToEdit) {
+                console.log(proToEdit, 'prottttt');
+
+                setProductData({
+                    ...proToEdit,
+                    parent_category: Array.isArray(proToEdit.parent_category) && proToEdit.parent_category.length > 0
+                        ? proToEdit.parent_category[0]._id
+                        : '',
+                    sub_category: Array.isArray(proToEdit.sub_category) && proToEdit.sub_category.length > 0 ? proToEdit.sub_category[0]._id : '',
+                    brand: Array.isArray(proToEdit.brand) && proToEdit.brand.length > 0 ? proToEdit.brand[0]._id : '',
+                    image: proToEdit.image || '',
+                    gallery1: proToEdit.gallery1 || '',
+                    gallery2: proToEdit.gallery2 || '',
+                    gallery3: proToEdit.gallery3 || '',
+                    gallery4: proToEdit.gallery4 || '',
+                    gallery5: proToEdit.gallery5 || '',
+                    color: proToEdit.color || []
+                });
+                setPreviewImage(proToEdit.image as string);
+                setPreviewGallery([
+                    proToEdit.gallery1 || null,
+                    proToEdit.gallery2 || null,
+                    proToEdit.gallery3 || null,
+                    proToEdit.gallery4 || null,
+                    proToEdit.gallery5 || null,
+                ]);
+
+                if (Array.isArray(proToEdit.country_pricing)) {
+                    setSelectedCountries(
+                        proToEdit.country_pricing.map((c: CountryPricing) => ({
+                            _id: c.country_id,
+                            country: c.country,
+                            currency: c.currency,
+                            currency_code: c.currency_code
+                        }))
+                    );
+
+
+                    const initialPriceDiscounts = proToEdit.country_pricing.reduce(
+                        (acc: Record<string, { price: string; discount: string; quantity: string }>, curr: CountryPricing) => {
+                            acc[curr.country_id] = {
+                                price: String(curr.unit_price),
+                                discount: String(curr.discount || ''),
+                                quantity: String(curr.quantity || ''),
+                            };
+                            return acc;
+                        },
+                        {} as Record<string, { price: string; discount: string; quantity: string }>
+                    );
+
+                    setPriceDiscounts(initialPriceDiscounts);
+                }
+            }
+        }
+    }, [products, id]);
+
+    useEffect(() => {
+        dispatch(fetchCategories(''));
         dispatch(fetchBrands());
         dispatch(fetchAttributes());
         dispatch(fetchCategories(''));
         dispatch(getAllColors());
-    }, [dispatch])
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (productData?.parent_category) {
+            dispatch(fetchCategoryNames(productData.parent_category));
+        }
+    }, [dispatch, productData]);
+
+
+    useEffect(() => {
+        if (productData?.attribute) {
+            dispatch(fetchAttributeValues(productData.attribute))
+        }
+    }, [dispatch, productData])
+
 
     const handleDescriptionChange = (value: string) => {
-        setProductData((prevState) => ({
-            ...prevState,
-            description: value, // Update the description value
-        }));
-    };
-    const [attributes, setAttributes] = useState([{ _id: '1', name: 'Ram' }, { _id: '2', name: 'Testing' }]);
-
-    const handleColorChange = (newColors: string[]) => {
-        setProductData(prevData => ({ ...prevData, color: newColors }));
+        setProductData((prevState) => ({ ...prevState, description: value }));
     };
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
-        setProductData(prevData => ({ ...prevData, [name]: value }));
+        setProductData((prevData) => ({ ...prevData, [name]: value }));
     };
 
     const handleAttributeValuesChange = (selectedValues: string[]) => {
-        setProductData(prevData => ({ ...prevData, attribute_value: selectedValues }));
+        setProductData((prevData) => ({ ...prevData, attribute_value: selectedValues }));
     };
 
     const onFileUpload = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
@@ -129,19 +201,13 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             const result = reader.result as string;
             if (fieldName === 'image') {
                 setPreviewImage(result);
-                setProductData((prevData) => ({
-                    ...prevData,
-                    image: file,
-                }));
+                setProductData((prevData) => ({ ...prevData, image: file }));
             } else if (fieldName.startsWith('gallery')) {
                 const index = parseInt(fieldName.slice(-1)) - 1;
                 const newPreviewGallery = [...previewGallery];
                 newPreviewGallery[index] = result;
                 setPreviewGallery(newPreviewGallery);
-                setProductData((prevData) => ({
-                    ...prevData,
-                    [fieldName]: file,
-                }));
+                setProductData((prevData) => ({ ...prevData, [fieldName]: file }));
             }
         };
         reader.readAsDataURL(file);
@@ -149,25 +215,32 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
     const handleCountrySelectionChange = (countries: Country[]) => {
         setSelectedCountries(countries);
-
         const updatedPriceDiscounts = countries.reduce((acc, country) => {
-            acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '' };
+            acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '', quantity: '' };
             return acc;
-        }, {} as Record<string, { price: string; discount: string }>);
-
+        }, {} as Record<string, { price: string; discount: string; quantity: string }>);
         setPriceDiscounts(updatedPriceDiscounts);
     };
 
-    const handleCountryChange = (countryId: string, field: 'price' | 'discount', value: string) => {
-        setPriceDiscounts(prev => ({
+    const handleCountryChange = (countryId: string, field: 'price' | 'discount' | 'quantity', value: string) => {
+        setPriceDiscounts((prev) => {
+            const updatedCountry = prev[countryId] || { price: '', discount: '', quantity: '' };
+            updatedCountry[field] = value;
+            return {
+                ...prev,
+                [countryId]: updatedCountry
+            };
+        });
+    };
+
+    const handleColorChange = (selectedColors: string[]) => {
+        setProductData(prev => ({
             ...prev,
-            [countryId]: {
-                ...prev[countryId],
-                [field]: value
-            }
+            color: selectedColors
         }));
     };
 
+    console.log(productData.color, 'productData color');
 
     return (
         <div>
@@ -206,37 +279,58 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             onChange={(e) => setProductData({ ...productData, name: e.target.value })}
                         />
                     </div>
-
                     <div className='flex md:flex-row flex-col gap-6'>
                         <div className='w-full'>
                             <label className="block text-sm font-medium">Categories</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
-                                value={productData.parent_category}
-                                onChange={(e) => setProductData({ ...productData, parent_category: e.target.value })}
-                            />
+                            <select
+                                className="w-full border border-gray-300 rounded-md bg-transparent py-3 px-3 outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                name="parent_category"
+                                value={productData.parent_category || ''}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Select Category</option>
+                                {categories?.map((category) => (
+                                    <option key={category._id} value={category._id}>
+                                        {category.parent_category}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
+
                         <div className='w-full'>
                             <label className="block text-sm font-medium">Subcategories</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
-                                value={productData.sub_category}
-                                onChange={(e) => setProductData({ ...productData, sub_category: e.target.value })}
-                            />
+                            <select
+                                className="w-full border border-gray-300 rounded-md bg-transparent py-3 px-3 outline-none transition focus:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                name="sub_category"
+                                value={productData.sub_category || ''}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Select Subcategory</option>
+                                {Array.isArray(categoryNames?.name) && categoryNames?.name?.map((subcategory) => (
+                                    <option key={subcategory._id} value={subcategory._id}>
+                                        {subcategory.value}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
                     <div className='flex md:flex-row flex-col gap-4'>
                         <div className='w-full'>
                             <label className="block text-sm font-medium">Brand</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
+                            <select
+                                className="w-full  border border-gray-300 rounded-md border-stroke bg-transparent py-3 px-3 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
+                                name="brand"
                                 value={productData.brand}
-                                onChange={(e) => setProductData({ ...productData, brand: e.target.value })}
-                            />
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Select Brand</option>
+                                {brands && brands.map((brand) => (
+                                    <option key={brand._id} value={brand._id}>
+                                        {brand.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className='w-full'>
                             <label className="block text-sm font-medium">Unit</label>
@@ -301,12 +395,20 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
 
 
-
-                    <div className="bg-white mt-4  w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
+                    {/* Image section */}
+                    <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black">
                         <div className='block w-full lg:mt-8'>
                             <p>Thumbnail</p>
                             <DropzoneImage
-                                onChange={(event) => onFileUpload(event, 'image')}
+                                onChange={(event) => {
+                                    onFileUpload(event, 'image');
+
+                                    const files = event.target.files;
+                                    if (files && files[0]) {
+                                        const url = URL.createObjectURL(files[0]);
+                                        setPreviewImage(url);
+                                    }
+                                }}
                                 image={previewImage}
                                 id="thumbnail-upload"
                             />
@@ -318,7 +420,20 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                 {Array.from({ length: 5 }).map((_, index) => (
                                     <DropzoneImage
                                         key={index}
-                                        onChange={(event) => onFileUpload(event, `gallery${index + 1}`)}
+                                        onChange={(event) => {
+                                            onFileUpload(event, `gallery${index + 1}`);
+
+                                            const files = event.target.files;
+                                            if (files && files[0]) {
+                                                const url = URL.createObjectURL(files[0]);
+                                                setPreviewGallery((prevGallery) => {
+                                                    const updatedGallery = [...prevGallery];
+                                                    updatedGallery[index] = url;
+                                                    return updatedGallery;
+                                                });
+                                            }
+                                        }}
+
                                         image={previewGallery[index]}
                                         id={`gallery-upload-${index + 1}`}
                                     />
@@ -335,6 +450,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                     <h5 className="text-xl font-semibold">Price and Stock Information</h5>
                                 </div>
 
+
                                 <div>
                                     <SelectGroupTwo
                                         selectedCountries={selectedCountries}
@@ -342,12 +458,12 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                     />
                                 </div>
 
+                                {/* Display selected countries and their pricing/quantity information */}
                                 {selectedCountries.map((country) => (
                                     <div key={country._id} className="mt-5">
                                         <div className="grid grid-cols-12 gap-4 mb-4">
                                             <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                Unit Price for {country.currency_code}
-                                                <span className="text-red-500">*</span>
+                                                Unit Price for {country.currency_code} <span className="text-red-500">*</span>
                                             </label>
                                             <div className="col-span-9">
                                                 <input
@@ -364,8 +480,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
                                         <div className="grid grid-cols-12 gap-4 mb-4">
                                             <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                Discount for {country.currency_code}{' '}
-                                                <span className="text-red-500">*</span>
+                                                Discount for {country.currency_code}
                                             </label>
                                             <div className="col-span-9">
                                                 <input
@@ -379,29 +494,34 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                                 />
                                             </div>
                                         </div>
+
+
+
+                                        {/* Quantity */}
+
+                                        <div className="mt-2">
+                                            <div className="grid grid-cols-12 gap-4 mb-4">
+                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                                    Quantity <span className="text-red-500">*</span>
+                                                </label>
+                                                <div className="col-span-9">
+                                                    <input
+                                                        name="quantity"
+                                                        type="number"
+                                                        className="dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                        placeholder="Quantity"
+                                                        min="0"
+                                                        step="1"
+                                                        value={productData.quantity}
+                                                        onChange={handleInputChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                 ))}
-
-                                {/* Quantity */}
-                                <div className="mt-2">
-                                    <div className="grid grid-cols-12 gap-4 mb-4">
-                                        <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                            Quantity <span className="text-red-500">*</span>
-                                        </label>
-                                        <div className="col-span-9">
-                                            <input
-                                                name="quantity"
-                                                type="number"
-                                                className="dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                                placeholder="Quantity"
-                                                min="0"
-                                                step="1"
-                                                value={productData.quantity}
-                                            // onChange={handleInputChange}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -410,10 +530,9 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
                     {/* Product Variation */}
 
-                    <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black ">
-                        <div className=" rounded-md">
+                    <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black">
+                        <div className="rounded-md">
                             <h5 className="text-xl font-semibold mb-4">Product Variation</h5>
-
                             <div className='w-full'>
                                 <MultipleColorSelect
                                     selectedColors={productData.color}
@@ -438,6 +557,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                                 {attribute.name}
                                             </option>
                                         ))}
+
                                     </select>
                                 </div>
                             </div>
@@ -451,10 +571,8 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                     />
                                 </div>
                             )}
-
                         </div>
                     </div>
-
 
                     {/* Product Description */}
 
