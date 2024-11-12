@@ -507,7 +507,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   </svg>
                   Settings
                 </NavLink>
+
+
+
+                
+                <NavLink
+                  to="/dashboard/all_staff"
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('Customers') && 'bg-graydark dark:bg-meta-4'}`}
+                >
+                  <svg
+                    className="fill-current"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M16 11C17.6569 11 19 9.65685 19 8C19 6.34315 17.6569 5 16 5C14.3431 5 13 6.34315 13 8C13 9.65685 14.3431 11 16 11ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11ZM8 13C5.33 13 2 14.34 2 16V18C2 18.55 2.45 19 3 19H13C13.55 19 14 18.55 14 18V16C14 14.34 10.67 13 8 13ZM16 13C15.67 13 15.31 13.02 14.94 13.05C15.59 13.72 16 14.54 16 15.5V18H21C21.55 18 22 17.55 22 17V15.5C22 14.34 18.67 13 16 13Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  All Staff
+                </NavLink>
+
+
               </li>
+
+
+             
               {/* <!-- Menu Item Settings --> */}
             </ul>
           </div>

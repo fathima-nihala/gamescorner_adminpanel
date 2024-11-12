@@ -26,6 +26,10 @@ import AddProduct from './pages/Product/AddProduct';
 import Color from './pages/Product/Color';
 import AllProducts from './pages/Product/AllProducts';
 import Customers from './pages/Customers';
+import Addtostaff from './pages/Addtostaff'
+import Editstaff from './pages/Editstaff';
+
+
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -251,10 +255,37 @@ function App() {
                   element={
                     <>
                       <PageTitle title="Customers | Games Corner" />
-                      <Customers/>
+                      <Customers />
                     </>
                   }
                 />
+
+
+
+
+
+                <Route
+                  path="/all_staff"
+                  element={
+                    <>
+                      <PageTitle title="All Staff | Games Corner" />
+                      <Addtostaff />
+                    </>
+                  }
+                />
+                <Route
+                  path="/edit-staff/:id"  
+                  element={
+                    <>
+                      <PageTitle title="Edit Staff | Games Corner" />
+                      <Editstaff />
+                    </>
+                  }
+                />
+
+
+
+
               </Routes>
 
 

@@ -39,9 +39,10 @@ const OrdersTable: React.FC = () => {
               <select
                 className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Delivery Status</option>
-                <option value="delivered">Delivered</option>
-                <option value="pending">Pending</option>
+                <option value="">Select order status</option>
+                <option value="all">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="Delivered">Delivered</option>
                 <option value="cancelled">Cancelled</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
@@ -52,8 +53,9 @@ const OrdersTable: React.FC = () => {
               <select
                 className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Payment Methods</option>
-                <option value="cash on delivery">Cash on Delivery</option>
+                <option value="">Select Payment status</option>
+                <option value="all">Paid</option>
+                <option value="cash on delivery">Unpaid</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
             </div>
