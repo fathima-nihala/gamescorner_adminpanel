@@ -67,6 +67,7 @@ interface ProfileState {
     passwordChangedAt: Date;
     resetPasswordOTP: string;
     resetPasswordOTPExpires: Date;
+    role: String;
   } | null;
   loading: boolean;
   error: string | null;

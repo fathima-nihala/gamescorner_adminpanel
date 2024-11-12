@@ -153,8 +153,13 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
                     setPriceDiscounts(initialPriceDiscounts);
                 }
+                if (proToEdit.attribute) {
+                    dispatch(fetchAttributeValues(proToEdit.attribute));
+                }
             }
         }
+            
+        
     }, [products, id]);
 
     useEffect(() => {
@@ -552,7 +557,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                         onChange={handleInputChange}
                                     >
                                         <option value="" className="text-body dark:text-bodydark">Select attribute</option>
-                                        {attributes.map((attribute) => (
+                                        {attributes?.map((attribute) => (
                                             <option key={attribute._id} value={attribute._id} className="text-body dark:text-bodydark">
                                                 {attribute.name}
                                             </option>

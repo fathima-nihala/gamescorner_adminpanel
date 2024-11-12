@@ -21,14 +21,14 @@ const OrdersTable: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 min-h-screen">
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white dark:bg-form-input rounded-lg shadow-md p-6">
         {/* Search and Filters Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center p-4 space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="relative w-full sm:w-1/3">
             <input
               type="text"
               placeholder="Search orders..."
-              className="bg-white p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+              className="bg-white dark:bg-form-input p-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           </div>
@@ -37,7 +37,7 @@ const OrdersTable: React.FC = () => {
             {/* Delivery Status Dropdown */}
             <div className="relative">
               <select
-                className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Delivery Status</option>
                 <option value="delivered">Delivered</option>
@@ -50,7 +50,7 @@ const OrdersTable: React.FC = () => {
             {/* Payment Method Dropdown */}
             <div className="relative">
               <select
-                className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Payment Methods</option>
                 <option value="cash on delivery">Cash on Delivery</option>
@@ -60,7 +60,7 @@ const OrdersTable: React.FC = () => {
 
             <button
               onClick={() => window.print()}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-150"
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white dark:bg-form-input font-semibold rounded-md hover:bg-blue-700 transition-colors duration-150"
             >
               <Printer className="w-4 h-4" />
               <span>Print</span>
@@ -87,7 +87,7 @@ const OrdersTable: React.FC = () => {
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50 transition-colors duration-200">
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.id}</td>
+                  <td className=" p-4 border-b border-gray-100 no-underline">{order.id}</td>
                   <td className="p-4 border-b border-gray-100 no-underline">{order.orderNumber}</td>
                   <td className="p-4 border-b border-gray-100 no-underline">{order.noOfProducts}</td>
                   <td className="p-4 border-b border-gray-100 no-underline">{order.customerId}</td>
@@ -95,9 +95,9 @@ const OrdersTable: React.FC = () => {
                   <td className="p-4 border-b border-gray-100 no-underline">${order.amount.toFixed(2)}</td>
                   <td className="p-4 border-b border-gray-100 no-underline">
                     <span className={`px-3 py-1 rounded-full text-sm ${
-                      order.deliveryStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
-                      order.deliveryStatus === 'Pending' ? 'bg-yellow-100 text-yellow-600' :
-                      'bg-red-100 text-red-600'
+                      order.deliveryStatus === 'Delivered' ? 'bg-green-100 dark:bg-form-input text-green-600' :
+                      order.deliveryStatus === 'Pending' ? 'bg-yellow-100 dark:bg-form-input text-yellow-600' :
+                      'bg-red-100 dark:bg-form-input text-red-600'
                     }`}>
                       {order.deliveryStatus}
                     </span>

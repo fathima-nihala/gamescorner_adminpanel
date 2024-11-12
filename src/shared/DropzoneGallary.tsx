@@ -3,13 +3,15 @@ import { Box, Text } from '@chakra-ui/react';
 import { IoMdCloudUpload } from 'react-icons/io';
 
 
-interface DropzoneImageProps {
+
+
+interface DropzoneGalleryProps {
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     image?: string | null;
     id: string;
 }
 
-const DropzoneImage: React.FC<DropzoneImageProps> = ({ onChange, image, id }) => {
+const DropzoneGallary: React.FC<DropzoneGalleryProps> = ({ onChange, image, id }) => {
     return (
         <div>
             <label
@@ -33,10 +35,10 @@ const DropzoneImage: React.FC<DropzoneImageProps> = ({ onChange, image, id }) =>
                 />
             </label>
             {image && (
-                <img src={image} alt="preview" className="w-[25%]  mt-6" />
+                <img src={image} alt="preview" className="w-[100%]  mt-6" />
             )}
         </div>
     );
 };
 
-export default DropzoneImage;
+export default DropzoneGallary;

@@ -157,7 +157,7 @@ const Profile: React.FC = () => {
             <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
               {admin?.name}
             </h3>
-            <p className="font-medium">{admin?.profession}</p>
+            <p className="font-medium">{admin?.role}</p>
 
             <div className="mx-auto max-w-180">
               <h4 className="font-semibold text-black dark:text-white">

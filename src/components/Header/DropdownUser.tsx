@@ -45,7 +45,7 @@ const DropdownUser = () => {
             {admin ? admin?.name : 'username' } 
           </span>
           <span className="block text-xs">
-            {admin ? admin?.profession : 'profession'}
+            {admin ? admin?.role : 'user'}
           </span>
         </span>
 
