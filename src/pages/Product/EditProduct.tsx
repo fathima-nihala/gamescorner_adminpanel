@@ -12,6 +12,7 @@ import SelectGroupTwo from '../../components/Forms/SelectGroup/SelectGroupTwo';
 import MultiSelect from '../../components/Forms/MultiSelect';
 import QuillEditor from '../QuillEditor';
 import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
+import DropzoneGallery from '../../shared/DropzoneGallary';
 
 interface CountryPricing {
     country_id: string;
@@ -64,7 +65,7 @@ interface Country {
 const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { products } = useSelector((state: RootState) => state.product);
-    const { attributes } = useSelector((state: RootState) => state.attribute);
+    const { attributes } = useSelector((state: RootState) => state.attribute) ;
     const brands = useSelector((state: RootState) => state.brands.brands);
     const categoryNames = useSelector(selectCategoryNames);
     const { categories } = useSelector((state: RootState) => state.category);
@@ -102,7 +103,6 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
         if (products && id) {
             const proToEdit = products.find((prod) => prod?._id === id);
             if (proToEdit) {
-                console.log(proToEdit, 'prottttt');
 
                 setProductData({
                     ...proToEdit,
@@ -117,7 +117,9 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     gallery3: proToEdit.gallery3 || '',
                     gallery4: proToEdit.gallery4 || '',
                     gallery5: proToEdit.gallery5 || '',
-                    color: proToEdit.color || []
+                    color: proToEdit.color.map((c:any)=>c._id) || [],
+                    attribute:proToEdit.attribute.map((c:any)=>c._id) || [],
+                    attribute_value:proToEdit.attribute_value.map((c:any)=>c._id) || []
                 });
                 setPreviewImage(proToEdit.image as string);
                 setPreviewGallery([
@@ -133,6 +135,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                         proToEdit.country_pricing.map((c: CountryPricing) => ({
                             _id: c.country_id,
                             country: c.country,
+              
                             currency: c.currency,
                             currency_code: c.currency_code
                         }))
@@ -174,11 +177,11 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
         if (productData?.parent_category) {
             dispatch(fetchCategoryNames(productData.parent_category));
         }
-    }, [dispatch, productData]);
+    }, [dispatch, productData.parent_category]);
 
 
     useEffect(() => {
-        if (productData?.attribute) {
+        if (productData.attribute) {
             dispatch(fetchAttributeValues(productData.attribute))
         }
     }, [dispatch, productData])
@@ -239,13 +242,13 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     };
 
     const handleColorChange = (selectedColors: string[]) => {
+        
         setProductData(prev => ({
             ...prev,
             color: selectedColors
         }));
     };
 
-    console.log(productData.color, 'productData color');
 
     return (
         <div>
@@ -404,7 +407,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     <div className="bg-white mt-4 w-full rounded-lg shadow-md p-6 text-graydark dark:text-white dark:bg-black">
                         <div className='block w-full lg:mt-8'>
                             <p>Thumbnail</p>
-                            <DropzoneImage
+                            <DropzoneGallery
                                 onChange={(event) => {
                                     onFileUpload(event, 'image');
 
@@ -446,6 +449,10 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             </div>
                         </div>
                     </div>
+
+
+
+                    
 
 
                     <div className="bg-white shadow-lg rounded-md dark:bg-black mt-5 w-full">

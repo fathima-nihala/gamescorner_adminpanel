@@ -6,13 +6,10 @@ import { AppDispatch, RootState } from '../redux/store';
 import { fetchProfile, updateProfile } from '../slices/userSlice';
 import { useSnackbar } from 'notistack';
 
-
 const Settings: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const { enqueueSnackbar } = useSnackbar();
-
-
   const { admin } = useSelector((state: RootState) => state.userState)
 
   const [fullName, setFullName] = useState<string>(admin?.name || '');

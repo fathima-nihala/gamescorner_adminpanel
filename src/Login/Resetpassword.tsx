@@ -19,7 +19,6 @@ const Resetpassword: React.FC = () => {
 
   const email = location.state?.email;
   const resetPasswordOTP = location.state?.resetPasswordOTP;
-  console.log(resetPasswordOTP, 'rrrr');
 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {

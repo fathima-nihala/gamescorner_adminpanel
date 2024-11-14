@@ -1,14 +1,20 @@
-// StaffList.js
-
 import { Link } from 'react-router-dom';
 import { Edit, Trash2 } from 'lucide-react';
 import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../redux/store';
+import { fetchUsers } from '../slices/userSlice';
 
 const StaffList = () => {
-  const staffMembers = [
-    { id: 1, name: 'George M. Winters', email: 'staff@example.com', phone: '662-817-4374' },
-    { id: 2, name: 'Donna B. Cantrell', email: 'staff2@example.com', phone: '+1 (586) 899-1627' },
-  ];
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(()=>{
+    dispatch(fetchUsers())
+  },[])
+
+  const { users } = useSelector((state: RootState) => state.userState);
 
   return (
     <>
@@ -31,14 +37,14 @@ const StaffList = () => {
               </tr>
             </thead>
             <tbody>
-              {staffMembers.map((staff, index) => (
-                <tr key={staff.id} className="border-b border-gray-200 hover:bg-gray-50">
+              {users.map((staff, index) => (
+                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{staff.name}</td>
                   <td className="px-4 py-2">{staff.email}</td>
                   <td className="flex items-center justify-center space-x-2 py-2">
                     <Link
-                      to={`/dashboard/edit-staff/${staff.id}`}
+                      to={`/dashboard/edit-staff/${staff._id}`}
                       className="p-2 bg-blue-100 rounded-full cursor-pointer hover:bg-blue-200"
                     >
                       <Edit className="w-4 h-4 text-blue-500" />

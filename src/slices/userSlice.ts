@@ -53,6 +53,84 @@ export const updateProfile = createAsyncThunk(
 );
 
 
+// Async thunk for fetching users with role 'user'
+export const fetchUsers = createAsyncThunk(
+  'user/fetchUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+
+      const response = await api.get('/staffs', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.users;
+    } catch (error: any) {
+      console.error('Error fetching users:', error);
+      return rejectWithValue(error.response?.data || 'Failed to fetch users');
+    }
+  }
+);
+
+
+
+export const fetchAllUsers = createAsyncThunk(
+  'user/fetchAllUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+
+      const response = await api.get('/users', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.allusers; // Assuming the response contains 'allusers'
+    } catch (error: any) {
+      console.error('Error fetching all users:', error);
+      return rejectWithValue(error.response?.data || 'Failed to fetch all users');
+    }
+  }
+);
+
+
+// Edit Staff Async Thunk
+export const editStaff = createAsyncThunk(
+  'user/editStaff',
+  async ({ id, formData }: { id: string | undefined , formData: FormData }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return rejectWithValue('No token found');
+      }
+
+      const response = await api.put(`/staff/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return response.data.user; // Assuming the response contains the updated user data
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data || 'Failed to update staff member',
+      );
+    }
+  },
+);
+
+
 interface ProfileState {
   admin: {
     id: string;
@@ -72,6 +150,24 @@ interface ProfileState {
   loading: boolean;
   error: string | null;
   updateSuccess: boolean;
+  users: User[]; 
+  adminusers: AdminUser[];
+}
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+}
+
+interface AdminUser {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
 }
 
 const initialState: ProfileState = {
@@ -79,6 +175,8 @@ const initialState: ProfileState = {
   loading: false,
   error: null,
   updateSuccess: false,
+  users: [],
+  adminusers:[],
 };
 
 const userSlice = createSlice({
@@ -90,6 +188,8 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.updateSuccess = false;
+      state.users = [];
+      state.adminusers = [];
     },
     resetUpdateSuccess: (state) => {
       state.updateSuccess = false;
@@ -127,7 +227,55 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
         state.updateSuccess = false;
+      })
+
+      // Fetch Users with role 'user'
+      .addCase(fetchUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload; // Set users list
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+       // Fetch All Users
+       .addCase(fetchAllUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.adminusers = action.payload; 
+      })
+      .addCase(fetchAllUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      //edit staff
+      .addCase(editStaff.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editStaff.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedUser = action.payload;
+        state.users = state.users.map(user =>
+          user._id === updatedUser._id ? updatedUser : user
+        );
+        state.updateSuccess = true;
+      })
+      .addCase(editStaff.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        state.updateSuccess = false;
       });
+    
   },
 });
 

@@ -1,29 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, Eye, Edit, Download, Trash, ChevronDown, Printer } from 'lucide-react';
-
-type Order = {
-  id: number;
-  orderNumber: string;
-  customerId: string;
-  productName: string;
-  noOfProducts: number;
-  amount: number;
-  deliveryStatus: string;
-  paymentMethod: string;
-};
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchOrders,
+  selectOrders,
+  selectOrderLoading,
+  selectOrderError,
+  type Order
+} from '../slices/OrderSlice';
+import type { AppDispatch } from '../redux/store';
 
 const OrdersTable: React.FC = () => {
-  const orders: Order[] = [
-    { id: 1, orderNumber: '#12345', customerId: 'C100', productName: 'Product 1', noOfProducts: 3, amount: 150, deliveryStatus: 'Delivered', paymentMethod: ' Cash on Delivery' },
-    { id: 2, orderNumber: '#12346', customerId: 'C101', productName: 'Product 2', noOfProducts: 1, amount: 50, deliveryStatus: 'Pending', paymentMethod: 'Cash on Delivery' },
-    { id: 3, orderNumber: '#12347', customerId: 'C102', productName: 'Product 3', noOfProducts: 2, amount: 75, deliveryStatus: 'Cancelled', paymentMethod: 'Cash on Delivery' },
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const orders = useSelector(selectOrders);
+  const loading = useSelector(selectOrderLoading);
+  const error = useSelector(selectOrderError);
+
+  const [orderStatus, setOrderStatus] = useState<string>('');
+  const [paymentStatus, setPaymentStatus] = useState<string>('');
+
+  useEffect(() => {
+    dispatch(fetchOrders(undefined));
+  }, [dispatch]);
+
+  const handleFilterChange = () => {
+    const filters: { orderStatus?: string; payment_status?: string } = {};
+    if (orderStatus) filters.orderStatus = orderStatus;
+    if (paymentStatus) filters.payment_status = paymentStatus;
+    dispatch(fetchOrders(Object.keys(filters).length ? filters : undefined));
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="p-4 sm:p-6 min-h-screen">
       <div className="bg-white dark:bg-form-input rounded-lg shadow-md p-6">
-        {/* Search and Filters Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center p-4 space-y-4 sm:space-y-0 sm:space-x-4">
+          {/* Search Input */}
           <div className="relative w-full sm:w-1/3">
             <input
               type="text"
@@ -33,29 +50,38 @@ const OrdersTable: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           </div>
 
+          {/* Filters */}
           <div className="flex flex-wrap items-center gap-4">
-            {/* Delivery Status Dropdown */}
             <div className="relative">
               <select
+                value={orderStatus}
+                onChange={(e) => {
+                  setOrderStatus(e.target.value);
+                  handleFilterChange();
+                }}
                 className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select order status</option>
-                <option value="all">Processing</option>
-                <option value="shipped">Shipped</option>
+                <option value="Processing">Processing</option>
+                <option value="Shipped">Shipped</option>
                 <option value="Delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="Cancelled">Cancelled</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
             </div>
 
-            {/* Payment Method Dropdown */}
             <div className="relative">
               <select
+                value={paymentStatus}
+                onChange={(e) => {
+                  setPaymentStatus(e.target.value);
+                  handleFilterChange();
+                }}
                 className="appearance-none bg-white dark:bg-form-input border border-gray-300 rounded-md px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Payment status</option>
-                <option value="all">Paid</option>
-                <option value="cash on delivery">Unpaid</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
               </select>
               <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
             </div>
@@ -75,53 +101,59 @@ const OrdersTable: React.FC = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-50">
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">No</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Order</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">No of Products</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Customer ID</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Product Name</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Amount</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Delivery Status</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Payment Method</th>
-                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100 no-underline">Options</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">#</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Order ID</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">No of Products</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Customer</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Amount</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Status</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Payment</th>
+                <th className="p-4 text-left text-gray-700 font-medium border-b border-gray-100">Payment status</th>
+                <th className="p-4 text-gray-700 font-medium border-b border-gray-100 text-center ">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50 transition-colors duration-200">
-                  <td className=" p-4 border-b border-gray-100 no-underline">{order.id}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.orderNumber}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.noOfProducts}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.customerId}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.productName}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">${order.amount.toFixed(2)}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">
-                    <span className={`px-3 py-1 rounded-full text-sm ${
-                      order.deliveryStatus === 'Delivered' ? 'bg-green-100 dark:bg-form-input text-green-600' :
-                      order.deliveryStatus === 'Pending' ? 'bg-yellow-100 dark:bg-form-input text-yellow-600' :
-                      'bg-red-100 dark:bg-form-input text-red-600'
-                    }`}>
-                      {order.deliveryStatus}
+              {orders.map((order: Order, index) => (
+                <tr key={order._id} className="hover:bg-gray-50 transition-colors duration-200">
+                  <td className="p-4 border-b border-gray-100">{index + 1}</td>
+                  <td className="p-4 border-b border-gray-100">{order.orderID}</td>
+                  <td className="p-4 border-b border-gray-100 text-center">{order.orderItems.length}</td>
+                  <td className="p-4 border-b border-gray-100">{order.user.customerId}</td>
+                  <td className="p-4 border-b border-gray-100">${order.totalPrice.toFixed(2)}</td>
+                  <td className="p-4 border-b border-gray-100">
+                    <span className={`px-3 py-1 rounded-full text-sm ${order.orderStatus === 'Delivered' ? 'text-white bg-green-600' :
+                      order.orderStatus === 'Processing' ? 'bg-yellow-100 text-yellow-600' :
+                        'bg-red-100 text-red-600'
+                      }`}>
+                      {order.orderStatus}
                     </span>
                   </td>
-                  <td className="p-4 border-b border-gray-100 no-underline">{order.paymentMethod}</td>
-                  <td className="p-4 border-b border-gray-100 no-underline">
-                    <div className="flex space-x-4 justify-center">
-                      {/* Eye Icon inside circle */}
-                      <button className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 group flex justify-center items-center w-8 h-8 no-underline">
-                        <Eye className="w-4 h-4 group-hover:text-blue-800 transition-colors duration-200" />
+                  <td className="p-4 border-b border-gray-100">{order.paymentInfo.type}</td>
+                  <td className="p-4 border-b border-gray-100">
+                    <span className={`px-1 py-1  text-[12px] ${order.payment_status === 'Paid' ? 'bg-green-100 text-green-600' :
+                      order.orderStatus === 'Unpaid' ? 'bg-yellow-100 text-yellow-600' :
+                        'text-white bg-red-600'
+                      }`}>
+                      {order.payment_status}
+                    </span>
+                  </td>
+                  <td className="p-4 border-b border-gray-100">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => navigate(`/dashboard/orders/${order._id}`)}
+                        className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200"
+                      >
+                        <Eye className="w-4 h-4" />
                       </button>
-                      {/* Edit Icon inside circle */}
-                      <button className="p-2 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 group flex justify-center items-center w-8 h-8 no-underline">
-                        <Edit className="w-4 h-4 group-hover:text-yellow-800 transition-colors duration-200" />
+                      <button className="p-2 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200">
+                        <Edit className="w-4 h-4" />
                       </button>
-                      {/* Download Icon inside circle */}
+
                       <button className="p-2 rounded-full bg-green-100 text-green-600 hover:bg-green-200 group flex justify-center items-center w-8 h-8 no-underline">
                         <Download className="w-4 h-4 group-hover:text-green-800 transition-colors duration-200" />
                       </button>
-                      {/* Trash Icon inside circle */}
-                      <button className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 group flex justify-center items-center w-8 h-8 no-underline">
-                        <Trash className="w-4 h-4 group-hover:text-red-800 transition-colors duration-200" />
+                      <button className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200">
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   </td>

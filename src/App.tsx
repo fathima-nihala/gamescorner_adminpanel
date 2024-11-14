@@ -28,6 +28,8 @@ import AllProducts from './pages/Product/AllProducts';
 import Customers from './pages/Customers';
 import Addtostaff from './pages/Addtostaff'
 import Editstaff from './pages/Editstaff';
+import Orderpage from './pages/Orderpage';
+import OrdersTable from './pages/Order';
 
 
 
@@ -274,7 +276,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/edit-staff/:id"  
+                  path="/edit-staff/:id"
                   element={
                     <>
                       <PageTitle title="Edit Staff | Games Corner" />
@@ -283,6 +285,28 @@ function App() {
                   }
                 />
 
+
+
+
+                <Route
+                  path="/orders/:id"
+                  element={
+                    <>
+                      <PageTitle title="Orderpage | Games Corner" />
+                      <Orderpage />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/orders"
+                  element={
+                    <>
+                      <PageTitle title="Ordertable | Games Corner" />
+                      <OrdersTable />
+                    </>
+                  }
+                />
 
 
 

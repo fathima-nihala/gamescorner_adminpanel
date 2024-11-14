@@ -165,7 +165,8 @@ const AllProducts: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
-    const [editProductId, setEditProductId] = useState<string | null>(null);
+    const [
+        editProductId, setEditProductId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 
 
