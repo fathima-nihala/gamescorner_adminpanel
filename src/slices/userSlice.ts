@@ -133,6 +133,7 @@ export const editStaff = createAsyncThunk(
 
 interface ProfileState {
   admin: {
+    _id: string;
     id: string;
     name: string;
     email: string;

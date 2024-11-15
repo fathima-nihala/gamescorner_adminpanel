@@ -4,7 +4,7 @@ import SidebarLinkGroup from './SidebarLinkGroup';
 import Logo from '../../images/logo/games.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
-import { fetchAllUsers } from '../../slices/userSlice';
+import { fetchAllUsers, fetchProfile } from '../../slices/userSlice';
 
 
 interface SidebarProps {
@@ -64,12 +64,15 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   useEffect(() => {
     dispatch(fetchAllUsers());
+    dispatch(fetchProfile());
   }, [dispatch]);
 
-  const { adminusers } = useSelector((state: RootState) => state.userState);
+  const { adminusers, admin } = useSelector((state: RootState) => state.userState);
   console.log("Fetched users:", adminusers);
+  console.log(admin?._id,'adminuu');
+  
 
-  // const currentUser = adminusers.find(user => user._id === loggedInUserId);
+  const currentUser = adminusers.find(user => user._id === admin?._id);
 
   // const admin = adminusers.find(user => user.role === 'admin');
 
@@ -527,7 +530,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
 
 
-                {/* {currentUser && currentUser.role === 'admin' && (
+                 {currentUser && currentUser.role === 'admin' && (
                   <NavLink
                     to="/dashboard/all_staff"
                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('Customers') && 'bg-graydark dark:bg-meta-4'}`}
@@ -547,7 +550,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </svg>
                     All Staff
                   </NavLink>
-                )} */}
+                )} 
 
               </li>
 

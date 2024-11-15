@@ -8,7 +8,6 @@ import { fetchProfile, updateProfile } from '../slices/userSlice';
 import { useSnackbar } from 'notistack';
 
 
-
 const Profile: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
