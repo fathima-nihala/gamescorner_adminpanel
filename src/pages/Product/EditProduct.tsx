@@ -282,7 +282,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                         <label className="block text-sm font-medium">Product Name</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded bg-white dark:bg-form-input"
                             value={productData.name}
                             onChange={(e) => setProductData({ ...productData, name: e.target.value })}
                         />
@@ -344,7 +344,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             <label className="block text-sm font-medium">Unit</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="w-full p-2 border rounded bg-white dark:bg-form-input"
                                 value={productData.unit || ''}
                                 onChange={(e) => setProductData({ ...productData, unit: e.target.value })}
                             />
@@ -353,7 +353,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             <label className="block text-sm font-medium">Weight</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="w-full p-2 border rounded bg-white dark:bg-form-input"
                                 value={productData.weight || ''}
                                 onChange={(e) => setProductData({ ...productData, weight: e.target.value })}
                             />
@@ -365,7 +365,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             <label className="block text-sm font-medium">Tax</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="w-full p-2 border rounded bg-white dark:bg-form-input"
                                 value={productData.tax}
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
@@ -374,7 +374,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             <label className="block text-sm font-medium">Estimated Shipping Price</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="w-full p-2 border rounded bg-white dark:bg-form-input"
                                 value={productData.tax}
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
@@ -383,7 +383,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                             <label className="block text-sm font-medium">Estimated Shipping Time</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="w-full p-2 border rounded bg-white dark:bg-form-input"
                                 value={productData.tax}
                                 onChange={(e) => setProductData({ ...productData, tax: e.target.value })}
                             />
@@ -392,10 +392,10 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
 
                     <div className="col-span-2">
-                        <label className="block text-sm font-medium">Tags</label>
+                        <label className="block text-sm font-medium ">Tags</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded bg-white dark:bg-form-input"
                             value={productData.tax}
                             onChange={(e) => setProductData({ ...productData, tags: e.target.value })}
                         />

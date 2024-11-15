@@ -95,7 +95,10 @@ const AddBrands: React.FC<AddBrandsProps> = ({ open, handleClose, initialData })
             handleClose();
         } catch (error: any) {
             const errorMessage = error.message || 'Failed to Add Brand. Please try again.';
-            enqueueSnackbar(errorMessage, { variant: 'error' });
+            enqueueSnackbar(errorMessage, { variant: 'error', anchorOrigin: {
+                vertical: 'top',
+                horizontal: 'right',
+            } });
         }
     };
 

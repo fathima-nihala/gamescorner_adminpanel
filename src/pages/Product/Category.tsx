@@ -113,7 +113,7 @@ const handleEdit = (id: string) => {
             <input
               type="text"
               placeholder="Search here..."
-              className="py-2 px-10 w-1/2 border border-gray-300 rounded-md outline-none"
+              className="py-2 px-10 w-1/2 border border-gray-300 rounded-md outline-none bg-white dark:bg-form-input"
               value={query}
               onChange={handleSearchChange}
             />

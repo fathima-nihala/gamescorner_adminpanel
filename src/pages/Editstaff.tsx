@@ -60,7 +60,7 @@ const EditStaff = () => {
     event.preventDefault();
 
     // Validate form
-    if (!staff.name || !staff.email || !staff.phone) {
+    if (!staff.name || !staff.email ) {
       enqueueSnackbar('Please fill in all required fields.', { variant: 'error' });
       return;
     }

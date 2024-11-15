@@ -197,6 +197,24 @@ export const toggleFeatured = createAsyncThunk(
   },
 );
 
+// Add togglePublish thunk
+export const togglePublish = createAsyncThunk(
+  'product/togglePublish',
+  async (
+    { id, publish }: { id: string; publish: boolean },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await api.patch(`/product/${id}/published`, { publish });
+      return { id, publish, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to update publish status',
+      );
+    }
+  },
+);
+
 // Product Slice
 const productSlice = createSlice({
   name: 'product',
@@ -366,6 +384,36 @@ const productSlice = createSlice({
     });
     builder.addCase(
       toggleTodaysDeal.rejected,
+      (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload;
+      },
+    );
+
+     // Toggle Publish
+     builder.addCase(togglePublish.pending, (state) => {
+      state.loading = true;
+      state.success = false;
+      state.error = null;
+    });
+    builder.addCase(togglePublish.fulfilled, (state, action) => {
+      state.loading = false;
+      state.success = true;
+      state.products = state.products.map((product) =>
+        product._id === action.payload.id
+          ? { ...product, publish: action.payload.publish }
+          : product
+      );
+      if (state.product && state.product._id === action.payload.id) {
+        state.product = {
+          ...state.product,
+          publish: action.payload.publish
+        };
+      }
+    });
+    builder.addCase(
+      togglePublish.rejected,
       (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.success = false;

@@ -20,6 +20,7 @@ import SwitcherOne from '../../components/Switchers/SwitcherOne';
 import SwitcherTwo from '../../components/Switchers/SwitcherTwo';
 import { DownloadSVG } from "../DownloadSVG";
 import EditProduct from './EditProduct';
+import SwitcherFour from '../../components/Switchers/SwitcherFour';
 
 interface Category {
     _id: string;
@@ -165,8 +166,7 @@ const AllProducts: React.FC = () => {
     const { enqueueSnackbar } = useSnackbar();
     const [delOpen, setDelOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<Product | null>(null);
-    const [
-        editProductId, setEditProductId] = useState<string | null>(null);
+    const [editProductId, setEditProductId] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 
 
@@ -261,7 +261,7 @@ const AllProducts: React.FC = () => {
                                     <input
                                         type="text"
                                         placeholder="Search products..."
-                                        className="border rounded-md px-4 py-2 w-full"
+                                        className="border rounded-md px-4 py-2 w-full bg-white dark:bg-form-input"
                                         value={query}
                                         onChange={handleSearch}
                                     />
@@ -293,6 +293,7 @@ const AllProducts: React.FC = () => {
                                             <th className="pb-3 text-start">Qty</th>
                                             <th className="pb-3 text-center">Today's Deal</th>
                                             <th className="pb-3 text-center">Featured</th>
+                                            <th className="pb-3 text-center">Publish</th>
                                             <th className="pb-3 text-center">Options</th>
                                         </tr>
                                     </thead>
@@ -333,9 +334,16 @@ const AllProducts: React.FC = () => {
                                                         <SwitcherOne id={product._id} />
                                                     </div>
                                                 </td>
+                                                
                                                 <td className="py-4 text-center">
                                                     <div className="flex justify-center items-center">
                                                         <SwitcherTwo id={product._id} />
+                                                    </div>
+                                                </td>
+
+                                                <td className="py-4 text-center">
+                                                    <div className="flex justify-center items-center">
+                                                        <SwitcherFour id={product._id} />
                                                     </div>
                                                 </td>
 

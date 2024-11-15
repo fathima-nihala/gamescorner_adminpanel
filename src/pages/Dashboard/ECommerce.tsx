@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartThree from '../../components/Charts/ChartThree';
@@ -6,12 +6,33 @@ import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import MapOne from '../../components/Maps/MapOne';
 import TableOne from '../../components/Tables/TableOne';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
+import { fetchProducts } from '../../slices/productSlice';
+import { fetchAllUsers } from '../../slices/userSlice';
+import { fetchCustomers } from '../../slices/customerSlice';
+import { fetchOrders, selectOrders } from '../../slices/OrderSlice';
 
 const ECommerce: React.FC = () => {
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchProducts({ name: '' }));
+    dispatch(fetchAllUsers());
+    dispatch(fetchCustomers());
+    dispatch(fetchOrders(undefined));
+  }, [dispatch]);
+
+  const { products } = useSelector((state: RootState) => state.product);
+  const { adminusers } = useSelector((state: RootState) => state.userState);  
+  const { customers } = useSelector((state: RootState) => state.customer);
+  const orders = useSelector(selectOrders);  
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats title="Total views" total="$3.456K" rate="0.43%" levelUp>
+        <CardDataStats title="Total Members" total={adminusers.length}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -30,7 +51,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Profit" total="$45,2K" rate="4.35%" levelUp>
+        <CardDataStats title="Total Order" total={orders.length} >
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -53,7 +74,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Product" total="2.450" rate="2.59%" levelUp>
+        <CardDataStats title="Total Product" total={products.length} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -72,7 +93,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Users" total="3.456" rate="0.95%" levelDown>
+        <CardDataStats title="Total Customers" total={customers.length} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"

@@ -26,12 +26,11 @@ import AddProduct from './pages/Product/AddProduct';
 import Color from './pages/Product/Color';
 import AllProducts from './pages/Product/AllProducts';
 import Customers from './pages/Customers';
-import Addtostaff from './pages/Addtostaff'
+import Addtostaff from './pages/StaffList'
 import Editstaff from './pages/Editstaff';
 import Orderpage from './pages/Orderpage';
 import OrdersTable from './pages/Order';
 import Orderedit from './pages/Orderedit';
-
 
 
 function App() {
@@ -87,7 +86,6 @@ function App() {
           </>
         }
       />
-
 
       {/* Protected Routes */}
       <Route
@@ -252,7 +250,6 @@ function App() {
                   }
                 />
 
-
                 <Route
                   path="/Customers"
                   element={
@@ -262,10 +259,6 @@ function App() {
                     </>
                   }
                 />
-
-
-
-
 
                 <Route
                   path="/all_staff"
@@ -322,8 +315,6 @@ function App() {
 
 
               </Routes>
-
-
             </DefaultLayout>
           </PrivateRoute>
         }
