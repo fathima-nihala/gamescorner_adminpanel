@@ -254,7 +254,7 @@ const AllProducts: React.FC = () => {
             <Breadcrumb pageName="All Products" />
             <div className="min-h-screen bg-gray-100">
                 <div className="p-1 md:p-2">
-                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                    <div className="rounded-sm border border-stroke bg-white  shadow-default dark:border-strokedark dark:bg-boxdark">
                         <div className='flex p-2 justify-between'>
                             <div className="flex flex-col md:flex-row items-center md:space-x-4 mb-6">
                                 <div className="relative w-full md:w-64">

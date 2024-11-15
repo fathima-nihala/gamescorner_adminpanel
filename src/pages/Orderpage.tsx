@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrders, selectOrders, selectTotalAmount, selectOrderLoading, selectOrderError } from '../slices/OrderSlice'; // Adjust the path accordingly
-import {  User, ShoppingBag } from "lucide-react";
+import {  User,Mail, ShoppingBag } from "lucide-react";
 import { AppDispatch, RootState } from "../redux/store";
 import { useParams } from "react-router-dom";
 
@@ -44,7 +44,7 @@ const OrderPage: FC = () => {
     <p className="mt-1 text-sm text-gray-500">{formattedDate}</p>
 
     return (
-        <div className="p-6 bg-slate-50 min-h-screen">
+        <div className="p-6 bg-slate-50 dark:bg-form-input  min-h-screen">
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <div className="text-lg font-semibold">
@@ -60,7 +60,7 @@ const OrderPage: FC = () => {
                 {/* Left Column */}
                 <div className="col-span-1 md:col-span-2 space-y-6">
                     {orders.map((order) => (
-                        <div key={order._id} className="bg-white p-4 rounded-md shadow">
+                        <div key={order._id} className="bg-white dark:bg-form-input p-4 rounded-md shadow">
 
                             {order.orderItems.map((item, index) => (
                                 <div>
@@ -87,7 +87,7 @@ const OrderPage: FC = () => {
                     ))}
 
                     {/* Order Summary */}
-                    <div className="bg-white p-6 rounded-md shadow h-64">
+                    <div className="bg-white dark:bg-form-input p-6 rounded-md shadow h-64">
                         <div className="flex justify-between items-center">
                             <h2 className="font-semibold">Order Summary</h2>
                             <span className="text-yellow-500">Payment pending</span>
@@ -107,7 +107,7 @@ const OrderPage: FC = () => {
                 {/* Right Column */}
                 <div className="space-y-6">
                     {/* Customers */}
-                    <div className="bg-white p-4 rounded-md shadow h-40">
+                    <div className="bg-white dark:bg-form-input p-4 rounded-md shadow h-40">
                         <h3 className="font-semibold">Customers</h3>
                         <div className="mt-2 flex items-center">
                             <User className="text-gray-500 w-5 h-5 mr-2" />
@@ -119,6 +119,46 @@ const OrderPage: FC = () => {
                         </div>
                         <p className="text-sm text-gray-400">Customer is tax-exempt</p>
                     </div>
+
+                      {/* Contact Information */}
+          <div className="bg-white dark:bg-form-input p-4 rounded-md shadow h-40">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-semibold">Contact Information</h3>
+                <div className="mt-2 flex items-center">
+                  <Mail className="text-gray-500 w-5 h-5 mr-2" />
+                  <p className="text-gray-500">alexjander@gmail.com</p>
+                </div>
+                <p className="text-gray-400">No phone number</p>
+              </div>
+            </div>
+          </div>
+          {/* Shipping Address */}
+          <div className="bg-white dark:bg-form-input p-4 rounded-md shadow h-56">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center justify-center">
+                <h3 className="font-semibold">Shipping Address</h3>
+              </div>
+            </div>
+            <div className="mt-2 flex items-center">
+              <User className="text-gray-500 w-5 h-5 mr-2" />
+              <p className="text-gray-500">Alex Jander</p>
+            </div>
+            <p className="text-gray-500 mt-2">1226 University Drive</p>
+            <p className="text-gray-500 mt-2">Menlo Park</p>
+            <p className="text-gray-500 mt-2">United States</p>
+            <p className="text-gray-500 mt-2">+123456789</p>
+          </div>
+          {/* Billing Address */}
+          <div className="bg-white dark:bg-form-input p-4 rounded-md shadow">
+            <div className="flex justify-between items-start p-4">
+              <div>
+                <h3 className="font-semibold">Billing Address</h3>
+                <p className="text-gray-500">Same as Shipping Address</p>
+              </div>
+            </div>
+          </div>
+          
                     {/* Additional customer or shipping information */}
                 </div>
             </div>
