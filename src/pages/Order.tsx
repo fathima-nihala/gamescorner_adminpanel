@@ -145,7 +145,9 @@ const OrdersTable: React.FC = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200">
+                      <button
+                        onClick={() => navigate(`/dashboard/orderedit/${order._id}`)}
+                        className="p-2 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200">
                         <Edit className="w-4 h-4" />
                       </button>
 

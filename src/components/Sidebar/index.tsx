@@ -68,13 +68,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   }, [dispatch]);
 
   const { adminusers, admin } = useSelector((state: RootState) => state.userState);
-  console.log("Fetched users:", adminusers);
-  console.log(admin?._id,'adminuu');
-  
-
   const currentUser = adminusers.find(user => user._id === admin?._id);
-
-  // const admin = adminusers.find(user => user.role === 'admin');
 
   return (
     <aside

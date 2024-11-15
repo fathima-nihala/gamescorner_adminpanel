@@ -30,6 +30,7 @@ import Addtostaff from './pages/Addtostaff'
 import Editstaff from './pages/Editstaff';
 import Orderpage from './pages/Orderpage';
 import OrdersTable from './pages/Order';
+import Orderedit from './pages/Orderedit';
 
 
 
@@ -304,6 +305,16 @@ function App() {
                     <>
                       <PageTitle title="Ordertable | Games Corner" />
                       <OrdersTable />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/orderedit/:id"
+                  element={
+                    <>
+                      <PageTitle title="Orderedit | Games Corner" />
+                      <Orderedit />
                     </>
                   }
                 />
