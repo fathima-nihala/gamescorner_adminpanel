@@ -20,14 +20,14 @@ const StaffList = () => {
     <>
       <Breadcrumb pageName="All Staff" />
     <div className="p-4 sm:p-6 min-h-screen">
-      <div className=" bg-white p-4 rounded-lg shadow">
+      <div className=" bg-white dark:bg-form-input p-4 rounded-lg shadow">
         <div className="flex justify-end items-center mb-4">
           <button className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600">
             Add New Staff
           </button>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white rounded-lg shadow">
+          <table className="min-w-full bg-white dark:bg-form-input rounded-lg shadow">
             <thead>
               <tr className="text-left border-b border-gray-200">
                 <th className="px-4 py-2">#</th>

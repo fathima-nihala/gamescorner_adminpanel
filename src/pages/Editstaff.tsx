@@ -88,7 +88,7 @@ const EditStaff = () => {
       <Breadcrumb pageName="Edit Staff" />
 
       <div className="p-4 sm:p-6 min-h-screen">
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-white dark:bg-form-input p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">{staff.name}</h2>
           <form onSubmit={handleSubmit}>
             {/* Name Field */}
@@ -101,7 +101,7 @@ const EditStaff = () => {
                 id="name"
                 value={staff.name}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded mt-1"
+                className="w-full p-2 border border-gray-300 rounded mt-1 bg-white dark:bg-form-input"
               />
             </div>
 
@@ -115,7 +115,7 @@ const EditStaff = () => {
                 id="email"
                 value={staff.email}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded mt-1"
+                className="w-full p-2 border border-gray-300 rounded mt-1 bg-white dark:bg-form-input"
               />
             </div>
 
@@ -129,7 +129,7 @@ const EditStaff = () => {
                 id="phone"
                 value={staff.phone}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded mt-1"
+                className="w-full p-2 border border-gray-300 rounded mt-1 bg-white dark:bg-form-input"
               />
             </div>
 
@@ -142,7 +142,7 @@ const EditStaff = () => {
                 id="role"
                 value={staff.role}
                 onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded mt-1"
+                className="w-full p-2 border border-gray-300 rounded mt-1 bg-white dark:bg-form-input"
               >
                 <option value="user">user</option>
                 <option value="admin">admin</option>
@@ -160,7 +160,7 @@ const EditStaff = () => {
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 bg-gray-500 text-white hover:bg-gray-600 rounded"
+                className="px-4 py-2 bg-gray-500 text-white bg-red-600 hover:bg-gray-600 rounded"
               >
                 Cancel
               </button>
