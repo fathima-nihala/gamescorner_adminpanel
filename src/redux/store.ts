@@ -9,7 +9,7 @@ import productReducer from '../slices/productSlice.ts';
 import colorReducer from '../slices/colorSlice.ts';
 import customerReducer from '../slices/customerSlice'
 import orderReducer from '../slices/OrderSlice.ts';
-
+import dashboardReducer from '../slices/dashboardSlice.ts'
 
 
  const store = configureStore({
@@ -23,7 +23,8 @@ import orderReducer from '../slices/OrderSlice.ts';
     product: productReducer,
     color: colorReducer,
     customer: customerReducer,
-    orders:orderReducer
+    orders:orderReducer,
+    dashboard: dashboardReducer,
   },
 });
 
