@@ -10,6 +10,7 @@ import colorReducer from '../slices/colorSlice.ts';
 import customerReducer from '../slices/customerSlice'
 import orderReducer from '../slices/OrderSlice.ts';
 import dashboardReducer from '../slices/dashboardSlice.ts'
+import notificationReducer from '../slices/notificationSlice.ts'
 
 
  const store = configureStore({
@@ -25,6 +26,7 @@ import dashboardReducer from '../slices/dashboardSlice.ts'
     customer: customerReducer,
     orders:orderReducer,
     dashboard: dashboardReducer,
+    notify: notificationReducer,
   },
 });
 

@@ -1,26 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ClickOutside from '../ClickOutside';
+import { Trash } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../redux/store';
+import { clearAllNotifications, deleteNotification, fetchNotifications, markAsRead } from '../../slices/notificationSlice';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [notifying, setNotifying] = useState(true);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchNotifications());
+  }, [dispatch])
+
+  const { notifications, loading, count } = useSelector((state: RootState) => state.notify);
+
+  const handleClearAll = () => {
+    dispatch(clearAllNotifications()).then(() => {
+      setDropdownOpen(false);
+    });
+  };
+  const handleDelete = (id: string) => {
+    dispatch(deleteNotification(id));
+  };
+
+  const handleNotificationClick = (id: string) => {
+    dispatch(markAsRead(id));
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
       <li>
         <Link
           onClick={() => {
-            setNotifying(false);
             setDropdownOpen(!dropdownOpen);
           }}
           to="#"
           className="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
         >
           <span
-            className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-meta-1 ${
-              notifying === false ? 'hidden' : 'inline'
-            }`}
+            className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-meta-1 ${dropdownOpen === false ? 'hidden' : 'inline'
+              }`}
           >
             <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
           </span>
@@ -40,81 +70,73 @@ const DropdownNotification = () => {
           </svg>
         </Link>
 
-        {dropdownOpen && (
+        {dropdownOpen && notifications && (
           <div
             className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80`}
           >
-            <div className="px-4.5 py-3">
+            <div className="px-4.5 py-3 flex justify-between">
               <h5 className="text-sm font-medium text-bodydark2">
-                Notification
+                Notification ({count})
               </h5>
+              {notifications.length > 0 && (
+                <button
+                  onClick={handleClearAll}
+                  className="text-sm italic text-red-500 hover:text-graydark cursor-pointer"
+                >
+                  Clear All
+                </button>
+              )}
             </div>
 
-            <ul className="flex h-auto flex-col overflow-y-auto">
-              <li>
-                <Link
-                  className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                  to="#"
-                >
-                  <p className="text-sm">
-                    <span className="text-black dark:text-white">
-                      Edit your information in a swipe
-                    </span>{' '}
-                    Sint occaecat cupidatat non proident, sunt in culpa qui
-                    officia deserunt mollit anim.
-                  </p>
+            {loading ? (
+              <div className="flex justify-center items-center h-40">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            ) : (
+              <ul className="flex h-auto flex-col overflow-y-auto max-h-[480px]">
+                {notifications.length === 0 ? (
+                  <li className="px-4.5 py-3 text-sm text-gray-500 text-center">
+                    No notifications
+                  </li>
+                ) : (
+                  notifications.map((notification) => (
+                    <li
+                      key={notification._id}
+                      className="border-b border-stroke dark:border-strokedark"
+                      onClick={() => handleNotificationClick(notification._id)}
+                    >
+                      <div className={`flex flex-col gap-2.5 px-4.5 py-3 hover:bg-gray-2 dark:hover:bg-meta-4 cursor-pointer ${notification.read ? 'opacity-70' : ''
+                        }`}>
+                        <p className="text-sm">
+                          <span className="text-black dark:text-white font-semibold">
+                            {notification.title}
+                          </span>
+                          <br />
+                          {notification.message}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs text-gray-500">
+                            {formatDate(notification.createdAt)}
+                          </p>
+                          <Trash
+                            className="w-4 h-4 text-red-600 hover:text-red-300 cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation(); 
+                              handleDelete(notification._id);
+                            }}
+                          />
 
-                  <p className="text-xs">12 May, 2025</p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                  to="#"
-                >
-                  <p className="text-sm">
-                    <span className="text-black dark:text-white">
-                      It is a long established fact
-                    </span>{' '}
-                    that a reader will be distracted by the readable.
-                  </p>
+                          {!notification.read && (
+                            <span className="w-2 h-2 bg-meta-1 rounded-full"></span>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  ))
+                )}
+              </ul>
+            )}
 
-                  <p className="text-xs">24 Feb, 2025</p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                  to="#"
-                >
-                  <p className="text-sm">
-                    <span className="text-black dark:text-white">
-                      There are many variations
-                    </span>{' '}
-                    of passages of Lorem Ipsum available, but the majority have
-                    suffered
-                  </p>
-
-                  <p className="text-xs">04 Jan, 2025</p>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-                  to="#"
-                >
-                  <p className="text-sm">
-                    <span className="text-black dark:text-white">
-                      There are many variations
-                    </span>{' '}
-                    of passages of Lorem Ipsum available, but the majority have
-                    suffered
-                  </p>
-
-                  <p className="text-xs">01 Dec, 2024</p>
-                </Link>
-              </li>
-            </ul>
           </div>
         )}
       </li>
