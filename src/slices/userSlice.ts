@@ -213,6 +213,7 @@ interface AdminUser {
   email: string;
   phone?: string;
   role: string;
+  profile? : string;
 }
 
 interface RegistrationData {

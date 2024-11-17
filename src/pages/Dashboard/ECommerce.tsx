@@ -5,13 +5,13 @@ import ChartThree from '../../components/Charts/ChartThree';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import MapOne from '../../components/Maps/MapOne';
-import TableOne from '../../components/Tables/TableOne';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { fetchProducts } from '../../slices/productSlice';
 import { fetchAllUsers } from '../../slices/userSlice';
 import { fetchCustomers } from '../../slices/customerSlice';
 import { fetchOrders, selectOrders } from '../../slices/OrderSlice';
+import Team from '../../components/Tables/Team';
 
 const ECommerce: React.FC = () => {
 
@@ -25,9 +25,9 @@ const ECommerce: React.FC = () => {
   }, [dispatch]);
 
   const { products } = useSelector((state: RootState) => state.product);
-  const { adminusers } = useSelector((state: RootState) => state.userState);  
+  const { adminusers } = useSelector((state: RootState) => state.userState);
   const { customers } = useSelector((state: RootState) => state.customer);
-  const orders = useSelector(selectOrders);  
+  const orders = useSelector(selectOrders);
 
   return (
     <>
@@ -124,7 +124,7 @@ const ECommerce: React.FC = () => {
         <ChartThree />
         <MapOne />
         <div className="col-span-12 xl:col-span-8">
-          <TableOne />
+          <Team />
         </div>
         <ChatCard />
       </div>
