@@ -164,12 +164,14 @@ const Color: React.FC = () => {
                                                     <Chip label={color.color_code} size="small" sx={{ mr: 1, mb: 1 }} className="text-black dark:text-white" />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <IconButton size="small" color="success" onClick={() => handleEdit(color._id)}>
-                                                        <EditColor id={color._id} />
-                                                    </IconButton>
-                                                    <IconButton size="small" color="error" onClick={() => handleDeleteClick(color._id)}>
-                                                        <Delete fontSize="small" />
-                                                    </IconButton>
+                                                    <div className="flex">
+                                                        <IconButton size="small" color="success" onClick={() => handleEdit(color._id)}>
+                                                            <EditColor id={color._id} />
+                                                        </IconButton>
+                                                        <IconButton size="small" color="error" onClick={() => handleDeleteClick(color._id)}>
+                                                            <Delete fontSize="small" />
+                                                        </IconButton>
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))
@@ -182,7 +184,27 @@ const Color: React.FC = () => {
                                     )}
                                 </TableBody>
                             </Table>
+                            {/* Pagination Controls */}
+                            <div className="flex justify-between items-center py-4 px-4">
+                                <button
+                                    disabled={currentPage === 1}
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                                >
+                                    Previous
+                                </button>
+                                <p>{`Page ${currentPage} of ${totalPages}`}</p>
+                                <button
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </TableContainer>
+
+
 
                         <Box
                             sx={{
@@ -233,24 +255,7 @@ const Color: React.FC = () => {
                     </Box>
                 </Box>
 
-                {/* Pagination Controls */}
-                <div className="flex justify-between items-center py-4 px-4">
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
-                    >
-                        Previous
-                    </button>
-                    <p>{`Page ${currentPage} of ${totalPages}`}</p>
-                    <button
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        className="bg-blue-500 text-white py-1 px-3 rounded-md disabled:opacity-50"
-                    >
-                        Next
-                    </button>
-                </div>
+
             </div>
             <ConfirmationModal
                 delOpen={delOpen}
