@@ -11,6 +11,7 @@ import customerReducer from '../slices/customerSlice'
 import orderReducer from '../slices/OrderSlice.ts';
 import dashboardReducer from '../slices/dashboardSlice.ts'
 import notificationReducer from '../slices/notificationSlice.ts'
+import couponReducer from '../slices/couponSlice.ts'
 
 
  const store = configureStore({
@@ -27,6 +28,7 @@ import notificationReducer from '../slices/notificationSlice.ts'
     orders:orderReducer,
     dashboard: dashboardReducer,
     notify: notificationReducer,
+    coupon:couponReducer,
   },
 });
 

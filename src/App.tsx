@@ -31,6 +31,7 @@ import Editstaff from './pages/Editstaff';
 import Orderpage from './pages/Orderpage';
 import OrdersTable from './pages/Order';
 import Orderedit from './pages/Orderedit';
+import Coupon from './pages/Product/Coupon';
 
 
 function App() {
@@ -308,6 +309,16 @@ function App() {
                     <>
                       <PageTitle title="Orderedit | Games Corner" />
                       <Orderedit />
+                    </>
+                  }
+                />
+
+                <Route
+                  path="/Coupon"
+                  element={
+                    <>
+                      <PageTitle title="Coupon | Games Corner" />
+                      <Coupon />
                     </>
                   }
                 />

@@ -5,6 +5,7 @@ import Logo from '../../images/logo/games.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { fetchAllUsers, fetchProfile } from '../../slices/userSlice';
+import Coupon from './../../pages/Product/Coupon';
 
 
 interface SidebarProps {
@@ -494,6 +495,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
                 </NavLink>
 
+
+
+                <li>
+                  <NavLink
+                    to="/dashboard/Coupon"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('Customers') && 'bg-graydark dark:bg-meta-4'}`}
+                  >
+                    <svg
+                      className="fill-current"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M21 4H3C2.45 4 2 4.45 2 5V9C3.11 9 4 9.89 4 11C4 12.11 3.11 13 2 13V17C2 17.55 2.45 18 3 18H21C21.55 18 22 17.55 22 17V13C20.89 13 20 12.11 20 11C20 9.89 20.89 9 22 9V5C22 4.45 21.55 4 21 4ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+
+                    Coupon
+                  </NavLink>
+                </li>
+
                 <NavLink
                   to="/dashboard/Customers"
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('Customers') && 'bg-graydark dark:bg-meta-4'}`}
@@ -564,25 +589,39 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   <NavLink
                     to="/dashboard/all_staff"
                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('Customers') && 'bg-graydark dark:bg-meta-4'}`}
-                  >
-                    <svg
-                      className="fill-current"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M16 11C17.6569 11 19 9.65685 19 8C19 6.34315 17.6569 5 16 5C14.3431 5 13 6.34315 13 8C13 9.65685 14.3431 11 16 11ZM8 11C9.65685 11 11 9.65685 11 8C11 6.34315 9.65685 5 8 5C6.34315 5 5 6.34315 5 8C5 9.65685 6.34315 11 8 11ZM8 13C5.33 13 2 14.34 2 16V18C2 18.55 2.45 19 3 19H13C13.55 19 14 18.55 14 18V16C14 14.34 10.67 13 8 13ZM16 13C15.67 13 15.31 13.02 14.94 13.05C15.59 13.72 16 14.54 16 15.5V18H21C21.55 18 22 17.55 22 17V15.5C22 14.34 18.67 13 16 13Z"
-                        fill="currentColor"
-                      />
-                    </svg>
+                  ><svg 
+                  className="fill-current"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path 
+                    d="M12 4a4 4 0 100 8 4 4 0 000-8zm-6 9c-1.66 0-3 1.34-3 3v2c0 0.55 0.45 1 1 1h16c0.55 0 1-0.45 1-1v-2c0-1.66-1.34-3-3-3h-1.23c-0.45 0.63-1.03 1.14-1.77 1.5-1.13 0.57-2.39 0.5-3.5 0-0.74-0.36-1.32-0.87-1.77-1.5H6z" 
+                    fill="currentColor"
+                  />
+                  <circle 
+                    cx="18" 
+                    cy="16" 
+                    r="2" 
+                    fill="currentColor"
+                  />
+                  <circle 
+                    cx="6" 
+                    cy="16" 
+                    r="2" 
+                    fill="currentColor"
+                  />
+                </svg>
                     All Staff
                   </NavLink>
                 )}
 
               </li>
+
+
+
 
 
 
