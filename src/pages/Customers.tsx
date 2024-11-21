@@ -94,11 +94,11 @@ const Customers: React.FC = () => {
                       {customer.name}
                     </td>
                     <td className="px-4 py-4 flex justify-center text-left text-[16px] font-medium gap-12">
-                      <button
+                      {/* <button
                         className="text-red-600 hover:text-red-700 dark:hover:text-white transition duration-150"
                       >
                         Logout
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleDelete(customer._id)}
                         className="text-red-600 hover:text-red-700 dark:hover:text-white transition duration-150"
