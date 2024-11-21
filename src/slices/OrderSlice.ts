@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import type { AppDispatch, RootState } from '../redux/store';
 
-
 // Types
 export interface OrderItem {
   currency_code: string;
@@ -14,7 +13,6 @@ export interface OrderItem {
   };
   quantity: number;
   price: number;
-
 }
 
 export interface shippingAddress {
@@ -25,7 +23,7 @@ export interface shippingAddress {
   phoneNo: number;
   pinCode: number;
   state: string;
-  shipping_price:number;
+  shipping_price: number;
 }
 
 export interface Order {
@@ -38,11 +36,11 @@ export interface Order {
     customerId: string;
   };
   orderItems: OrderItem[];
-  discount: number; 
-  tax: number; 
+  discount: number;
+  tax: number;
   totalPrice: number;
   orderStatus: string;
-  payment_status: string; 
+  payment_status: string;
   createdAt: string;
   orderID: string;
   paymentInfo: {
@@ -50,10 +48,9 @@ export interface Order {
     status?: string;
   };
   taxPrice: string;
-  shippingPrice:string
+  shippingPrice: string;
   totalDiscount: string;
-  shippingAddress : shippingAddress;
-  
+  shippingAddress: shippingAddress;
 }
 
 interface OrderResponse {
@@ -90,7 +87,7 @@ export interface UpdateOrderStatusPayload {
   paymentStatus: string;
   paymentInfoStatus: string;
   orderStatus: string;
-  shippingPrice:string;
+  shippingPrice: string;
 }
 
 // API configuration with error handling
@@ -112,17 +109,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       localStorage.removeItem('token');
-//       window.location.href = '/login';
-//     }
-//     return Promise.reject(error);
-//   },
-// );
-
 // Initial state
 const initialState: OrderState = {
   list: [],
@@ -136,10 +122,11 @@ const initialState: OrderState = {
   lastUpdated: null,
 };
 
+
 // Async thunks
 export const fetchOrders = createAsyncThunk<
   OrderResponse,
-  { orderStatus?: string; payment_status?: string } | undefined,
+  { orderStatus?: string; payment_status?: string; orderID?: string } | undefined,
   { dispatch: AppDispatch; state: RootState; rejectValue: string }
 >('orders/fetchOrders', async (params, { rejectWithValue }) => {
   try {
@@ -152,12 +139,13 @@ export const fetchOrders = createAsyncThunk<
     if (!response.data.success) throw new Error('Failed to fetch orders');
     return response.data;
   } catch (error) {
-    const errorMessage = axios.isAxiosError(error)
-      ? error.response?.data?.message || 'Failed to fetch orders'
-      : 'An unexpected error occurred';
-    return rejectWithValue(errorMessage);
+const errorMessage = axios.isAxiosError(error)
+  ? error.response?.data?.message || 'Failed to fetch orders'
+  : 'An unexpected error occurred';
+return rejectWithValue(errorMessage);
   }
 });
+
 
 export const deleteOrder = createAsyncThunk<
   string,
@@ -231,7 +219,6 @@ const orderSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    
     clearOrderErrors: (state) => {
       state.error = null;
       state.orderDetailsError = null;
@@ -239,8 +226,6 @@ const orderSlice = createSlice({
     resetOrders: () => initialState,
   },
 
-
-  
   extraReducers: (builder) => {
     builder
       // Fetch Orders
