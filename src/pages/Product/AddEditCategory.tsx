@@ -210,16 +210,9 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
               onChange={(e) => onFieldChange('parent_category', e.target.value)}
               error={!!error.parent_category}
               helperText={error.parent_category}
-              sx={{
-                '& .MuiInputBase-root': {
-                  backgroundColor: 'white',
-                },
-
-                '& .MuiInputLabel-root': {
-                  color: 'rgba(0, 0, 0, 0.6)',
-                },
-                '& .MuiInputBase-input': {
-                  color: 'black',
+              slotProps={{
+                input: {
+                  className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input",
                 },
               }}
             />
@@ -258,11 +251,19 @@ const AddEditCategory: React.FC<AddEditCategoryProps> = ({ mode, id }) => {
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', py: 2 }} className='bg-white dark:bg-black text-black dark:text-white'>
           <Button
-            onClick={handleFormSubmit}
             variant="contained"
-            sx={{ backgroundColor: '#fa6800', '&:hover': { backgroundColor: '#fa6800' }, borderRadius: '10px' }}
+            color="primary"
+            onClick={handleFormSubmit}
+            className='px-4'
           >
             Save
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleClose}
+          >
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>

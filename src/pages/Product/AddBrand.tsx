@@ -132,16 +132,9 @@ const AddBrands: React.FC<AddBrandsProps> = ({ open, handleClose, initialData })
                         onChange={(e) => setData({ ...data, name: e.target.value })}
                         error={!!error.name}
                         helperText={error.name}
-                        sx={{
-                            '& .MuiInputBase-root': {
-                                backgroundColor: 'white',
-                            },
-                            
-                            '& .MuiInputLabel-root': {
-                                color: 'rgba(0, 0, 0, 0.6)',
-                            },
-                            '& .MuiInputBase-input': {
-                                color: 'black',
+                        slotProps={{
+                            input: {
+                                className: "text-black dark:text-white border border-stroke dark:border-strokedark bg-white dark:bg-form-input",
                             },
                         }}
                     />
@@ -157,19 +150,22 @@ const AddBrands: React.FC<AddBrandsProps> = ({ open, handleClose, initialData })
                 </Box>
             </DialogContent>
             <DialogActions sx={{ display: 'flex', justifyContent: 'center', paddingTop: "10px", paddingBottom: "20px" }} className='bg-white dark:bg-black text-black dark:text-white'>
-                <Button
-                    sx={{ backgroundColor: '#fa6800', '&:hover': { backgroundColor: '#fa6800' }, borderRadius: '10px' }}
-                    variant="contained"
-                    onClick={handleSubmit}
-                >
-                    Save
-                </Button>
-                <Button
-                    sx={{ color: '#fa6800', borderColor: '#fa6800', borderRadius: '10px', '&:hover': { borderColor: '#fa6800' } }}
-                    variant="outlined" onClick={closeDialog}
-                >
-                    Cancel
-                </Button>
+                
+                 <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                        className='px-4'
+                    >
+                        Save
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={closeDialog}
+                    >
+                        Cancel
+                    </Button>
             </DialogActions>
         </Dialog>
     );

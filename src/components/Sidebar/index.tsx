@@ -5,7 +5,6 @@ import Logo from '../../images/logo/games.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import { fetchAllUsers, fetchProfile } from '../../slices/userSlice';
-import Coupon from './../../pages/Product/Coupon';
 
 
 interface SidebarProps {
@@ -496,7 +495,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 </NavLink>
 
 
-
+                {currentUser && currentUser.role === 'admin' && (
                 <li>
                   <NavLink
                     to="/dashboard/Coupon"
@@ -518,6 +517,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     Coupon
                   </NavLink>
                 </li>
+                )}
 
                 <NavLink
                   to="/dashboard/Customers"

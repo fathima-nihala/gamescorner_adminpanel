@@ -115,18 +115,21 @@ const EditColor: React.FC<EditColorProps> = ({ id }) => {
                     className="bg-white dark:bg-black text-black dark:text-white"
                 >
                     <Button
-                        sx={{ backgroundColor: '#fa6800', '&:hover': { backgroundColor: '#fa6800' }, borderRadius: '10px' }}
                         variant="contained"
+                        color="primary"
                         onClick={handleSubmit}
+                        className='px-4'
                     >
                         Save
                     </Button>
                     <Button
-                        sx={{ color: '#fa6800', borderColor: '#fa6800', borderRadius: '10px', '&:hover': { borderColor: '#fa6800' } }}
-                        variant="outlined" onClick={handleClose}
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleClose}
                     >
                         Cancel
                     </Button>
+
                 </DialogActions>
             </Dialog>
         </div>

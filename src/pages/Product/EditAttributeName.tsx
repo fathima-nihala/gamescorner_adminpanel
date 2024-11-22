@@ -113,24 +113,16 @@ const EditAttributeName: React.FC<EditAttributeNameProps> = ({ id }) => {
                     className="bg-white dark:bg-black text-black dark:text-white"
                 >
                     <Button
-                        sx={{
-                            backgroundColor: '#fa6800',
-                            '&:hover': { backgroundColor: '#fa6800' },
-                            borderRadius: '10px'
-                        }}
                         variant="contained"
+                        color="primary"
                         onClick={handleSubmit}
+                        className='px-4'
                     >
                         Save
                     </Button>
                     <Button
-                        sx={{
-                            color: "#fa6800",
-                            borderColor: "#fa6800",
-                            borderRadius: "10px",
-                            "&:hover": { borderColor: "#fa6800" }
-                        }}
-                        variant="outlined"
+                        variant="contained"
+                        color="secondary"
                         onClick={handleClose}
                     >
                         Cancel
