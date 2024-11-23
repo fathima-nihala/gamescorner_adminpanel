@@ -13,6 +13,7 @@ import MultiSelect from '../../components/Forms/MultiSelect';
 import QuillEditor from '../QuillEditor';
 import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 import DropzoneGallery from '../../shared/DropzoneGallary';
+import { editProduct } from '../../slices/productSlice';
 
 interface CountryPricing {
     country_id: string;
@@ -65,7 +66,7 @@ interface Country {
 const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { products } = useSelector((state: RootState) => state.product);
-    const { attributes } = useSelector((state: RootState) => state.attribute) ;
+    const { attributes } = useSelector((state: RootState) => state.attribute);
     const brands = useSelector((state: RootState) => state.brands.brands);
     const categoryNames = useSelector(selectCategoryNames);
     const { categories } = useSelector((state: RootState) => state.category);
@@ -103,6 +104,8 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
         if (products && id) {
             const proToEdit = products.find((prod) => prod?._id === id);
             if (proToEdit) {
+                console.log(proToEdit.color, 'huyuuu');
+                const attributeIds = proToEdit.attribute.map((attr: any) => attr._id);
 
                 setProductData({
                     ...proToEdit,
@@ -117,9 +120,9 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     gallery3: proToEdit.gallery3 || '',
                     gallery4: proToEdit.gallery4 || '',
                     gallery5: proToEdit.gallery5 || '',
-                    color: proToEdit.color.map((c:any)=>c._id) || [],
-                    attribute:proToEdit.attribute.map((c:any)=>c._id) || [],
-                    attribute_value:proToEdit.attribute_value.map((c:any)=>c._id) || []
+                    color: proToEdit.color.map((c: any) => c._id) || [],
+                    attribute: proToEdit.attribute.map((c: any) => c._id) || [],
+                    attribute_value: proToEdit.attribute_value.map((c: any) => c._id) || []
                 });
                 setPreviewImage(proToEdit.image as string);
                 setPreviewGallery([
@@ -135,7 +138,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                         proToEdit.country_pricing.map((c: CountryPricing) => ({
                             _id: c.country_id,
                             country: c.country,
-              
+
                             currency: c.currency,
                             currency_code: c.currency_code
                         }))
@@ -156,13 +159,13 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
                     setPriceDiscounts(initialPriceDiscounts);
                 }
-                if (proToEdit.attribute) {
-                    dispatch(fetchAttributeValues(proToEdit.attribute));
+                if (proToEdit?.attribute) {
+                    dispatch(fetchAttributeValues(attributeIds));
                 }
             }
         }
-            
-        
+
+
     }, [products, id]);
 
     useEffect(() => {
@@ -242,11 +245,96 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     };
 
     const handleColorChange = (selectedColors: string[]) => {
-        
         setProductData(prev => ({
             ...prev,
             color: selectedColors
         }));
+    };
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+            const formData = new FormData();
+
+            // Add basic fields
+            formData.append('name', productData.name);
+            formData.append('description', productData.description);
+            formData.append('parent_category', productData.parent_category);
+            formData.append('brand', productData.brand);
+            formData.append('sub_category', productData.sub_category);
+
+            // Add optional fields if they exist
+            if (productData.unit) formData.append('unit', productData.unit);
+            if (productData.weight) formData.append('weight', productData.weight);
+            if (productData.tags) formData.append('tags', productData.tags);
+            if (productData.shipping_time) formData.append('shipping_time', productData.shipping_time);
+            if (productData.tax) formData.append('tax', productData.tax);
+            if (productData.quantity) formData.append('quantity', productData.quantity);
+
+            productData.color.forEach((color) => {
+                formData.append('color', color);
+            });
+
+            formData.append('attribute', productData.attribute);
+           
+            if (Array.isArray(productData.attribute_value)) {
+                productData.attribute_value.forEach(attrVal => {
+                    formData.append('attribute_value[]', attrVal);
+                });
+            }
+
+            // Handle country pricing
+            // const countryPricingData = selectedCountries.map(country => ({
+            //     country_id: country._id,
+            //     country: country.country,
+            //     currency: country.currency,
+            //     currency_code: country.currency_code,
+            //     unit_price: parseFloat(priceDiscounts[country._id]?.price || '0'),
+            //     discount: parseFloat(priceDiscounts[country._id]?.discount || '0'),
+            //     quantity: priceDiscounts[country._id]?.quantity || '0'
+            // }));
+
+            const countryPricingData = selectedCountries.map(country => ({
+                country_id: country._id,
+                country: country.country,
+                currency: country.currency,
+                currency_code: country.currency_code,
+                unit_price: Number(priceDiscounts[country._id]?.price || '0'),
+                discount: Number(priceDiscounts[country._id]?.discount || '0')
+            }));
+
+            formData.append('country_pricing', JSON.stringify(countryPricingData));
+
+            // Handle image files
+            if (productData.image instanceof File) {
+                formData.append('image', productData.image);
+            }
+
+            // Handle gallery images
+            ['gallery1', 'gallery2', 'gallery3', 'gallery4', 'gallery5'].forEach((gallery) => {
+                const galleryFile = productData[gallery as keyof ProductData];
+                if (galleryFile instanceof File) {
+                    formData.append(gallery, galleryFile);
+                }
+            });
+            const result = await dispatch(editProduct({ id, formData })).unwrap();
+
+            if (result.success) {
+                handleClose();
+            } else {
+                setError(result.message || 'Failed to update product');
+            }
+        } catch (err: any) {
+            setError(err.message || 'An error occurred while updating the product');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
 
@@ -452,7 +540,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
 
 
-                    
+
 
 
                     <div className="bg-white shadow-lg rounded-md dark:bg-black mt-5 w-full">
@@ -601,11 +689,22 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     </div>
 
                     <div className="flex space-x-4">
-                        <button className="bg-red-500 text-white p-2 rounded">
+                        <form onSubmit={handleSubmit}>
+                            {error && (
+                                <div className="error-message mb-4 text-red-500">
+                                    {error}
+                                </div>
+                            )}
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-400"
+                            >
+                                {isSubmitting ? 'Updating...' : 'Update Product'}
+                            </button>
+                        </form>
+                        <button className="bg-red-500 text-white p-2 rounded" onClick={handleClose}>
                             Cancel
-                        </button>
-                        <button className="bg-blue-500 text-white p-2 rounded">
-                            Save
                         </button>
                     </div>
 
