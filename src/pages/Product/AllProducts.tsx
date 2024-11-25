@@ -319,11 +319,20 @@ const AllProducts: React.FC = () => {
                                                 <td className="py-4  text-start">{product.product_type}</td>
                                                 <td className="py-4  text-start">{product.brand.name}</td>
                                                 <td className="py-4  text-start">
-                                                    {product.parent_category.map((category) => (
+                                                    {/* {product.parent_category.map((category) => (
                                                         <div key={category._id}>
                                                             <p>{category.parent_category}</p>
                                                         </div>
-                                                    ))}
+                                                    ))} */}
+                                                    {Array.isArray(product.parent_category) ? (
+                                                        product.parent_category.map((category) => (
+                                                            <div key={category._id}>
+                                                                <p>{category.parent_category}</p>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p>{product.parent_category}</p>
+                                                    )}
                                                 </td>
 
                                                 <td className="py-4  text-start">

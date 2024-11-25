@@ -36,7 +36,15 @@ interface ProductData {
     attribute: string;
     sub_category: string;
     attribute_value: string[];
-    country_pricing: CountryPricing[];
+    // country_pricing: CountryPricing[];
+    country_pricing: Array<{
+        country_id: string;
+        country: string;
+        currency: string;
+        currency_code: string;
+        unit_price: number;
+        discount: number;
+    }>;
     quantity?: string;
     shipping_time: string;
     tax: string;
@@ -63,6 +71,11 @@ interface Country {
     currency: string;
 }
 
+interface PriceDiscount {
+    price: string;
+    discount: string;
+}
+
 const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { products } = useSelector((state: RootState) => state.product);
@@ -70,7 +83,6 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const brands = useSelector((state: RootState) => state.brands.brands);
     const categoryNames = useSelector(selectCategoryNames);
     const { categories } = useSelector((state: RootState) => state.category);
-
     const [productData, setProductData] = useState<ProductData>({
         name: '',
         parent_category: '',
@@ -98,7 +110,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [previewGallery, setPreviewGallery] = useState<(string | null)[]>(Array(5).fill(null));
     const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
-    const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string; quantity: string }>>({});
+    const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string; }>>({});
 
     useEffect(() => {
         if (products && id) {
@@ -144,17 +156,15 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                         }))
                     );
 
-
                     const initialPriceDiscounts = proToEdit.country_pricing.reduce(
-                        (acc: Record<string, { price: string; discount: string; quantity: string }>, curr: CountryPricing) => {
+                        (acc: Record<string, { price: string; discount: string; }>, curr: CountryPricing) => {
                             acc[curr.country_id] = {
                                 price: String(curr.unit_price),
                                 discount: String(curr.discount || ''),
-                                quantity: String(curr.quantity || ''),
                             };
                             return acc;
                         },
-                        {} as Record<string, { price: string; discount: string; quantity: string }>
+                        {} as Record<string, { price: string; discount: string; }>
                     );
 
                     setPriceDiscounts(initialPriceDiscounts);
@@ -224,24 +234,46 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
         reader.readAsDataURL(file);
     };
 
+    useEffect(() => {
+        if (productData?.country_pricing?.length) {
+            const existingCountries = productData.country_pricing.map(pricing => ({
+                _id: pricing.country_id,
+                country: pricing.country,
+                currency: pricing.currency,
+                currency_code: pricing.currency_code
+            }));
+            setSelectedCountries(existingCountries);
+
+            const existingPriceDiscounts = productData.country_pricing.reduce((acc, pricing) => {
+                acc[pricing.country_id] = {
+                    price: pricing.unit_price.toString(),
+                    discount: pricing.discount.toString()
+                };
+                return acc;
+            }, {} as Record<string, PriceDiscount>);
+            setPriceDiscounts(existingPriceDiscounts);
+        }
+    }, [productData]);
+
     const handleCountrySelectionChange = (countries: Country[]) => {
         setSelectedCountries(countries);
         const updatedPriceDiscounts = countries.reduce((acc, country) => {
-            acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '', quantity: '' };
+            acc[country._id] = priceDiscounts[country._id] || { price: '', discount: '' };
             return acc;
-        }, {} as Record<string, { price: string; discount: string; quantity: string }>);
+        }, {} as Record<string, PriceDiscount>);
         setPriceDiscounts(updatedPriceDiscounts);
     };
 
-    const handleCountryChange = (countryId: string, field: 'price' | 'discount' | 'quantity', value: string) => {
-        setPriceDiscounts((prev) => {
-            const updatedCountry = prev[countryId] || { price: '', discount: '', quantity: '' };
-            updatedCountry[field] = value;
-            return {
-                ...prev,
-                [countryId]: updatedCountry
-            };
-        });
+    const handleCountryChange = (countryId: string, field: 'price' | 'discount', value: string) => {
+        if (value && !/^\d*\.?\d*$/.test(value)) return;
+        
+        setPriceDiscounts(prev => ({
+            ...prev,
+            [countryId]: {
+                ...prev[countryId],
+                [field]: value
+            }
+        }));
     };
 
     const handleColorChange = (selectedColors: string[]) => {
@@ -282,32 +314,29 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             });
 
             formData.append('attribute', productData.attribute);
-           
+
             if (Array.isArray(productData.attribute_value)) {
                 productData.attribute_value.forEach(attrVal => {
                     formData.append('attribute_value[]', attrVal);
                 });
             }
 
-            // Handle country pricing
-            // const countryPricingData = selectedCountries.map(country => ({
-            //     country_id: country._id,
-            //     country: country.country,
-            //     currency: country.currency,
-            //     currency_code: country.currency_code,
-            //     unit_price: parseFloat(priceDiscounts[country._id]?.price || '0'),
-            //     discount: parseFloat(priceDiscounts[country._id]?.discount || '0'),
-            //     quantity: priceDiscounts[country._id]?.quantity || '0'
-            // }));
 
-            const countryPricingData = selectedCountries.map(country => ({
-                country_id: country._id,
-                country: country.country,
-                currency: country.currency,
-                currency_code: country.currency_code,
-                unit_price: Number(priceDiscounts[country._id]?.price || '0'),
-                discount: Number(priceDiscounts[country._id]?.discount || '0')
-            }));
+            const countryPricingData = selectedCountries.map(country => {
+                const priceData = priceDiscounts[country._id];
+                if (!priceData?.price) {
+                    throw new Error(`Please enter price for ${country.country}`);
+                }
+                
+                return {
+                    country_id: country._id,
+                    country: country.country,
+                    currency: country.currency,
+                    currency_code: country.currency_code,
+                    unit_price: parseFloat(priceData.price),
+                    discount: priceData.discount ? parseFloat(priceData.discount) : 0
+                };
+            });
 
             formData.append('country_pricing', JSON.stringify(countryPricingData));
 
@@ -539,17 +568,12 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     </div>
 
 
-
-
-
-
                     <div className="bg-white shadow-lg rounded-md dark:bg-black mt-5 w-full">
                         <div className="p-3">
                             <div className="p-6 bg-white dark:bg-black">
                                 <div className="flex justify-between items-center mb-4">
                                     <h5 className="text-xl font-semibold">Price and Stock Information</h5>
                                 </div>
-
 
                                 <div>
                                     <SelectGroupTwo
@@ -594,34 +618,28 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                                                 />
                                             </div>
                                         </div>
-
-
-
-                                        {/* Quantity */}
-
-                                        <div className="mt-2">
-                                            <div className="grid grid-cols-12 gap-4 mb-4">
-                                                <label className="col-span-3 text-gray-700 text-sm font-medium">
-                                                    Quantity <span className="text-red-500">*</span>
-                                                </label>
-                                                <div className="col-span-9">
-                                                    <input
-                                                        name="quantity"
-                                                        type="number"
-                                                        className="dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
-                                                        placeholder="Quantity"
-                                                        min="0"
-                                                        step="1"
-                                                        value={productData.quantity}
-                                                        onChange={handleInputChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-
                                     </div>
                                 ))}
+                                {/* Quantity */}
+                                <div className="mt-2">
+                                    <div className="grid grid-cols-12 gap-4 mb-4">
+                                        <label className="col-span-3 text-gray-700 text-sm font-medium">
+                                            Quantity <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="col-span-9">
+                                            <input
+                                                name="quantity"
+                                                type="number"
+                                                className="dark:bg-form-input bg-white form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-md focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                                placeholder="Quantity"
+                                                min="0"
+                                                step="1"
+                                                value={productData.quantity}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
