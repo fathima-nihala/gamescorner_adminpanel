@@ -13,7 +13,8 @@ import MultiSelect from '../../components/Forms/MultiSelect';
 import QuillEditor from '../QuillEditor';
 import MultipleColorSelect from '../../components/Forms/MultipleColorSelect';
 import DropzoneGallery from '../../shared/DropzoneGallary';
-import { editProduct } from '../../slices/productSlice';
+import { editProduct, fetchProducts } from '../../slices/productSlice';
+import { useSnackbar } from 'notistack';
 
 interface CountryPricing {
     country_id: string;
@@ -22,7 +23,6 @@ interface CountryPricing {
     currency_code: string;
     unit_price: number;
     discount?: number;
-    // quantity?: string;
 }
 
 interface ProductData {
@@ -112,12 +112,16 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
     const [priceDiscounts, setPriceDiscounts] = useState<Record<string, { price: string; discount: string; }>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (products && id) {
             const proToEdit = products.find((prod) => prod?._id === id);
             if (proToEdit) {
-                const attributeIds = proToEdit.attribute.map((attr: any) => attr._id);
+                const attributeIds = Array.isArray(proToEdit.attribute)
+                    ? proToEdit.attribute.map((attr: any) => attr._id)
+                    : proToEdit.attribute
+
                 setProductData({
                     ...proToEdit,
                     parent_category: Array.isArray(proToEdit.parent_category) && proToEdit.parent_category.length > 0
@@ -132,7 +136,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                     gallery4: proToEdit.gallery4 || '',
                     gallery5: proToEdit.gallery5 || '',
                     color: proToEdit.color.map((c: any) => c._id) || [],
-                    attribute: proToEdit.attribute.map((c: any) => c._id) || [],
+                    attribute: Array.isArray(proToEdit.attribute) ? proToEdit.attribute.map((c: any) => c._id) : [proToEdit.attribute],
                     attribute_value: proToEdit.attribute_value.map((c: any) => c._id) || [],
                     quantity: proToEdit.quantity || ''
                 });
@@ -261,7 +265,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
     const handleCountryChange = (countryId: string, field: 'price' | 'discount', value: string) => {
         if (value && !/^\d*\.?\d*$/.test(value)) return;
-    
+
         setPriceDiscounts((prev) => ({
             ...prev,
             [countryId]: {
@@ -269,7 +273,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
                 [field]: value,
             },
         }));
-    
+
         setProductData((prevData) => ({
             ...prevData,
             country_pricing: prevData.country_pricing.map((pricing) =>
@@ -279,8 +283,6 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             ),
         }));
     };
-    
-
 
     const handleColorChange = (selectedColors: string[]) => {
         setProductData(prev => ({
@@ -288,8 +290,6 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             color: selectedColors
         }));
     };
-
-
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -311,7 +311,7 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
             if (productData.tags) formData.append('tags', productData.tags);
             if (productData.shipping_time) formData.append('shipping_time', productData.shipping_time);
             if (productData.tax) formData.append('tax', productData.tax);
-            if (productData.quantity) {formData.append('quantity', productData.quantity);}
+            if (productData.quantity) { formData.append('quantity', productData.quantity); }
             productData.color.forEach((color) => {
                 formData.append('color', color);
             });
@@ -356,11 +356,26 @@ const EditProduct: React.FC<EditProductProps> = ({ id, open, handleClose }) => {
 
             if (result.success) {
                 handleClose();
+                dispatch(fetchProducts({ name: '' }));
+                enqueueSnackbar('Product updated successfully!', {
+                    variant: 'success',
+                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                });
             } else {
-                setError(result.message || 'Failed to update product');
+                const errorMessage = result.message || 'Failed to update product';
+                setError(errorMessage);
+                enqueueSnackbar(errorMessage, {
+                    variant: 'error',
+                    anchorOrigin: { vertical: 'top', horizontal: 'right' },
+                });
             }
         } catch (err: any) {
-            setError(err.message || 'An error occurred while updating the product');
+            const errorMessage = err.message || 'An error occurred while updating the product';
+            setError(errorMessage); 
+            enqueueSnackbar(errorMessage, { 
+                variant: 'error',
+                anchorOrigin: { vertical: 'top', horizontal: 'right' },
+            });
         } finally {
             setIsSubmitting(false);
         }
