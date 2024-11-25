@@ -43,10 +43,15 @@ interface Product {
     }>;
     description: string;
     tags: string;
-    brand: {
+    // brand: {
+    //     _id: string;
+    //     name: string;
+    // };
+    brand: Array<{
         _id: string;
         name: string;
-    };
+    }>;
+
     parent_category: Category[];
 }
 
@@ -248,7 +253,6 @@ const AllProducts: React.FC = () => {
         setEditProductId(null);
     };
 
-
     return (
         <>
             <Breadcrumb pageName="All Products" />
@@ -317,7 +321,8 @@ const AllProducts: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="py-4  text-start">{product.product_type}</td>
-                                                <td className="py-4  text-start">{product.brand.name}</td>
+                                                <td className="py-4  text-start">{product.brand[0].name}</td>
+                                                
                                                 <td className="py-4  text-start">
                                                     {/* {product.parent_category.map((category) => (
                                                         <div key={category._id}>
@@ -343,7 +348,7 @@ const AllProducts: React.FC = () => {
                                                         <SwitcherOne id={product._id} />
                                                     </div>
                                                 </td>
-                                                
+
                                                 <td className="py-4 text-center">
                                                     <div className="flex justify-center items-center">
                                                         <SwitcherTwo id={product._id} />

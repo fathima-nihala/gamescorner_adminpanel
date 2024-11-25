@@ -19,6 +19,15 @@ export interface AttributeValue {
   value: string;
 }
 
+interface AttributeResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+  count: number;
+  attribute: Attribute[];
+}
+
+
 interface AttributeValuesResponse {
   value: AttributeValue[];
 }
@@ -28,7 +37,6 @@ interface AttributeState {
   attributes: Attribute[];
   attribute: Attribute | null;
   attributeValues: AttributeValuesResponse; 
-
   loading: boolean;
   error: string | null;
 }
@@ -45,18 +53,32 @@ const initialState: AttributeState = {
 };
 
 // Fetch all attributes
+// export const fetchAttributes = createAsyncThunk(
+//   'attributes/fetchAll',
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const response = await api.get<{ attribute: Attribute[] }>('/attributes');
+//       return response.data.attribute;
+//     } catch (error: any) {
+//       return rejectWithValue(
+//         error.response?.data?.message || 'Failed to fetch attributes',
+//       );
+//     }
+//   },
+// );
+
 export const fetchAttributes = createAsyncThunk(
   'attributes/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get<{ attribute: Attribute[] }>('/attributes');
-      return response.data.attribute;
+      const response = await api.get<AttributeResponse>('/attributes');
+      return response.data.attribute; // Now correctly accessing the attribute array
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || 'Failed to fetch attributes',
+        error.response?.data?.message || 'Failed to fetch attributes'
       );
     }
-  },
+  }
 );
 
 // Add a new attribute
@@ -188,20 +210,6 @@ export const deleteAttributeValue = createAsyncThunk(
   },
 );
 
-//fetch attribute value
-// export const fetchAttributeValues = createAsyncThunk(
-//   'attributes/attributeValue',
-//   async (id: string, { rejectWithValue }) => {
-//     try {
-//       const response = await api.get(`/attributes/${id}/value`);
-//       return response.data.AttributeValues;
-//     } catch (error: any) {
-//       return rejectWithValue(
-//         error.response?.data?.message || 'Failed to fetch attribute values',
-//       );
-//     }
-//   },
-// );
 
 // Fetch attribute values
 export const fetchAttributeValues = createAsyncThunk(
@@ -234,12 +242,20 @@ const attributeSlice = createSlice({
       .addCase(fetchAttributes.pending, (state) => {
         state.loading = true;
       })
+      // .addCase(
+      //   fetchAttributes.fulfilled,
+      //   (state, action: PayloadAction<Attribute[]>) => {
+      //     state.loading = false;
+      //     state.attributes = action.payload;
+      //   },
+      // )
       .addCase(
         fetchAttributes.fulfilled,
         (state, action: PayloadAction<Attribute[]>) => {
           state.loading = false;
           state.attributes = action.payload;
-        },
+          state.error = null;
+        }
       )
       .addCase(fetchAttributes.rejected, (state, action) => {
         state.loading = false;
