@@ -321,7 +321,7 @@ const AllProducts: React.FC = () => {
                                                     </div>
                                                 </td>
                                                 <td className="py-4  text-start">{product.product_type}</td>
-                                                <td className="py-4  text-start">{product.brand[0].name}</td>
+                                                <td className="py-4  text-start">{product.brand[0]?.name}</td>
                                                 
                                                 <td className="py-4  text-start">
                                                     {/* {product.parent_category.map((category) => (
