@@ -315,14 +315,15 @@ const AllProducts: React.FC = () => {
                                                             alt={product.name}
                                                             className="w-12 h-12 object-cover rounded"
                                                         />
-                                                        <span className=" font-medium">
-                                                            {product.name}
+                                                        <span className="font-medium truncate" title={product.name}>
+                                                            {product.name.split(' ').slice(0, 4).join(' ')}...
                                                         </span>
+
                                                     </div>
                                                 </td>
                                                 <td className="py-4  text-start">{product.product_type}</td>
                                                 <td className="py-4  text-start">{product.brand[0]?.name}</td>
-                                                
+
                                                 <td className="py-4  text-start">
                                                     {/* {product.parent_category.map((category) => (
                                                         <div key={category._id}>
@@ -363,7 +364,7 @@ const AllProducts: React.FC = () => {
 
                                                 <td className="py-4 text-center flex justify-center items-center">
                                                     <button
-                                                        className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100"
+                                                        className="p-2 rounded-full bg-white dark:bg-boxdark border border-gray-300 shadow hover:bg-gray-100 "
                                                         onClick={() => handleOpen(product._id)}
                                                     >
                                                         <Edit className="w-4 h-4 text-blue-500" />
